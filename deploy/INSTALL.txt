@@ -1,0 +1,30 @@
+Installation Instruction
+
+1. Reset Wordpress Database (leaves sample page and hello world post
+	(they mustnt be in the loaded XML)
+2. activate if not yet
+	GiGpress
+	osCommerce
+	wordpress database reset
+	wordpress importer
+	wp ui
+3. import as admin
+				shitkatapult.initial.wordpress.content.xml
+	via tools -> import -> wordpress -> XML
+TODO check the linked image situation
+
+4. import options from updateWpOptionsGeneric.sql
+
+5. override site names and labels with site specific SQL e.g. updateWpOptionsOnDev1.sql
+
+Maybe oscommerce & gigpress plugin needs to be toggled to create the table
+
+NOW MENUS SHOULD BE WORKING
+
+6. import gigpress data
+transferArtists.sql
+transferVenues.sql
+transferShows.sql
+
+7. import Newsm into posts
+transferNews.sql

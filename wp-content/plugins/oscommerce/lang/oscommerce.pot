@@ -1,0 +1,95 @@
+# SOME DESCRIPTIVE TITLE.
+# This file is put in the public domain.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/oscommerce\n"
+"POT-Creation-Date: 2008-11-14 14:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: classes/osc_db.class.php:229
+msgid "A shop by that name already exixsts. Please choose another."
+msgstr ""
+
+#: classes/osc_db.class.php:234 classes/osc_db.class.php:270
+msgid "Shop information was commited successfully."
+msgstr ""
+
+#: classes/osc_db.class.php:265
+msgid "A shop with that url already exixsts. Please enter another."
+msgstr ""
+
+#: classes/osc_management.class.php:173
+#, php-format
+msgid "Edit \"%s\""
+msgstr ""
+
+#: classes/osc_management.class.php:185
+msgid "Delete"
+msgstr ""
+
+#: classes/osc_management.class.php:199
+msgid "No shops found."
+msgstr ""
+
+#: classes/osc_management.class.php:215 classes/osc_management.class.php:243
+#: osCommerce.php:99
+msgid "Add Shop"
+msgstr ""
+
+#: classes/osc_management.class.php:219 classes/osc_management.class.php:268
+msgid "Shop Name"
+msgstr ""
+
+#: classes/osc_management.class.php:223 classes/osc_management.class.php:272
+msgid "Url"
+msgstr ""
+
+#: classes/osc_management.class.php:227 classes/osc_management.class.php:276
+msgid "Username"
+msgstr ""
+
+#: classes/osc_management.class.php:231 classes/osc_management.class.php:280
+msgid "Password"
+msgstr ""
+
+#: classes/osc_management.class.php:235 classes/osc_management.class.php:284
+msgid "DB Name"
+msgstr ""
+
+#: classes/osc_management.class.php:239 classes/osc_management.class.php:288
+msgid "Host"
+msgstr ""
+
+#: classes/osc_management.class.php:264 osCommerce.php:102
+msgid "Edit Shop"
+msgstr ""
+
+#: classes/osc_management.class.php:292
+msgid "Update Shop"
+msgstr ""
+
+#: classes/osc_management.class.php:307 osCommerce.php:81 osCommerce.php:82
+#: osCommerce.php:92 osCommerce.php:98 osCommerce.php:99 osCommerce.php:102
+msgid "osCommerce"
+msgstr ""
+
+#: classes/osc_management.class.php:324
+msgid "Title"
+msgstr ""
+
+#: classes/osc_widget.class.php:77
+msgid "There are currently no shops."
+msgstr ""
+
+#: osCommerce.php:98
+msgid "Listing"
+msgstr ""

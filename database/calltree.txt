@@ -1,0 +1,34 @@
+onLoad
+if (prodPage)
+	->renderProductsInTab
+		->loadProductsForTab
+		if (!hasProds)
+			ajax->		renderPagination(result, format, paged);
+						addToProdCache(result[3]); // this is the product list
+						renderProductsInTab(result[3], format);
+						selectTab(format,'#product-format-tabs',loadProductsForTab,productClickHandler);
+		else
+			if not rendered ->renderProductsInTab
+			selectTab
+	->selectTab
+	if (prodId) 
+		->toggleProduct
+
+if (artPage)
+	->renderArtistsInTab
+		->loadArtistsForTab
+		if (!hasProds)
+			ajax->		renderPagination(result, artist_set, paged);
+						addToManuNprodCache(result[3]); // this is the product list
+						renderArtistsInTab(result[3], artist_set);
+						selectTab(artist_set,'#artist-set-tabs',loadArtistsForTab,artistClickHandler);
+		else
+			if not rendered ->renderArtistsInTab
+			selectTab
+	->selectTab
+	if (artId) 
+		->toggleArtist
+	
+	
+	
+	

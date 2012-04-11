@@ -1,0 +1,77 @@
+@charset "utf-8";
+/* CSS Document */
+.alertmsg {
+  border: 1px solid #CCCCCC;
+  position: absolute;
+  width: 153px;
+  border: 1px solid #C93;
+  background: #FAEBD7;
+  padding: 5px;
+  /*
+	left       : 0px;
+	top        : -170px;
+	*/
+}
+
+/* FORM LAYOUT START ------------------------------------------------------------------------------------ */
+#form { /* set width in form, not fieldset (still takes up more room w/ fieldset width */
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#form fieldset { /* note that this clear causes inputs to break to left in ie5.x mac, commented out */
+  clear: both;
+  font-size: 100%;
+  border: 1px solid #CCCCCC;
+  padding: 10px; /* padding in fieldset support spotty in IE */
+  margin: 0;
+}
+
+#form fieldset legend {
+  font-size: 16px;
+  color: #555555;
+  font-weight: bold;
+  margin: 0;
+  padding: 0 5px;
+}
+
+#form .row {
+  clear: both;
+  display: block;
+  height: expression('1%');
+  margin: 10px 0 0 0;
+}
+
+#form label {
+  font-size: 100%;
+  color: #666666;
+  font-weight: bold;
+  float: left;
+  text-align: right;
+  width: 100px;
+  padding-top: 6px;
+}
+
+#form input.text,#form textarea,#form .select,#form input.file {
+  float: left;
+  /*display          : inline; inline display must not be set or will hide submit buttons in IE 5x mac */
+  width: 375px;
+  margin-top: 5px;
+  margin-left: 12px;
+  /* set margin on left of form elements rather than right of label aligns textarea better in IE */
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+#form .submit {
+  border-top: none;
+}
+
+/* admin interface */
+.osc-table-header {
+  color: #404040;
+  font-weight: bold;
+}
+
+/* FORM LAYOUT END -------------------------------------------------------------------------------------- */
