@@ -245,6 +245,16 @@ function filterosCommerceShoppingCart($content)
     return $content;
 }
 
+// this simply appends the guid as a div to the post
+function filterAddGuidToPost($content)
+{
+	global $wp_query;
+	$post = $wp_query->post;
+	$link = '<DIV class="guid">'.$post->guid.'</DIV>';
+    return $content.$link;
+}
+
+
 register_activation_hook(__FILE__, 'osc_activate');
 // TODO osc_activate in register_deactivation_hook  ????
 //register_deactivation_hook(__FILE__, 'osc_activate');
@@ -255,4 +265,5 @@ add_action('admin_head', 'osCommerceAdminHeaderScript');
 add_filter('the_content', 'filterOscReleaseListing');
 add_filter('the_content', 'filterosCommerceArtistListing');
 add_filter('the_content', 'filterosCommerceShoppingCart');
+add_filter('the_content', 'filterAddGuidToPost');
 ?>
