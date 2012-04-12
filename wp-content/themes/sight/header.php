@@ -38,7 +38,7 @@ wp_enqueue_script('script', get_template_directory_uri() . '/js/script.js', 'jqu
             (function(jQuery) {
             	jQuery(function() {
 // only disable slideshow with ss_disable
-<?php if ( is_home() && !get_option('ss_disable') ) : ?>
+<?php if ( (is_home() || strstr($Path,'/category/news') >= 0) && !get_option('ss_disable') ) : ?>
             		jQuery('#slideshow').cycle({
                         fx:     'scrollHorz',
                         timeout: <?php echo (get_option('ss_timeout')) ? get_option('ss_timeout') : '7000' ?>,
@@ -71,8 +71,8 @@ wp_enqueue_script('script', get_template_directory_uri() . '/js/script.js', 'jqu
     </div>
 
     <?php wp_nav_menu(array('menu' => 'Navigation', 'theme_location' => 'Navigation', 'depth' => 2, 'container' => 'div', 'container_class' => 'nav', 'menu_class' => 'dd', 'menu_id' => 'dd', 'walker' => new extended_walker())); ?>
-
-    <?php if ( is_home() && !get_option('ss_disable') ) get_template_part('slideshow'); ?>
+	<?php $Path=$_SERVER['REQUEST_URI']; fb('requestURI : '.$Path. 'strstr:'.strstr($Path,'/category/news')); ?>
+    <?php if ( (is_home() || strstr($Path,'/category/news') >= 0) && !get_option('ss_disable') ) get_template_part('slideshow'); ?>
 
     <!-- Container -->
     <div id="container" class="clear">
