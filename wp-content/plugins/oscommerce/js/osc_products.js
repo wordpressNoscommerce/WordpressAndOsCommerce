@@ -1,30 +1,9 @@
-// javascript for product code late loaded
-
-// implement method to return computed css
-// jQuery.fn.getcss = function() {
-// // if (arguments.length) return jQuery.fn.css.apply(this, arguments);
-// var attr = ['font-family','font-size','font-weight','font-style','color',
-// 'text-transform','text-decoration','letter-spacing','word-spacing',
-// 'line-height','text-align','vertical-align','direction','background-color',
-// 'background-image','background-repeat','background-position',
-// 'background-attachment','opacity','width','height','top','right','bottom',
-// 'left','margin-top','margin-right','margin-bottom','margin-left',
-// 'padding-top','padding-right','padding-bottom','padding-left',
-// 'border-top-width','border-right-width','border-bottom-width',
-// 'border-left-width','border-top-color','border-right-color',
-// 'border-bottom-color','border-left-color','border-top-style',
-// 'border-right-style','border-bottom-style','border-left-style','position',
-// 'display','visibility','z-index','overflow-x','overflow-y','white-space',
-// 'clip','float','clear','cursor','list-style-image','list-style-position',
-// 'list-style-type','marker-offset'];
-// var len = attr.length, obj = {};
-// for (var i = 0; i < len; i++)
-// obj[attr[i]] = jQuery.fn.css.call(this, attr[i]);
-// return obj;
-// }
-// VideoJS.setupAllWhenReady();
-
-// try this as a global variable TODO consider placing it in the DOM
+/** javascript for oscommerce tabbed UI
+ * JSON injection is used for initial data to be shown on the first tab
+ * additonal pages are loaded using AJAX requests to PHP server pages
+ * get_product_data.php, get_product_page.php, get_manufacturer_page.php
+ * state is kept in location.hash to make local state bookmarkable (REST)
+ * **/
 
 jQuery.noConflict();
 (function($) { //this defines a scope so we cannot simply split this up into multiple files
@@ -54,19 +33,19 @@ jQuery.noConflict();
 		var lastProductId = 0; // keep state
 		var lastArtistId = 0;
 
-		// URL Parms
-//		var page_id = getParameterFromUrl('page_id');
-		var products_id = getParameterFromUrl('products_id');
-		var artists_id = getParameterFromUrl('artistId');
-		var paged = getParameterFromUrl('paged', 1);
-		var rpage = getParameterFromUrl('rpage', 1);	// different pageno for releases
-		var artist_set = getParameterFromUrl('artistSet', 'main');
-		var format = getParameterFromUrl('format','vinyl');
+		// URL Parms == application state
+//		var page_id = getParameterFromUrl('page_id');		// obsolete due to permalinks
+		var products_id;
+		var artists_id;
+		var paged;
+		var rpage;// different pageno for releases
+		var artist_set;
+		var format;
+		getStateFromUrl(location.href);	// set URL parms
 		// keep new and changed parameters in location.hash to avoid page reload
 		// TODO fix wp-ui problems with such a hash
 
 		$('.wpui-light').removeClass('wpui-light').addClass('shit-theme');	// change theme for us
-		getStateFromUrl(location.href);	// get parms
 		attachNavClickHandler();
 
 		var curTabCtx = getCurTabCtx();
@@ -251,8 +230,8 @@ jQuery.noConflict();
 			return function(curTabCtx, tabName, rpage) {
 				if (relemap[artistId] == undefined)
 					relemap[artistId] = {}; // init empty object before loading
-				// load new data if empty or next page
-				if (relemap[artistId].length == 0 || rpage > 1) {
+				// load new data if empty or next page (as this is an object now count the props instead of length)
+				if (countProperties(relemap[artistId])|| rpage > 1) {
 					var fetchurl = oscPrefix + "/get_product_page.php?json=1&artistId=" + artistId;
 					fetchurl += "&format=All"; // TODO read all formats for now
 					fetchurl += "&pagesize=3"; // only 3 at a time
@@ -1089,11 +1068,12 @@ jQuery.noConflict();
 				if (artistName != undefined)
 					$(this).append('<span class="artist-name">'+artistName+'</span>'+'<span class="track-name">'+trackTitle+'</span>');
 			});
-			$(loopSel+' .post').mouseenter(function() {
-				$(this).css('background-color', '#FFEA97').find('.thumb').hide().css('z-index', '-1');
-			}).mouseleave(function() {
-				$(this).css('background-color', '#F5F5F5').find('.thumb').show().css('z-index', '1');
-			});
+//			// remove old handlers also
+//			$(loopSel+' .post').unbind('mouseenter').mouseenter(function() {
+//				$(this).css('background-color', '#EAEAEA').find('.thumb').hide().css('z-index', '-1');
+//			}).unbind('mouseleave').mouseleave(function() {
+//				$(this).css('background-color', '#FFFFFF').find('.thumb').show().css('z-index', '1');
+//			});
 			$(loopSel+' .post').unbind('click'); // remove any leftovers ONLY in current LOOP
 			$(loopSel+' .post').click(clickHandler); // set new one
 			$.cookie('mode', 'grid'); // store the mode in a cookie

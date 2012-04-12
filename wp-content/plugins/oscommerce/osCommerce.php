@@ -71,7 +71,7 @@ if(isset($_GET['osc_action']) && $_GET['osc_action'] == 'osc_delete')
 
 function osc_activate()
 {
-    fbDebugBacktrace(); // debug only when doing something
+    // fbDebugBacktrace();
     $db = new osc_db();
     $db->create_tbl();
     unset($db);
@@ -225,6 +225,7 @@ function filterosCommerceArtistListing($content)
     return $content;
 }
 
+/** inject shopping cart for tag **/
 function filterosCommerceShoppingCart($content)
 {
     if(preg_match(OSC_SHOPPINGCART_TAG, $content))
@@ -245,7 +246,7 @@ function filterosCommerceShoppingCart($content)
     return $content;
 }
 
-// this simply appends the guid as a div to the post
+// this filter simply appends the guid as a div to the post
 function filterAddGuidToPost($content)
 {
 	global $wp_query;

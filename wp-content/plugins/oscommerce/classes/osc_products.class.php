@@ -2,10 +2,10 @@
 if(!class_exists('osc_products')) :
 require_once(OSCOMMERCECLASSPATH .'/osc_product_templates.class.php');
 require_once(OSCOMMERCECLASSPATH .'/osc_currencies.class.php');
-//require_once ( ABSPATH . WPINC . '/cache.php' );
-//	require_once(OSCOMMERCEPATH .'/osc_product_template.php');
 
+/** ========================================================================== **/
 /** osCommerce product handling using the DB connection stored in the database **/
+/** ========================================================================== **/
 class osc_products extends osc_product_templates
 {
   var $records_per_page;
@@ -26,6 +26,7 @@ class osc_products extends osc_product_templates
   var $max_page;
   var $release_formats;
 
+  /** constructor reads all parms from the Request URL and sets defaults **/
   function osc_products()
   {
     $this->osc_db = new osc_db();
@@ -47,8 +48,7 @@ class osc_products extends osc_product_templates
     $this->osc_db = new osc_db();
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // count total available products in shop
+  /** count total available products in shop **/
   function osc_count_products($db)
   {
     // p.products_quantity is 0 for master products without parent
@@ -61,8 +61,7 @@ class osc_products extends osc_product_templates
     fb("prodCountCatId($cat_id):$sql:".$this->product_count);
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // limit counting to same conditions as display but without paging
+  /** limit counting to same conditions as display but without paging **/
   function osc_count_products_from($from)
   {
     //			fbDebugBacktrace();
@@ -77,8 +76,7 @@ class osc_products extends osc_product_templates
     fb("prodCountFrom($sql):".$this->product_count);
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // list products according to parms set in oscProducts object
+  /** list products according to parms set in oscProducts object **/
   function osc_show_tabbed_products_page() {
     $this->result = $this->osc_query_products();        // result as a member var?
     if (empty($this->result)) {
@@ -93,7 +91,6 @@ class osc_products extends osc_product_templates
     }
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
   /** answer AJAX request for tab content and show either the grid with products as HTML
    *  or return the data as json (get_product_page.php) **/
   function osc_get_products_page() {
@@ -118,8 +115,7 @@ class osc_products extends osc_product_templates
     }
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // insert the product data as jquery array using JSON in the header
+  /** insert the product data as jquery array using JSON in the header **/
   // var $product[format] = [{"products_id":"3493","products_image":"vhr-45-009_kl.jpg","products_name":"Long Distance Calling \/ Satellite Bay","products_model":"vhr-45-009","products_weight":"0.00","products_quantity":"0","products_price":"0.0000","manufacturers_id":"302","manufacturers_name":"Long Distance Calling","manufacturers_image":null,"products_tax_class_id":"0","specials_new_products_price":null,"final_price":"0.0000","products_description":"info coming soon<br \/>"},{"products_id":"3489","products_image":"vhr-45-001_kl.jpg","products_name":"Troum \/ Nargis","products_model":"vhr-45-002","products_weight":"0.00","products_quantity":"0","products_price":"0.0000","manufacturers_id":"301","manufacturers_name":"Troum","manufacturers_image":null,"products_tax_class_id":"0","specials_new_products_price":null,"final_price":"0.0000","products_description":"This is part one of the &quot;Landscapes Single Series&quot;<br \/>"}];
   function osc_inject_product_list_json() {
     $this->osc_fix_product_list_json();
@@ -135,15 +131,13 @@ class osc_products extends osc_product_templates
   products['<?php echo strtolower($this->format); ?>'] = <?php echo json_encode($this->result); ?>;
 </script>
     <?php
-    /*        $ids = array();
+    /*  $ids = array();
      foreach ($this->result as $product) $ids->push($product->products_id);
-
      fb('injected '.count($this->result).' products for '.$this->format.' using JSON: '. implode("-",$ids));
      */
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // add missing fields to product list
+  /** add missing fields to product list **/
   function osc_fix_product_list_json() {
     $i=0; // add missing fields to products array before jsoning it
     foreach ($this->result as $product) {
@@ -160,11 +154,11 @@ class osc_products extends osc_product_templates
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////
-  // cat_id == labelID .... man_id == artistID... format == productFormat .... paged pageNumber
+  /** main query uses class parms for query conditions and leaves count and result in class vars **/
+  /** cat_id == labelID .... man_id == artistID... format == productFormat .... paged pageNumber **/
   function osc_query_products()
   {
-    //		    fbDebugBacktrace();
+    // fbDebugBacktrace();
     $this->osc_get_shop_db ();    // get handle for shop database
     if (empty($this->shop_db)) {
       fb('could not get handle for SHOP DB');
@@ -198,12 +192,11 @@ class osc_products extends osc_product_templates
 			LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
 			LEFT JOIN specials s ON p.products_id = s.products_id
 			LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
-    // condition
+    // general conditions
     $where = "WHERE p.products_status = '1' and p.products_parent = '' ";
-    // show the products of a specified manufacturer
     if ($this->artist_id) {
-      // We show the ones for the given manufacturer
-      $where .= "AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
+	    // show the products of a specified manufacturer
+    	$where .= "AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
     }
     if ($this->label_id) {
       // show the products in a given categorie
@@ -215,7 +208,7 @@ class osc_products extends osc_product_templates
     }
     $sql = $select . $from . $where . $order;
 
-    /* CALCULATE PAGING */
+    /** CALCULATE PAGING **/
     // GET TOTAL AMOUNT OF PRODUCTS TODO try to story this value somehow
     $this->osc_count_products_from($from.$where);
     fb('counted '.$this->product_count.' products');
@@ -240,7 +233,7 @@ class osc_products extends osc_product_templates
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  // make HTML from the query OBSOLETE
+  /** render HTML from the query OBSOLETE IN AJAX version **/
   function osc_show_products_in_grid() {
     if(count($this->result) > 0)
     {
@@ -269,14 +262,10 @@ class osc_products extends osc_product_templates
 
       unset($currencies);
     }
-
-    //			unset($shop_db);    // TODO check the database connections
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // get handle to shop db using data from wp db
-  // db is member and injected to avoid dependency
-  // returns shop_db
+  /** get handle to shop DB using data from wordpress DB,
+   * $osc_db is member and has been injected from caller to avoid dependency **/
   function osc_get_shop_db () {
     $db = $this->osc_db;
     // TODO try to fix shop_id to save queries
@@ -311,14 +300,11 @@ class osc_products extends osc_product_templates
     //  		    }
     $this->shop_db  = new wpdb($res_arr[0]->vchUsername, $res_arr[0]->vchPassword, $res_arr[0]->vchDbName, $res_arr[0]->vchHost);
     if (empty($this->shop_db))
-    fb('SHOPDB_Object is EMPTY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    //		    else     // fails with json warning
-    //  				fb('SHOPDB_Object:'.json_encode($this->shop_db));
+    	fb('SHOPDB_Object is EMPTY !');
     return $this->shop_db;
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // show product box content as HTML
+  /** show product box content as HTML **/
   function show_product_box ($j, $product, $shop_url) { ?>
 <div class="product-box post hentry type-post status-publish format-standard">
   <div class="product-thumb">
@@ -335,8 +321,7 @@ class osc_products extends osc_product_templates
   <?php
   } // EOF show_product_box
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // write the tabs for the formats
+  /** write the tabs for the given formats **/
   function osc_show_format_tabs() {
     if (empty($this->format)) $this->format = "Vinyl"; // debugging
     ?>
@@ -365,17 +350,18 @@ class osc_products extends osc_product_templates
   <?php
   } // EOF osc_show_format_tabs
 
-  /////////////////////////////////////////////////////////////////////////////////////
-  // write the tabs for the formats with UL list which is tabbed by .wptabs() and then filled with content
-  // by own jquery code in @link products.js
+  /** write the tabs for the formats as an UL list which is input for jquery.wptabs()
+   *  and then filled with content by jquery code in @link osc_products.js **/
   function osc_show_format_tabs_ajax() {
-    if (empty($this->format)) $this->format = "Vinyl"; // debugging
-    //    the product details DIV are right below the format tab header
-    ?>
+    if (empty($this->format)) $this->format = "Vinyl";
+    //    the DIV#product-detail is right below the format tab header
+?>
 <div id="product-format-tabs"
 	class="wp-tabs wpui-light wpui-styles widget">
 	<div id="product-detail" class="product-detail"></div>
-	<?php 	    foreach ($this->release_formats as $format) { 
+<?php
+	foreach ($this->release_formats as $format) {	// loop over configured formats
+	// use echo here so the eclipse formatter doesnt introduce whitespace in the wrong places
 	echo '
 	<div id="'.$format.'" class="ui-tabs-panel ui-widget-content">
 		<h3 class="wp-tab-title" style="display: none;">'.$format.'</h3>
@@ -387,13 +373,14 @@ class osc_products extends osc_product_templates
 			</span> out of <span class="maxpage"><?php echo $this->max_page;?> </span>
 				pages (<span class="loaded"><?php echo ($this->records_per_page*$this->paged);
 				?> </span>/<span class="reccount"><?php echo $this->product_count;
-				?> </span>&nbsp;items) </span> <a class="nextpostslink" href="#">LOAD
-				MORE</a>
+				?> </span>&nbsp;items) </span> <a class="nextpostslink" href="#">LOAD MORE</a>
 		</div>
-		<?php           }; ?>
-	</div>
+		<?php           };
+		echo '
+	</div>';
+		?>
 	<?php         }; // foreach ?>
-</div>
+	</div>
 <!-- product-format-tabs -->
   <?php 	} // EOF osc_show_format_tabs_ajax
 

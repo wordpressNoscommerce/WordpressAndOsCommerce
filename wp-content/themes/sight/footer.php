@@ -19,7 +19,7 @@
       src="/wp-content/themes/sight/images/moebius.png"
     /> </a>
   </p>
-</div>
+</div><!-- footer -->
 </div>
 <div id="debugDiv" class="ui-draggable resizable">
   <span id="closeButton" onClick="toggleDebugDiv();">X</span>

@@ -6,7 +6,7 @@ Any style changes make there will override styles in this document.
 */
 
 /* By default this is an h3 that appears above each artist's list of shows */
-h3.gigpress-artist-heading  {	
+h3.gigpress-artist-heading  {
 }
 
 /* This span contains the RSS and iCal links for the artist */
@@ -28,6 +28,7 @@ span.gigpress-artist-subscriptions {
 	border-collapse: collapse;
 	border-top: 1px solid #CCC;
 	margin: 0.5em 0 1em 0;
+	font-family: Verdana, sans-serif;
 }
 
 /* This is for the main header cells containing the column labels */
@@ -229,11 +230,11 @@ p.gigpress-subscribe a {
 }
 
 a.gigpress-rss, a.gigpress-rss:hover {
-	background: transparent url(../images/feed-icon-12x12.png) no-repeat left center;	
+	background: transparent url(../images/feed-icon-12x12.png) no-repeat left center;
 }
 
 a.gigpress-ical, a.gigpress-ical:hover {
-	background: transparent url(../images/icalendar-icon.gif) no-repeat left center;	
+	background: transparent url(../images/icalendar-icon.gif) no-repeat left center;
 }
 
 
@@ -244,7 +245,7 @@ ul.gigpress-listing {
 }
 
 /* Generic styles for the list items within */
-.gigpress-listing li {	
+.gigpress-listing li {
 }
 
 /* For artist headings in the sidebar */
@@ -252,7 +253,7 @@ h3.gigpress-list-artist-heading {
 }
 
 /* For tour headings in the sidebar */
-span.gigpress-list-tour-heading {	
+span.gigpress-list-tour-heading {
 	font-weight: bold;
 	font-size: 110%;
 }
