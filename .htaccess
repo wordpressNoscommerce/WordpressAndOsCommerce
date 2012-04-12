@@ -24,10 +24,12 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 
-# images
+# some images
 RewriteCond %{REQUEST_URI} !/images/.*
 RewriteRule loading.gif images/loading.gif
 
+# news images
+Redirect /wp-content/uploads/images/ http://www.shopkatapult.com/images/
 </IfModule>
 
 # END WordPress
