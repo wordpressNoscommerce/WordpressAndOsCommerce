@@ -28,11 +28,8 @@ function is_news() {
 	return strpos($_SERVER['REQUEST_URI'],'/category/news') !== false;
 }
 ?>
-<?php wp_head(); ?>
-<script type="text/javascript">
-        // $ is not defined here
-//        	alert("jquery:" + jQuery+"\n$:"+$);
-        	jQuery.noConflict();
+<?php wp_head();
+/* was in javascript block below
 			// debugDiv is in footer.php
 	        function toggleDebugDiv() {
 	          var visibility = jQuery('#debugDiv').css('visibility');
@@ -40,6 +37,12 @@ function is_news() {
 	            jQuery('#debugDiv').css('height', (visibility == 'hidden')?'auto':'0px');
 	            jQuery('#debugDiv').css('visibility', (visibility == 'hidden')?'visible':'hidden');
 	        }
+*/
+?>
+<script type="text/javascript">
+        // $ is not defined here
+//        	alert("jquery:" + jQuery+"\n$:"+$);
+        	jQuery.noConflict();
             (function(jQuery) {
             	jQuery(function() {
 // only disable slideshow with ss_disable
