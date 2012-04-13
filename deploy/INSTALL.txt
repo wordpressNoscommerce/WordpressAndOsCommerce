@@ -26,5 +26,9 @@ transferArtists.sql
 transferVenues.sql
 transferShows.sql
 
-7. import Newsm into posts
+7. import News into posts
 transferNews.sql
+
+8. check home and siteurl
+
+9. check oscommerce DB access

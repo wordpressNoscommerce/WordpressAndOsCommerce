@@ -95,7 +95,7 @@ color: white;
 #content .post h2 a {
 	font-size: 20px;
 }
-.post .post-content {
+.gigpress-listing, .post .post-content {
 	font-family: Verdana, sans-serif;
 	line-height: 18px;
 	font-size: 11px;

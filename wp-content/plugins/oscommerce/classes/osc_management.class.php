@@ -303,32 +303,32 @@ class osc_management extends osc_db // DASHBOARD MANAGEMENT AND WIDGET CONTROL
     <form name="frm_edit" method="post" action="?page=osCommerce" onSubmit="javascript: return frm_validate();">
       <div class="row">
         <label for="vchShopName"><font color="red">*</font> <?php _e('Shop Name','osCommerce'); ?> </label> <input type="text"
-          name="vchShopName" id="vchShopName" value="<?php echostripslashes($shop->vchShopName);?>" class="text"
+          name="vchShopName" id="vchShopName" value="<?php echo stripslashes($shop->vchShopName);?>" class="text"
         >
       </div>
       <div class="row">
         <label for="vchUrl"><font color="red">*</font> <?php _e('Url','osCommerce'); ?> </label> <input type="text" name="vchUrl"
-          id="vchUrl" value="<?php echostripslashes($shop->vchUrl);?>" class="text"
+          id="vchUrl" value="<?php echo stripslashes($shop->vchUrl);?>" class="text"
         >
       </div>
       <div class="row">
         <label for="vchUsername"><font color="red">*</font> <?php _e('Username','osCommerce'); ?> </label> <input type="text"
-          name="vchUsername" id="vchUsername" value="<?php echostripslashes($shop->vchUsername);?>" class="text"
+          name="vchUsername" id="vchUsername" value="<?php echo stripslashes($shop->vchUsername);?>" class="text"
         >
       </div>
       <div class="row">
         <label for="vchPassword"><font color="red">*</font> <?php _e('Password','osCommerce'); ?> </label> <input type="text"
-          name="vchPassword" id="vchPassword" value="<?php echostripslashes($shop->vchPassword);?>" class="text"
+          name="vchPassword" id="vchPassword" value="<?php echo stripslashes($shop->vchPassword);?>" class="text"
         >
       </div>
       <div class="row">
         <label for="vchDbName"><font color="red">*</font> <?php _e('DB Name','osCommerce'); ?> </label> <input type="text" name="vchDbName"
-          id="vchDbName" value="<?php echostripslashes($shop->vchDbName);?>" class="text"
+          id="vchDbName" value="<?php echo stripslashes($shop->vchDbName);?>" class="text"
         >
       </div>
       <div class="row">
         <label for="vchHost"><font color="red">*</font> <?php _e('Host','osCommerce'); ?> </label> <input type="text" name="vchHost"
-          id="vchHost" value="<?php echostripslashes($shop->vchHost);?>" class="text"
+          id="vchHost" value="<?php echo stripslashes($shop->vchHost);?>" class="text"
         >
       </div>
       <p class="submit">

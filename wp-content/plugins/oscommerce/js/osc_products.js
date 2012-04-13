@@ -70,7 +70,6 @@ jQuery.noConflict();
 					|| products == undefined
 					|| countProperties(products) == 0) { // empty test
 					var msg = 'no products received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
-					alert(msg);
 					console.error(msg);
 					return true;
 				}
@@ -84,7 +83,6 @@ jQuery.noConflict();
 					|| manufacturers == undefined
 					|| countProperties(manufacturers) == 0) { // empty test
 					var msg = 'no manufacturers received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
-					alert(msg);
 					console.error(msg);
 					return true;
 				}
@@ -1072,7 +1070,7 @@ jQuery.noConflict();
 //			$(loopSel+' .post').unbind('mouseenter').mouseenter(function() {
 //				$(this).css('background-color', '#EAEAEA').find('.thumb').hide().css('z-index', '-1');
 //			}).unbind('mouseleave').mouseleave(function() {
-//				$(this).css('background-color', '#FFFFFF').find('.thumb').show().css('z-index', '1');
+//				$(this).css('background-color', '#EAEAEA').find('.thumb').show().css('z-index', '1');
 //			});
 			$(loopSel+' .post').unbind('click'); // remove any leftovers ONLY in current LOOP
 			$(loopSel+' .post').click(clickHandler); // set new one

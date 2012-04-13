@@ -278,7 +278,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     else
     $this->shop_url = 'http://'.$res_arr[0]->vchUrl;
 
-    $this->img_url = rtrim($this->shop_url, '/') ."/images/";
+    $this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
 
     $this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
 

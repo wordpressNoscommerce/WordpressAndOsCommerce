@@ -45,7 +45,6 @@ class osc_products extends osc_product_templates
     if (empty($this->format)) $this->format = 'vinyl'; // fix default format
     if (empty($this->paged)) $this->paged = 1;	// default is first page
     $this->release_formats = array('Vinyl','CD','MP3','LP','EP','DVD');
-    $this->osc_db = new osc_db();
   }
 
   /** count total available products in shop **/
@@ -79,10 +78,16 @@ class osc_products extends osc_product_templates
   /** list products according to parms set in oscProducts object **/
   function osc_show_tabbed_products_page() {
     $this->result = $this->osc_query_products();        // result as a member var?
-    if (empty($this->result)) {
-      $msg ='No Releases found!';
+    if (empty($this->shop_db)) {
+      $now = date(DATE_RFC822);
+      $msg ="No Connection To Shop Database!! ($now)";
       fb($msg);
-      echo "<h1>$msg</h1>";
+      echo "<h3>$msg</h3>";
+    } else if (empty($this->result)) {
+      $now = date(DATE_RFC822);
+      $msg ="No Releases found !! ($now)";
+      fb($msg + $this->sql);
+      echo '<h3 style="color: red;">'.$msg."</h3><pre>" . $this->sql . $this->shop_db. "</pre>";
     } else {
       $this->osc_inject_product_list_json();    // first page of data
       $this->osc_inject_all_product_templates();
@@ -160,10 +165,6 @@ class osc_products extends osc_product_templates
   {
     // fbDebugBacktrace();
     $this->osc_get_shop_db ();    // get handle for shop database
-    if (empty($this->shop_db)) {
-      fb('could not get handle for SHOP DB');
-      throw new Exception('empty SHOP DB');
-    }
     $select = 'SELECT	p.products_id,
 						p.products_image,
 						p.products_image_lrg,
@@ -273,20 +274,7 @@ class osc_products extends osc_product_templates
 						FROM wp_oscommerce WHERE intShopId = '. $this->shop_id;
     //  			$res_arr  = $this->osc_db->get_results($shopSql);
     $res_arr  = $db->get_results($shopSql);
-
-    $shop_url = $res_arr[0]->vchUrl;
-    if (preg_match('/http:/', $shop_url))
-    $this->shop_url = $res_arr[0]->vchUrl;
-    else
-    $this->shop_url = 'http://'.$res_arr[0]->vchUrl;
-
-    $this->img_url = rtrim($this->shop_url, '/') ."/images/";
-
-    $this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
-
-    $this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
-
-
+	/// check if database connection works and show it to frontend
     if (!is_array($res_arr)|| count($res_arr) == 0) {
       $now = time();
       $now = date('d.m. H:M',$now);
@@ -294,6 +282,19 @@ class osc_products extends osc_product_templates
       fb($msg);
       throw new Exception($msg);
     }
+
+    $shop_url = $res_arr[0]->vchUrl;
+    if (preg_match('/http:/', $shop_url))
+    $this->shop_url = $res_arr[0]->vchUrl;
+    else
+    $this->shop_url = 'http://'.$res_arr[0]->vchUrl;
+
+    $this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
+
+    $this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
+
+    $this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
+
     // show connection data
     //  		    if (sizeof($res_arr) > 0) {
     //  		        fb("ShopDb_data:".sizeof($res_arr).":$shop_id:{$res_arr[0]->vchUrl},{$res_arr[0]->vchUsername}, {$res_arr[0]->vchPassword}, {$res_arr[0]->vchDbName}, {$res_arr[0]->vchHost}");
@@ -405,7 +406,6 @@ class osc_products extends osc_product_templates
             ";
 
     $this->osc_get_shop_db ();    // get handle for shop database
-    if (empty($this->shop_db)) throw new Exception('empty SHOP DB');
 
     $prod_xsell_query_results = $this->shop_db->get_results($sql); // returns array of objects
     fb('SQL:'.$sql.' found XSell Records:'.count($prod_xsell_query_results));
@@ -436,7 +436,6 @@ class osc_products extends osc_product_templates
          ";
 
     $this->osc_get_shop_db ();    // get handle for shop database
-    if (empty($this->shop_db)) throw new Exception('empty SHOP DB');
 
     $prod_format_query_results = $this->shop_db->get_results($sql); // returns array of objects
     fb('SQL:'.$sql.' found Format Records:'. count($prod_format_query_results));
