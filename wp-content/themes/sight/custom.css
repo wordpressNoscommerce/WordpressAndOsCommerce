@@ -5,8 +5,11 @@
 	padding-bottom: 0px;
 }
 
-body {
-	font-family: 'Crimson Text', serif;
+/* set sans-serif font for smaller text */
+.gigpress-listing, .post .post-content {
+	font-family: Verdana, sans-serif;
+	line-height: 18px;
+	font-size: 11px;
 }
 
 /**************************************************************************************/
@@ -37,12 +40,15 @@ div.site-description {
 }
 /**************************************************************************************/
 /**navigation formatting**/
-.menu-item {
+.dd {
+	height: 40px;
+}
+ul.dd li.menu-item {
 	width: 110px;
 }
 
-.dd {
-	height: 40px;
+.nav ul.dd li ul li {
+	padding: 0;
 }
 
 .nav .dd li ul {
@@ -53,19 +59,36 @@ div.site-description {
 	background: none repeat scroll 0 0 #595959;
 }
 
-.nav .dd li.parent a.dd_hover {
-	border-bottom: 0px solid #595959;
-/* 	padding-bottom: 10px; */
-}
-
-.nav .dd li a {
-	font-size: 16px;
+.nav ul.dd > li > a {
+	font-size: 15px;
 	padding-bottom: 10px;
 	padding-top: 13px;
+	color: #595959;
+	font-weight: bold;
+/* 	font-stretch: condensed; */
+}
+
+/* active menu is black and underlined  */
+.nav .dd li.current-menu-item a {
+	text-decoration: underline;
+	color: black;
+}
+/* fix long label */
+li#menu-item-11 > a{
+	font-size: 10px;
+	font-stretch: ultra-condensed;
+}
+
+.nav .dd li.parent a.dd_hover {
+	border-bottom: 0px;
+/* 	padding-bottom: 10px; */
 }
 
 .nav .dd .sub-menu li a {
 	font-size: 12px;
+	font-stretch: wider;
+	color: white;
+	padding-left: 8px;
 }
 
 .nav .dd li ul {
@@ -76,6 +99,10 @@ div.site-description {
 li#menu-item-13 a {
 	margin-left: 12px;
 }
+
+
+/**************************************************************************************/
+/** slideshow formatting **/
 
 #slideshow .slide {
 	background: #685a68;
@@ -94,11 +121,6 @@ color: white;
 }
 #content .post h2 a {
 	font-size: 20px;
-}
-.gigpress-listing, .post .post-content {
-	font-family: Verdana, sans-serif;
-	line-height: 18px;
-	font-size: 11px;
 }
 /**************************************************************************************/
 /*  override some sight theme styles  */
