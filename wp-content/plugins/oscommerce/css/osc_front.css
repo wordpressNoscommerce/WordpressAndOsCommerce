@@ -15,10 +15,9 @@ body {
 /* } */
 
 /* limit depth to ui tabs only */
-div#product-format-tabs.wp-tabs .ui-tabs>ul {
-  padding-top: 7px;
-  border-bottom: 1px solid #D9D9D9;
-}
+/* div#product-format-tabs.wp-tabs .ui-tabs>ul { */
+/*   border-bottom: 1px solid #D9D9D9; */
+/* } */
 
 /* TODO dont override the jplayer lists */
 div#product-detail-tabs.wp-tabs ul.ui-tabs-nav li {
@@ -486,15 +485,20 @@ span.product-model {
   color: #FF0000;
 }
 
-#prod-details { /*   max-height: 200px; */
+#product-detail { /*   max-height: 200px; */
   color: #595959;
   /*   overflow: hidden; */
+  margin-left: 20px;
   margin-bottom: 20px;
   padding-bottom: 20px;
 }
 
 div#product-detail-tabs {
   font-size: small;
+}
+
+div#product-detail-tabs .ui-tabs {
+  padding: 0;
 }
 
 div.product-image-wide {
@@ -532,9 +536,13 @@ div#product-detail-tabs.wp-tabs div.ui-tabs  ul.ui-tabs-nav {
   /* 	vertical-align: top; */
 }
 
+/* set the background for the tabmenu under the product image */
 div#product-detail-tabs.wp-tabs>ul {
   background-color: #333333;
   vertical-align: top;
+}
+div.post-content #product-detail-tabs .ui-tabs-panel {
+	margin: 0;
 }
 
 div#product-detail-tabs.wp-tabs li.ui-state-active a {

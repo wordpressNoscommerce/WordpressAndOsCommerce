@@ -6,7 +6,7 @@
 }
 
 /* set sans-serif font for smaller text */
-.gigpress-listing, .post .post-content {
+.gigpress-listing, .post .post-content,.textwidget {
 	font-family: Verdana, sans-serif;
 	line-height: 18px;
 	font-size: 11px;
@@ -31,13 +31,13 @@
 }
 
 /* disable search box */
-div.search,div.menu { /* 	display: none; */
+/* div.search,div.menu {  */
+/* 	display: none; */
+/* } */
 
-}
-
-div.site-description {
-	padding-top: 20px;
-}
+/* div.site-description { */
+/* 	padding-top: 20px; */
+/* } */
 /**************************************************************************************/
 /**navigation formatting**/
 .dd {
@@ -180,23 +180,24 @@ div#container.clear { /* 	padding-top: 0px; */
 /* wptab formats */
 
 /* remove wp-tabs default borders */
-div.post-content div.wp-tabs div.ui-tabs {
-	background: none repeat scroll 0 0 white;
+div.wp-tabs div.ui-tabs {
+/* 	background: none repeat scroll 0 0 white; */
 	border-width: 0px;
+	padding-top: 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
 
 /* remove the grey bar and remove round corners */
 div.wp-tabs div.ui-tabs ul.ui-tabs-nav {
-	background: none repeat scroll 0 0 white;
+	background: none repeat scroll 0 0 transparent;
 	border-width: 0px 0px 1px 0px;
 	padding-top: 0px;
 	padding-left: 0px;
 	border-radius: 0px;
 }
 
-div.wp-tabs div.ui-tabs ul.ui-tabs-nav li.first-li {
+div.post-content > div.wp-tabs > div.ui-tabs > ul.ui-tabs-nav li.first-li {
 	padding-left: 30px;		/* same padding as content-header on standard pages */
 }
 
@@ -219,7 +220,7 @@ div.wp-tabs div.ui-tabs div.wp-tab-content {
 }
 
 .wp-tab-content {
-	background: none repeat scroll 0 0 white;
+	background: none repeat scroll 0 0 transparent;
 }
 
 div.post-content .ui-tabs-nav {
@@ -228,7 +229,7 @@ div.post-content .ui-tabs-nav {
 }
 
 div.post-content ul.ui-tabs-nav li {
-	background: none repeat scroll 0 0 white;
+/* 	background: none repeat scroll 0 0 white; */
 	border-style: none;
 	padding-top: 0px;
 	padding-left: 0px;
@@ -251,7 +252,7 @@ div.post-content ul.ui-tabs-nav li.ui-state-active {
 }
 
 /* most precise rule to override wpui-all.css */
-div.post-content ul.ui-tabs-nav li.ui-state-default a {
+div.post-content div.wp-tabs ul.ui-tabs-nav li.ui-state-default a {
 	color: #bbb;
 }
 
@@ -275,10 +276,6 @@ div.post-content .ui-tabs-panel {
 	border: 0px;
 	margin: 10px 0 0 0;
 	padding: 0px;
-}
-
-div.post-content #product-detail-tabs .ui-tabs-panel {
-	margin: 0;
 }
 
 /* override css from themes/sight/style.css */
@@ -357,13 +354,13 @@ div.post-content #product-detail-tabs .ui-tabs-panel {
 /* div.nav, div.nav * { z-index: 100; } */
 /* div.search, div.search * { z-index: 999; } */
 
-/* .header .search { */
-/*     position: relative; */
-/*     margin-top: 0; */
-/*     top: 70px; */
-/* 	left: 32px; */
-/*     width: 145px; */
-/* } */
+.header .search {
+    position: relative;
+    margin-top: 0;
+    top: 70px;
+	left: 32px;
+    width: 145px;
+}
 /******************************************************************/
 /* debug div */
 #debugDiv {
