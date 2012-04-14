@@ -45,6 +45,22 @@ jQuery.noConflict();
 		// keep new and changed parameters in location.hash to avoid page reload
 		// TODO fix wp-ui problems with such a hash
 
+		// the click Handler for products using closures created with selfexecuting functions
+		// BUT they need to be defined before first use below!!!!
+		var productClickHandler = function () {
+			var curCtx = '#product-format-tabs';
+			var target = '#product-detail';
+			var toggleFunc = toggleProduct;
+			return boxClickHandler(curCtx, target,toggleFunc);
+		}();
+		// the click Handler for artist releases is just like the product one but opening default to listenbuy tab
+		var releaseClickHandler = function () {
+			var curCtx = '#release-format-tabs';
+			var target = '#release-detail';
+			var toggleFunc = toggleProduct;
+			return boxClickHandler(curCtx,target,toggleFunc);
+		}();
+
 		$('.wpui-light').removeClass('wpui-light').addClass('shit-theme');	// change theme for us
 		attachNavClickHandler();
 		var curTabCtx = getTabCtx(location.href);	// current Ctx is the one location... we are just being loaded
@@ -52,8 +68,8 @@ jQuery.noConflict();
 			fixWpTabHeader(curTabCtx); 	// modify formating of tabs
 			initPage(location.href);
 			var json = getJsonData();
-			for ( var f in json) {
-				delete json[f]; // remove container after loading page
+			for ( var tab in json) {
+				delete json[tab]; // remove container after loading page
 			}
 		}
 		// ##########################################################################
@@ -107,13 +123,14 @@ jQuery.noConflict();
 				// put a clickhandler in new pagination divs
 				$(curTabCtx+' div.pagination a').unbind('click').click(changeStateHandler);
 			}
-			return true;
+			return true; // rendering OK
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// called to rebuild the page also from click handlers
 		function initPage(href) {
 			console.log('initPage(%o)',href);
-			location.href = href;	// set location!!!!
+			if (location.href != href) 	// if we set this to same value the page reloads forever!!!
+				location.href = href;	// maintain restful state of javascript app in location.hash
 			var curTabCtx = getTabCtx(href);
 			var curTab = getTab(href);
 			var curLoader = getTabLoader(href);
@@ -431,11 +448,11 @@ jQuery.noConflict();
 			// set new hash
 			location.hash ="#"+newhash;
 			// TODO replace this with urlextractor from hash its all in there
-			var artistBox = $(e.currentTarget);
-			var artistId = artistBox.find('span.artist-id').html();
+			var box = $(e.currentTarget);
+			var artistId = box.find('span.artist-id').html();
 			// id of containing tabs-panel is our current product
 			// format/artist set
-			var tab = artistBox.closest('.ui-tabs-panel').attr('id');
+			var tab = box.closest('.ui-tabs-panel').attr('id');
 			console.log('selectTab: ' + tab + '  artistId: ' + artistId);
 			return toggleArtist(artistId, tab);
 		}
@@ -495,44 +512,25 @@ jQuery.noConflict();
 		 * ############################## PRODUCT MODE ###############################
 		 * ###########################################################################
 		 */
-		// the click Handler for products
-		function productClickHandler(e) {
-			e.preventDefault();
-			e.stopPropagation();	// TODO one seems superfluous
-			// post click handler not working in this context
-			var newhash = $(this).find('a.thumb').attr('href').match(/.*#(.*)/)[1];
-			// set new hash
-			location.hash ="#"+newhash;
-			// TODO replace this with urlextractor from hash its all in there
-			var prodBox = $(e.currentTarget);
-			var prodId = prodBox.find('span.product-id').html();
-			var prodModel = prodBox.find('span.product-model').html();
-			// id of containing tabs-panel is our current tabset
-			var tab = prodBox.closest('.ui-tabs-panel').attr('id');
-			console.log('productClick: ' + tab + '  prodId: ' + prodId + ' prodModel: ' + prodModel);
-			return toggleProduct('#product-format-tabs', prodId, tab, "#product-detail");
-		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// the click Handler for artist releases is just like the product one but opening default to listenbuy tab
-		function releaseClickHandler(e) {
-			e.preventDefault();
-			e.stopPropagation();	// TODO one seems superfluous
-			// post click handler not working in this context
-			var newhash = $(this).find('.product-thumb a').attr('href').match(/.*#(.*)/)[1];
-			// set new hash
-			location.hash ="#"+newhash;
-			var prodBox = $(e.currentTarget);
-			var prodId = prodBox.find('span.product-id').html();
-			var prodModel = prodBox.find('span.product-model').html();
-			// id of containing tabs-panel is our current tabset
-			var tab = prodBox.closest('.ui-tabs-panel').attr('id'); // allArtistReleases
-			console.log('releaseClick: ' + tab + '  prodId: ' + prodId + ' prodModel: ' + prodModel);
-			toggleProduct('#release-format-tabs', prodId, tab, '#release-detail');
-			// now switch to listenbuy tab (dont forget the browser added integer)
-			// TODO merge with above
-			$('#release-detail a[href^="#listenbuy"]').click();
+		function boxClickHandler(curCtx, target,toggleFunc) {
+			return function (e) {
+				e.preventDefault();
+				e.stopPropagation();	// TODO one seems superfluous
+				var newhash = $(this).find('a.thumb').attr('href').match(/.*#(.*)/)[1];
+				location.hash ="#"+newhash;
+				// TODO maybe replace this with urlextractor from hash as all parms are in there
+				var box = $(e.currentTarget);
+				var prodId = box.find('span.product-id').html();
+				var prodModel = box.find('span.product-model').html();
+				// id of containing tabs-panel is our current tabset
+	//		var tab = box.closest('.ui-tabs-panel').attr('id');
+				var tab = box.closest('.ui-tabs-panel').find('h3.wp-tab-title').html();
+				console.log('Click: ' + tab + '  prodId: ' + prodId + ' prodModel: ' + prodModel);
+				toggleFunc(curCtx, prodId, tab, target);
+				return false;
+			};
 		}
-
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show product data in product-detail or release-detail DIV
 		function toggleProduct(curTabCtx,prodId,format,seltor) {
@@ -620,7 +618,7 @@ jQuery.noConflict();
 			if (seltor.indexOf('product') >=0)
 				$(seltor+' a[href^="#listenbuy"]').click(); // show tracks
 			else // scroll into view
-				document.getElementById('prod-detail-header').scrollIntoView();
+				document.getElementById('prod-detail-header').scrollIntoView(true);
 			$(seltor).fadeIn(fadeintime); //show active tab
 			lastProductId = prodId;
 		}
