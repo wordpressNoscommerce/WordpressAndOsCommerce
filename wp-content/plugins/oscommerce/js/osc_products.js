@@ -48,11 +48,11 @@ jQuery.noConflict();
 		$('.wpui-light').removeClass('wpui-light').addClass('shit-theme');	// change theme for us
 		attachNavClickHandler();
 
-		var curTabCtx = getCurTabCtx();
+		var curTabCtx = getTabCtx(location.href);	// current Ctx is the one location... we are just being loaded
 		if (renderJsonData(curTabCtx)) {		// returns false if wrong context
 			fixWpTabHeader(curTabCtx); 	// modify formating of tabs
-			initPage();
-			var json = getCurJsonData();
+			initPage(location.href);
+			var json = getJsonData();
 			for ( var f in json) {
 				delete json[f]; // remove container after loading page
 			}
@@ -69,9 +69,10 @@ jQuery.noConflict();
 				if (typeof products === 'undefined'
 					|| products == undefined
 					|| countProperties(products) == 0) { // empty test
-					var msg = 'no products received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
+					var msg = 'No JSON products received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
+					$('#content .page .post-content').append('<h1 style="color: red;">'+msg+'<br>Check Database Connection to shopdb</h1>');
 					console.error(msg);
-					return true;
+					return false;
 				}
 				json = products;
 				templateName = '#product-box-template';
@@ -82,9 +83,10 @@ jQuery.noConflict();
 				if (typeof manufacturers === 'undefined'
 					|| manufacturers == undefined
 					|| countProperties(manufacturers) == 0) { // empty test
-					var msg = 'no manufacturers received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
+					var msg = 'no JSON manufacturers received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
+					$('#content .page .post-content').append('<h1 style="color: red;">'+msg+'<br>Check Database Connection to shopdb</h1>');
 					console.error(msg);
-					return true;
+					return false;
 				}
 				json = manufacturers;
 				templateName = '#manufacturer-box-template';
@@ -99,17 +101,24 @@ jQuery.noConflict();
 				addToCache(newItems);
 				renderItemsInTab(curTabCtx,newItems,tab,pageno,templateName);
 				renderPagination(curTabCtx,pageSize, totalItems, newItems, 1);
+				// put a clickhandler in new pagination divs
+				$(curTabCtx+' div.pagination a').unbind('click').click(changeStateHandler);
+
 			}
 			return true;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// called to rebuild the page also from tab click handlers
-		function initPage() {
-			console.log('initPage(%o)',location);
-			var curTabCtx = getCurTabCtx();
-			var curTab = getCurTab();
-			var curLoader = getCurTabLoader();
-			curLoader(curTabCtx, curTab, paged);
+		function initPage(href) {
+			console.log('initPage(%o)',href);
+			var curTabCtx = getTabCtx(href);
+			var curTab = getTab(href);
+			var curLoader = getTabLoader(href);
+			curLoader(curTabCtx, curTab, paged);		// try to load the requested page
+
+			var clickHandler = getClickHandler(href);
+			// also replace wptabs clickhandler here
+			attachTabClickHandler(curTabCtx,curTab,curLoader, clickHandler);
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// use closure to pass artist_id TODO is this necessary as we have a global var
@@ -126,8 +135,8 @@ jQuery.noConflict();
 			var template = $(templateName);
 			console.assert(template.length); // make sure its found
 			var loopDiv = prepareLoopDiv(tabDivSel);
-			console.trace();
-//			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artist_set,paged,pageno);
+//			console.trace();
+			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artist_set,paged,pageno);
 			// the template
 			$.each(newItems, function(i, v) {
 				v.format = fixedTabName;
@@ -267,8 +276,15 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// check if more data is needed for current tab
 		function needToLoad(curTabCtx,tabName, pageno) {
-			var curPage = getCurPageOfTab(getTabSelector(curTabCtx,tabName));
-			var result = pageno > curPage;
+			var result = false;
+			var tabSelector = getTabSelector(curTabCtx,tabName);
+			var numPosts = $(tabSelector+' .grid .post').length;
+			if (numPosts == 0) { // no posts in our tab
+				result = true;	// so need to load!
+			} else {
+				var curPage = getLastPageOfTab(tabSelector);
+				result = pageno > curPage;
+			}
 			console.trace();
 			return result;
 		}
@@ -279,9 +295,8 @@ jQuery.noConflict();
 		function selectTab(curTabCtx,tabNameOrg, loadItemsForTab, clickHandler) {
 			var tabName = tabNameOrg.toLowerCase().replace(/ /g, '_');
 			var tabSelector = getTabSelector(curTabCtx,tabNameOrg);
-			// we are on the right tab already
-			if ($(curTabCtx+ ' div.ui-tabs '+tabSelector+':visible').length) {
-				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
+			if ($(tabSelector+':visible').length) { // we are on the right tab already
+//				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
 				return; // nothing more to do we are active already
 			}
 			// replace wptabs clickhandler so we can fuck around with it
@@ -298,7 +313,7 @@ jQuery.noConflict();
 			}
 
 			// tabGroupSelector == '#product-format-tabs' &&
-			if (tabNameOrg != allArtReleases) {
+			if (curTabCtx == '#release-format-tabs') {
 				//				console.debug('found artist-detail %d with content %s', $('#artist-detail').length, $('#artist-detail').html());
 				// remove the title from the tab also
 				$('div#artist-set-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible').find('h3').html(
@@ -307,36 +322,40 @@ jQuery.noConflict();
 						}).css('display', 'none');
 				$('#artist-detail').empty(); // clear artist detail only when not showing releases
 			}
-			// remove selection for tab DiV and hide it
-			var selContDivs = $(curTabCtx).find('DIV.ui-tabs-selected');
-			selContDivs.removeClass('ui-tabs-selected ui-state-active') .addClass('ui-tabs-hide');
+
+			// remove selection for ALL tab header LI
+			var selNavLi = $(curTabCtx+' ul.ui-tabs-nav li.ui-state-default');
+			selNavLi.removeClass('ui-tabs-selected ui-state-active');
+			console.log('removing selection for %o', selNavLi);
+
+			// set active class for LI link immediately
+			$(curTabCtx).find('LI.ui-state-default').has('A[href=#'+tabName+']')
+													.addClass( 'ui-tabs-selected ui-state-active');
+
+			// NOW USE EASING on the content DIVS
+			// remove selection for ALL tab-panel DiV and hide them (robuster version)
+			var selContDivs = $(curTabCtx).find('div.ui-tabs DIV.ui-tabs-panel');
+			selContDivs.removeClass('ui-tabs-selected ui-state-active').addClass('ui-tabs-hide');
 			console.log('hiding tabs for %o', selContDivs);
 
 //			if (selContDivs.length == 0) {
 //				$(curTabCtx + ' DIV.pagination').addClass('ui-tabs-hide');
 //				console.log('NO SELECTION %s so remove pagination div', tabName);
 //			}
-			// remove selection for tab header LI
-			var selected = $(curTabCtx+' li.ui-tabs-selected');
-			selected.removeClass('ui-tabs-selected ui-state-active');
-			console.log('removing selection for %o', selected);
 
 			// remove hidden class add set new selection for tab
 			var newSelTab = $(tabSelector);
 			newSelTab.removeClass('ui-tabs-hide').addClass('ui-tabs-selected');
-			// set active class for LI link also (robust version doesnt use stepwise navigation
-			$(curTabCtx).find('LI.ui-state-default').has('A[href=#'+tabName+']')
-													.addClass( 'ui-tabs-selected ui-state-active');
 
 			console.log('selectTab(%s, %s)', tabNameOrg, curTabCtx);
 			finishTab(curTabCtx,tabSelector, tabName, loadItemsForTab, clickHandler);
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// finish things on current tab	(pagination, addboxclick, go deeper)
+		// finish things on current tab	(pagination, addboxclick, show detail data)
 		function finishTab (curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler) {
 			console.log('finishTab (%o,%o,%o)',curTabCtx, tabSelector, tabName);//, loadItemsForTab, clickHandler);
 			// remove pagination if we loaded last page
-			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
+//			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
 			// dont forget to walk the grid and fix detail
 			attachClickhandlerToGrid(tabSelector, clickHandler);
 			// go deeper in the data when needed (this may create recursion)
@@ -345,81 +364,70 @@ jQuery.noConflict();
 				if (artists_id != undefined)
 					if (getArtistMaster(artists_id))
 						toggleArtist(artists_id, artist_set);
-					else
-						loadItemsForTab(curTabCtx,tabName,paged);			// try to load the relevant page directly
-				else
-					if ($(tabSelector + ' div#loop div.artist-box').length == 0)
-						loadItemsForTab(curTabCtx,tabName,1);			// load first page if empty
 			} else {
 				if (products_id != undefined)
-					if (getProductMaster(products_id))
+					if (getProductMaster(products_id)) 		// show product if available
 						if (curTabCtx == '#product-format-tabs')
-							toggleProduct(curTabCtx, products_id, format, "#product-detail");		// show product if available
+							toggleProduct(curTabCtx, products_id, format, "#product-detail");
 						else
-							toggleProduct(curTabCtx, products_id, format, "#release-detail");		// show product if available
-					else
-						if (curTabCtx == '#product-format-tabs')
-							loadItemsForTab(curTabCtx,tabName,paged);		// try to load the page directly
-						else
-							loadItemsForTab(curTabCtx,tabName,rpage);		// try to load the release page directly
-				else
-					if (curTabCtx == '#product-format-tabs') {
-						if ($(tabSelector + ' div#loop div.product-box').length == 0)
-							loadItemsForTab(curTabCtx,tabName,1);			// load first page if empty
-					} else
-						if ($(tabSelector + ' div#loop div.release-box').length == 0)
-							loadItemsForTab(curTabCtx,tabName,1);			// load first page if empty
+							toggleProduct(curTabCtx, products_id, format, "#release-detail");
 			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// attach click handler for pagination link only if there is another page to load
-		function attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab) {
-			var thispage = getCurPageOfTab(tabSelector);
-			var maxpage = getMaxPageOfTab(tabSelector);
-			if (thispage < maxpage) {
-				$(tabSelector + ' div.pagination').removeClass('ui-tabs-hide');
-				// remove previous click handler
-				$(tabSelector + ' div.pagination a.nextpostslink').unbind('click').click(function(e) {
-					e.preventDefault();
-					// this value is likely to be changed in the meanwhile
-					$(this).addClass('loading').text('LOADING...');
-					console.log('next page from %d/%d', thispage, maxpage);
-					loadItemsForTab(curTabCtx,tabName, thispage + 1, e.currentTarget); // load next page
-					return false;
-				});
-			} else { // hide pagination if only single page!
-				$(tabSelector + ' div.pagination').addClass('ui-tabs-hide');
-			}
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		function renderPagination(curTabCtx, pageSize, totalRecCount, newItems, pageno) {
+		function renderPagination(tabSelector, pageSize, totalRecCount, newItems, pageno) {
 			var maxPage = Math.ceil(totalRecCount / pageSize);
-			if ($(curTabCtx + ' div.pagination a').length == 0) {
-				console.log('add missing pagination for ' + curTabCtx);
+			var pager = $(tabSelector + ' div.pagination a');
+			if (pager.length == 0) {
+				console.log('add missing pagination for ' + tabSelector);
 				var template = $('#pagination-template');
 				console.assert(template.length);
 				// append to div not to content div which will be overwritten
-				$(template).tmpl().appendTo(curTabCtx + ' .ui-tabs-panel:visible');
+				$(template).tmpl().appendTo(tabSelector + ' .ui-tabs-panel:visible');
+				// put a clickhandler in new pagination divs
+				pager.unbind('click').click(changeStateHandler);
 			} else // stop the loading image
-				$(curTabCtx + ' div.pagination a').removeClass('loading').text('LOAD MORE');
-			if ($(curTabCtx + ' div.pagination a').length == 0) {
+				pager.removeClass('loading').text('LOAD MORE');
+			if (pager.length == 0) {
 				console.log('cannot find new pagination');
 				return; // bail out nothing to do
 			}
+			// add tabname to anchor href to be picked up by the clickHandler
+			var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), getTab(tabSelector));
+			newHref = addHashParameter(newHref, 'paged', (+pageno)+1);	// link to the next page
+			pager.attr('href', newHref);
+
 			// put data in right DIV for current curTabCtx
 			if (pageno) {
 				var loaded = pageSize * pageno;
 				if (pageno == maxPage)
 					loaded = totalRecCount; // max is totalRecCount
-				$(curTabCtx + ' span.thispage').html(pageno);
-				$(curTabCtx + ' span.loaded').html(loaded); // total of loaded items
+				$(tabSelector + ' span.thispage').html(pageno);
+				$(tabSelector + ' span.loaded').html(loaded); // total of loaded items
 			}
 			if (maxPage)
-				$(curTabCtx + ' span.maxpage').html(maxPage);
+				$(tabSelector + ' span.maxpage').html(maxPage);
 			if (totalRecCount)
-				$(curTabCtx + ' span.reccount').html(totalRecCount);
-		}
+				$(tabSelector + ' span.reccount').html(totalRecCount);
 
+			var pageDiv = pager.parent();
+			if (loaded < maxPage) {
+				pageDiv.removeClass('ui-tabs-hide');
+			} else { // hide pagination if only single page!
+				pageDiv.addClass('ui-tabs-hide');
+			}
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// attach click handler for pagination link only if there is another page to load
+		function attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab) {
+			var lastPage = getLastPageOfTab(tabSelector);
+			var maxpage = getMaxPageOfTab(tabSelector);
+			var pageDiv = $(tabSelector + ' div.pagination');
+			if (lastPage < maxpage) {
+				pageDiv.removeClass('ui-tabs-hide');
+			} else { // hide pagination if only single page!
+				pageDiv.addClass('ui-tabs-hide');
+			}
+		}
 		/**
 		 * ###########################################################################
 		 * ############################## ARTIST MODE ################################
@@ -1012,20 +1020,21 @@ jQuery.noConflict();
 			return parm;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		function addHashParameter(name,value) {
+		function addHashParameter(hash,name,value) {
 			var newVal = name+'='+encodeURI(value);
-			if (location.hash.indexOf(name) >= 0) {
-				console.log('replace %s : %s in hash %s', name, value, location.hash);
+			if (hash.indexOf(name) >= 0) {
+				console.log('replace %s : %s in hash %s', name, value, hash);
 				// replace in place if found
-				var oldval = (RegExp('(&|#)'+name + '=' + '(.+?)(&|$)').exec(location.hash))[2];
-				console.log(oldval);
-				var match = (RegExp('(&|#)('+name+'='+'(.+?))(&|$)').exec(location.hash));
+				var oldval = (RegExp('(&|#)'+name + '=' + '(.+?)(&|$)').exec(hash))[2];
+				console.log('found previous value: %s',oldval);
+				var match = (RegExp('(&|#)('+name+'='+'(.+?))(&|$)').exec(hash));
 				var oldNameValue = match[2];
-				console.log(oldNameValue);
+				console.log('found previous name value pair %s',oldNameValue);
 				var re = new RegExp(oldNameValue);
-				location.hash = location.hash.replace(re,newVal);
+				hash = hash.replace(re,newVal);
 			} else
-				location.hash += '&' + newVal;	// append if not found
+				hash += '&' + newVal;	// append if not found
+			return hash;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// stolen from the net... read name parm from location.. null is turned into string
@@ -1033,7 +1042,13 @@ jQuery.noConflict();
 			return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [ , null ])[1]);
 		}
 		function getHashParameter(name, hash) {	// TODO always starts with & ??? really
-			return decodeURI((RegExp('(&|#)'+name + '=' + '(.+?)(&|$)').exec(hash?hash:location.hash) || [ , , null])[2]);
+			var value = decodeURI((RegExp('(&|#)'+name + '=' + '(.+?)(&|$)').exec(hash?hash:location.hash) || [ , , null])[2]);
+			if (value == "null" || value == undefined){
+				// if the hash is a single token (alphnumeric and  _) we use it for the respective parameter
+				if ((isReleasePage(hash) && name == 'format') ||(isArtistPage(hash) && name == 'artistSet'))
+					value = decodeURI((RegExp('[^#]*#([a-z0-9_]+)$').exec(hash?hash:location.hash) || [ , null])[1]);
+			}
+			return value;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// copied from themes/sight/js/script.js for adaption as we have to use
@@ -1149,40 +1164,27 @@ jQuery.noConflict();
 		// this has to be called AFTER wpui which changes the DOM so this selector works
 		// dont add without removing the previous wpui click handler
 		function attachTabClickHandler(curTabCtx, tabName, loadItemsForTab, clickHandler) {
-			var aSelector = curTabCtx + ' > .ui-tabs > UL.ui-tabs-nav > LI  A';
-			console.log('attachTabClickHandler for wptabs in %s found %d events: %o', curTabCtx, $(aSelector).length,
-					$(aSelector).data('events') ? $(aSelector).data('events').click : null);
-			$(aSelector).unbind('click').click(
-					function(e) {
-						e.preventDefault();
-						var newTabName = this.hash.substring(1); // use hash from link hash
-						console.log('clicked on tabName with link %s tab %s', newTabName, tabName);
-						if (curTabCtx == '#artist-set-tabs') {
-							addHashParameter('artistSet', newTabName);
-							artist_set = newTabName; // keep globals updated
-							selectTab(curTabCtx, newTabName, loadItemsForTab, clickHandler);
-						} else if (curTabCtx == '#product-format-tabs') {
-							addHashParameter('format', newTabName);
-							format = newTabName; // keep globals updated
-							selectTab(curTabCtx, newTabName, loadItemsForTab, clickHandler);
-						} else {
-							alert('clicked in context %s WHAT TO DO?' + curTabCtx);
-							console.log('clicked in context %s WHAT TO DO?', curTabCtx);
-						}
-						console.assert(newTabName);
-					});
+			var anchors = $(curTabCtx + ' > .ui-tabs > UL.ui-tabs-nav > LI  A');
+			console.log('attachTabClickHandler found %d tabs in %s', anchors.length,curTabCtx);
+			anchors.unbind('click').click(changeStateHandler);
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// replace click handler for navigation links and fix the tab headers
+		// replace click handler for navigation links -- once called by DOMloaded event
 		function attachNavClickHandler() {
-			if (location.hash.indexOf('#') >= 0)
-				$('div.nav ul.sub-menu li.menu-item a').click(function(e) {
-					e.stopPropagation();
-					var href = $(e.currentTarget).attr('href');
-					getStateFromUrl(href);
-					initPage(href); // open page for href parms... dont reload
-					return false;
-				});
+//			if (location.hash.indexOf('#') >= 0)
+				$('div.nav ul.sub-menu li.menu-item a').unbind('click').click(changeStateHandler);
+		}
+		function changeStateHandler(e) {
+			var href = $(e.currentTarget).attr('href');
+			if (href.indexOf('#')== 0)
+				href = location.pathname + href;	// include pathname of current page in context
+			if (!isCurCtx(href)) return true;	// reload page if we are wron
+			// we are in the right context carry on
+			getStateFromUrl(href);
+			e.preventDefault();
+			e.stopPropagation();
+			initPage(href); // open page for href parms... dont reload
+			return false;
 		}
 
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1240,53 +1242,99 @@ jQuery.noConflict();
 		function getTabSelector(curTabCtx, tabName) {
 			return curTabCtx + ' div[id^='+tabName.toLowerCase().replace(/ /g, '_')+']';
 		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// context dependent values and functions
-		function getCurTabCtx() {
-			if (isReleasePage()) {
-				return '#product-format-tabs';
-			} else if (isArtistPage()) {
-				return '#artist-set-tabs';
-			} else
-				return;
+		function getTabFromSelector(tabSelector) {
+			var left = tabSelector.indexOf('div[id^=');
+			var right= tabSelector.indexOf(']');
+			if (left >= 0)
+				return tabSelector.substring(left+8,right);
 		}
-		function getCurTab() {
-			if (isReleasePage()) {
-				return format;
-			} else if (isArtistPage()) {
-				return artist_set;
-			} else
-				return;
-		}
-		function getCurTabLoader() {
-			if (isReleasePage()) {
-				return loadProductsForTab;
-			} else if (isArtistPage()) {
-				return loadArtistsForTab;
-			} else
-				return;
-		}
-		function getCurJsonData() {
-			if (isReleasePage()) {
-				return products;
-			} else if (isArtistPage()) {
-				return manufacturers;
-			} else
-				return;
-		}
-		function getCurPageOfTab(tabSelector) {
+		function getLastPageOfTab(tabSelector) {
 			return (+$(tabSelector + ' span.thispage').html());	// number conversion !!!
 		}
 		function getMaxPageOfTab(tabSelector) {
 			return (+$(tabSelector + ' span.maxpage').html());	// number conversion !!!
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// TODO this needs adapting to the current installation
-		function isReleasePage() {
-			return location.href.indexOf('/releases/') >= 0;
+		// context dependent values and functions
+		function getTabCtx(href) {
+			if (isReleasePage(href)) {
+				return '#product-format-tabs';
+			} else if (isArtistPage(href)) {
+				return '#artist-set-tabs';
+			} else
+				return;
 		}
-		function isArtistPage() {
-			return location.href.indexOf('/artists/') >= 0;
+		function getTab(href) {
+			if (isReleasePage(href)) {
+				return format;
+			} else if (isArtistPage(href)) {
+				return artist_set;
+			} else
+				return;
+		}
+		function getTabParm(href) {
+			if (isReleasePage(href)) {
+				return 'format';
+			} else if (isArtistPage(href)) {
+				return 'artistSet';
+			} else
+				return;
+		}
+		function getTabLoader(href) {
+			if (isReleasePage(href)) {
+				return loadProductsForTab;
+			} else if (isArtistPage(href)) {
+				return loadArtistsForTab;
+			} else
+				return;
+		}
+		function getClickHandler(href) {
+			if (isReleasePage(href)) {
+				return productClickHandler;
+			} else if (isArtistPage(href)) {
+				return artistClickHandler;
+			} else
+				return;
+		}
+		function getJsonData(href) {
+			if (isReleasePage(href)) {
+			  // proper empty test
+					if (typeof products === 'undefined' || products == undefined || countProperties(products) == 0)
+						return {};
+					else
+						return products;
+			} else if (isArtistPage(href)) {
+			  // proper empty test
+					if (typeof manufacturers === 'undefined' || manufacturers == undefined || countProperties(manufacturers) == 0)
+						return {};
+					else
+						return manufacturers;
+			} else
+				return {};
+		}
+		function getPageSize(href) {
+			if (isArtistPage(href)) return artistsPageSize;
+			if (isReleasePage(href)) return productsPageSize;
+		}
+		function getPageSize(href) {
+			if (isArtistPage(href)) return artistsPageSize;
+			if (isReleasePage(href)) return productsPageSize;
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// TODO this needs adapting to the current installation
+		function isReleasePage(href) {
+			if (href == undefined) href = location.href;
+			return href.indexOf('/releases') >= 0 || href == '#product-format-tabs';		// dont match trailing slash which is optional
+		}
+		function isArtistPage(href) {
+			if (href == undefined) href = location.href;
+			return href.indexOf('/artists') >= 0 || href == '#artist-set-tabs';		// dont match trailing slash which is optional
+		}
+		// checks if location.hash and href are in the same page context
+		// TODO this has to go when we render everything from this script
+		// instead of relying on the server to provide rudimentary but required HTML to render into
+		function isCurCtx(href) {
+			return ((isReleasePage() && isReleasePage(href)) || (isArtistPage() && isArtistPage(href)));
 		}
 	});
 })(jQuery);

@@ -29,7 +29,7 @@ class osc_products extends osc_product_templates
   /** constructor reads all parms from the Request URL and sets defaults **/
   function osc_products()
   {
-    $this->osc_db = new osc_db();
+    $this->osc_db = new osc_db();		// a connection to wordpress DB
     $this->shop_id = $_GET['shopId'];
     $this->artist_id = $_GET['artistId'];
     $this->format = $_GET['format'];
@@ -77,46 +77,27 @@ class osc_products extends osc_product_templates
 
   /** list products according to parms set in oscProducts object **/
   function osc_show_tabbed_products_page() {
-    $this->result = $this->osc_query_products();        // result as a member var?
+  	try {
+    	$this->result = $this->osc_query_products();        // result as a member var?
+  	} catch (Exception $e) {
+  		echo '<h4 style="color: red;">'.$e->getMessage().'</h4>';
+  		return;
+  	}
     if (empty($this->shop_db)) {
       $now = date(DATE_RFC822);
-      $msg ="No Connection To Shop Database!! ($now)";
+      $msg ="No Connection To Shop Database!! ($now) ";
       fb($msg);
       echo "<h3>$msg</h3>";
     } else if (empty($this->result)) {
       $now = date(DATE_RFC822);
       $msg ="No Releases found !! ($now)";
       fb($msg + $this->sql);
-      echo '<h3 style="color: red;">'.$msg."</h3><pre>" . $this->sql . $this->shop_db. "</pre>";
+      echo '<h3 style="color: red;">'.$msg.'</h3><pre style="font-size:8px;">'.$this->sql."</pre>";
     } else {
       $this->osc_inject_product_list_json();    // first page of data
       $this->osc_inject_all_product_templates();
       // show the tabs for releases
       $current_tab = $this->osc_show_format_tabs_ajax();
-    }
-  }
-
-  /** answer AJAX request for tab content and show either the grid with products as HTML
-   *  or return the data as json (get_product_page.php) **/
-  function osc_get_products_page() {
-
-    $this->result = $this->osc_query_products();        // result as a member var?
-    if (empty($this->result)) {
-      $now = date(DATE_RFC822);
-      $msg ="No Records found for prod_query_result ($now): $this->sql";
-      fb($msg);
-      if (!$this->json)	echo "<h3>$msg</h3>";
-      else 				echo $msg;
-    } else {
-      $this->osc_fix_product_list_json();    // add extra fields to list items
-      if ($this->json) {
-        $retval = array($this->records_per_page,$this->product_count, $this->max_page, $this->result,$this->release_formats);
-        // encode tuple of pagesize, count and result
-        echo json_encode($retval);
-      } else {
-        // show product grid as HTML
-        $this->osc_show_products_in_grid();
-      }
     }
   }
 
@@ -164,48 +145,54 @@ class osc_products extends osc_product_templates
   function osc_query_products()
   {
     // fbDebugBacktrace();
-    $this->osc_get_shop_db ();    // get handle for shop database
-    $select = 'SELECT	p.products_id,
-						p.products_image,
-						p.products_image_lrg,
-						pd.products_name,
-						p.products_model,
-						p.products_weight,
-						p.products_quantity,
-						p.products_price,
-						p.manufacturers_id,
-						m.manufacturers_name,
-						m.manufacturers_image,
-						p.products_tax_class_id,
-						IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-						IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-						pd.products_description,
-						pd.products_format,
-						pd.products_viewed,
-						pd.products_head_keywords_tag
-						';
+  	$this->osc_get_shop_db ();    // get handle for shop database
+    $select = '
+SELECT	p.products_id,
+	p.products_image,
+	p.products_image_lrg,
+	pd.products_name,
+	p.products_model,
+	p.products_weight,
+	p.products_quantity,
+	p.products_price,
+	p.manufacturers_id,
+	m.manufacturers_name,
+	m.manufacturers_image,
+	p.products_tax_class_id,
+	IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
+	IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
+	pd.products_description,
+	pd.products_format,
+	pd.products_viewed,
+	pd.products_head_keywords_tag ';
     $order = "ORDER BY p.products_model desc";
 
     //	TODO HACK: use literal table names cos cannot include other virthost installation dirs on production server
     //			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php"; from shopkatapult/index.php:#141
-    $from ='FROM products p
-			LEFT JOIN products_description pd ON pd.products_id = p.products_id
-			LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
-			LEFT JOIN specials s ON p.products_id = s.products_id
-			LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
+    $from ='
+FROM products p
+LEFT JOIN products_description pd ON pd.products_id = p.products_id
+LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
+LEFT JOIN specials s ON p.products_id = s.products_id
+LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
     // general conditions
-    $where = "WHERE p.products_status = '1' and p.products_parent = '' ";
+    $where = "
+WHERE p.products_status = '1' and p.products_parent = '' ";
     if ($this->artist_id) {
 	    // show the products of a specified manufacturer
-    	$where .= "AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
+    	$where .= "
+AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
+
     }
     if ($this->label_id) {
       // show the products in a given categorie
-      $where .= "AND p2c.categories_id = '" . (int)$this->label_id . "' ";
+      $where .= "
+AND p2c.categories_id = '" . (int)$this->label_id . "' ";
     }
     if ($this->format && $this->format <> 'All') {
       // show the products having a specific format (keyword)
-      $where .= "AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
+      $where .= "
+AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
     }
     $sql = $select . $from . $where . $order;
 
@@ -263,46 +250,6 @@ class osc_products extends osc_product_templates
 
       unset($currencies);
     }
-  }
-
-  /** get handle to shop DB using data from wordpress DB,
-   * $osc_db is member and has been injected from caller to avoid dependency **/
-  function osc_get_shop_db () {
-    $db = $this->osc_db;
-    // TODO try to fix shop_id to save queries
-    $shopSql = 'SELECT vchUrl, vchUsername, vchPassword, vchDbName, vchHost
-						FROM wp_oscommerce WHERE intShopId = '. $this->shop_id;
-    //  			$res_arr  = $this->osc_db->get_results($shopSql);
-    $res_arr  = $db->get_results($shopSql);
-	/// check if database connection works and show it to frontend
-    if (!is_array($res_arr)|| count($res_arr) == 0) {
-      $now = time();
-      $now = date('d.m. H:M',$now);
-      $msg = "($now) DATABASE CONNECTION FAILED for shop_id=$this->shop_id maybe too many connections?".json_encode($res_arr);
-      fb($msg);
-      throw new Exception($msg);
-    }
-
-    $shop_url = $res_arr[0]->vchUrl;
-    if (preg_match('/http:/', $shop_url))
-    $this->shop_url = $res_arr[0]->vchUrl;
-    else
-    $this->shop_url = 'http://'.$res_arr[0]->vchUrl;
-
-    $this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
-
-    $this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
-
-    $this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
-
-    // show connection data
-    //  		    if (sizeof($res_arr) > 0) {
-    //  		        fb("ShopDb_data:".sizeof($res_arr).":$shop_id:{$res_arr[0]->vchUrl},{$res_arr[0]->vchUsername}, {$res_arr[0]->vchPassword}, {$res_arr[0]->vchDbName}, {$res_arr[0]->vchHost}");
-    //  		    }
-    $this->shop_db  = new wpdb($res_arr[0]->vchUsername, $res_arr[0]->vchPassword, $res_arr[0]->vchDbName, $res_arr[0]->vchHost);
-    if (empty($this->shop_db))
-    	fb('SHOPDB_Object is EMPTY !');
-    return $this->shop_db;
   }
 
   /** show product box content as HTML **/
@@ -385,6 +332,30 @@ class osc_products extends osc_product_templates
 <!-- product-format-tabs -->
   <?php 	} // EOF osc_show_format_tabs_ajax
 
+  /** answer AJAX request for tab content and show either the grid with products as HTML
+   *  or return the data as json (get_product_page.php) **/
+  function osc_get_products_page() {
+
+    $this->result = $this->osc_query_products();        // result as a member var?
+    if (empty($this->result)) {
+      $now = date(DATE_RFC822);
+      $msg ="No Records found for prod_query_result ($now): $this->sql";
+      fb($msg);
+      if (!$this->json)	echo "<h3>$msg</h3>";
+      else 				echo $msg;
+    } else {
+      $this->osc_fix_product_list_json();    // add extra fields to list items
+      if ($this->json) {
+        $retval = array($this->records_per_page,$this->product_count, $this->max_page, $this->result,$this->release_formats);
+        // encode tuple of pagesize, count and result
+        echo json_encode($retval);
+      } else {
+        // show product grid as HTML
+        $this->osc_show_products_in_grid();
+      }
+    }
+  }
+
   /** return single MP3 tracks to an AJAX request -- get_xsell_products.php **/
   function osc_get_xsell_products($products_id) {
     $sql = "
@@ -454,6 +425,52 @@ class osc_products extends osc_product_templates
     else
     return $prod_format_query_results;
   }
+
+  /** get handle to shop DB using data from wordpress DB,
+   * $osc_db is member and has been injected from caller to avoid dependency **/
+  function osc_get_shop_db () {
+    $db = $this->osc_db;
+    // TODO try to fix shop_id to save queries
+    $shopSql = 'SELECT vchUrl, vchUsername, vchPassword, vchDbName, vchHost
+				FROM '.$db->dbuser.'.wp_oscommerce WHERE intShopId = '. $this->shop_id;
+
+ 	$res_arr  = $db->get_results($shopSql);
+
+    /// check if database connection works and show it to frontend
+    if (!is_array($res_arr)|| count($res_arr) == 0) {
+	    $now = date('d.m. H:M',time());
+	    $msg = "No entry found for shop ID:($this->shop_id) ($now)";
+	    fb($msg);
+	    throw new Exception($msg);
+    }
+//  	echo '<h4 style="color: gray;">'.$db->dbuser.'@'.$db->dbname.' table '.$db->table_name ;
+//	echo '<h4 style="color: blue;">Found Entry: '.$res_arr[0]->vchUrl .' DB:'.$res_arr[0]->vchUsername .':'.$res_arr[0]->vchPassword .'@'.$res_arr[0]->vchHost .'#'.$res_arr[0]->vchDbName .'</h4>';
+  	$shop_url = $res_arr[0]->vchUrl;
+    if (preg_match('/http:/', $shop_url))
+    $this->shop_url = $res_arr[0]->vchUrl;
+    else
+    $this->shop_url = 'http://'.$res_arr[0]->vchUrl;
+
+    $this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
+
+    $this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
+
+    $this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
+
+    // show connection data
+    //  		    if (sizeof($res_arr) > 0) {
+    //  		        fb("ShopDb_data:".sizeof($res_arr).":$shop_id:{$res_arr[0]->vchUrl},{$res_arr[0]->vchUsername}, {$res_arr[0]->vchPassword}, {$res_arr[0]->vchDbName}, {$res_arr[0]->vchHost}");
+    //  		    }
+    $this->shop_db  = new wpdb($res_arr[0]->vchUsername, $res_arr[0]->vchPassword, $res_arr[0]->vchDbName, $res_arr[0]->vchHost);
+    if (empty($this->shop_db) || !$this->shop_db->ready) {
+	    $now = date('d.m. H:M',time());
+	    $msg = "Connection Failed to shopDB:".$this->shop_db->ready.json_encode($res_arr[0]);
+	    fb($msg);
+	    throw new Exception($msg);
+	}
+    return $this->shop_db;
+  }
+
 } // EOC class def
 endif;
 ?>

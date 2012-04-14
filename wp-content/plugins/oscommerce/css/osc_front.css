@@ -403,12 +403,12 @@ div#encoding {
 /******************************* artist grid ************************/
 
 /* reduce padding for tabs */
-div#post_108.post-108 div.post-content div.wp-tabs div.ui-tabs div#main.ui-tabs-panel div.wp-tab-content {
+/* div#post_108.post-108 div.post-content div.wp-tabs div.ui-tabs div#main.ui-tabs-panel div.wp-tab-content { */
 /*   margin-top: 0px; */
 /*   margin-bottom: 0px; */
 /*   padding-top: 0px; */
 /*   padding-bottom: 0px; */
-}
+/* } */
 
 /* div.entry div.post-content { */
 /*   padding-top: 0px; */
@@ -417,18 +417,27 @@ div#post_108.post-108 div.post-content div.wp-tabs div.ui-tabs div#main.ui-tabs-
 
 
 /* artist & product grid */
-div.post-content div#loop div.product-box,div.post-content div#loop div.artist-box {
+/* div.post-content div#loop div.product-box,div.post-content div#loop div.artist-box { */
 /*   height: 230px; */
 /*   width: 190px; */
 /*   margin: 0 13px 13px 0; */
 /*   float: left; */
 /*   padding: 0 0 0 0; */
-}
+/* } */
 
-div.post-content div#loop.clear div.product-box,div.post-content div#loop.clear div.artist-box {
-/*   float: left; */
-/*   padding: 0 0 0 0; */
-}
+/* div.post-content div#loop.grid div.product-box,div.post-content div#loop.grid div.artist-box { } */
+
+/* div#content div#loop.grid div.post { */
+/* 	height: 154px; */
+/* 	width: 154px; */
+/* 	margin: 19px 0 0 19px; */
+/* 	padding: 0px 18px 18px 0px; */
+	/*     height: 154px; */
+	/*     width: 154px; */
+	/*     margin: 19px 0 0 19px; */
+	/*     padding: 18px; */
+/* } */
+
 
 .product-thumb {
   float: left;

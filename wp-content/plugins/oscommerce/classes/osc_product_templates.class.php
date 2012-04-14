@@ -22,7 +22,6 @@
  pd.products_format,
  pd.products_viewed,
  pd.products_head_keywords_tag */
-define('PRODUCTPAGE','page_id=145');
 class osc_product_templates
 {
     /** inject all product templates **/
@@ -45,7 +44,7 @@ class osc_product_templates
 '; ?>
 <div class="product-box post hentry type-post status-publish format-standard">
   <div class="product-thumb">
-    <a href="?page_id=145#infotext&format=${format}&paged=${paged}&products_id=${products_id}" class="product-thumb"><img src="${products_image_url}" alt="${products_name}" title="${products_name}" /> </a>
+    <a href="#infotext&format=${format}&paged=${paged}&products_id=${products_id}" class="product-thumb"><img src="${products_image_url}" alt="${products_name}" title="${products_name}" /> </a>
   </div>
   <div class="product-info clear">
     <span class="product-id">${products_id}</span>
