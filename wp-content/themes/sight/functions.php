@@ -1,6 +1,7 @@
 <?php
 
 /*** Theme setup ***/
+remove_filter('the_content', 'wpautop'); // http://themeforest.net/forums/thread/wordpress-adds-extra-paragraph-tag/34162?page=1
 
 add_theme_support( 'post-thumbnails' );
 add_theme_support( 'automatic-feed-links' );
