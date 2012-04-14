@@ -69,10 +69,16 @@ ul.dd li.menu-item {
 }
 
 /* active menu is black and underlined  */
-.nav .dd li.current-menu-item a {
+.nav .dd li.current-menu-item > a {
 	text-decoration: underline;
 	color: black;
 }
+
+.nav .dd li.current-menu-item a.dd_hover {
+	text-decoration: none;
+	color: white;
+}
+
 /* fix long label */
 li#menu-item-11 > a{
 	font-size: 10px;
@@ -150,17 +156,6 @@ div#loop.grid {
 	padding-left: 0px;
 }
 
-div.wrapper div#container div#content div#loop.grid div.post {
-	height: 154px;
-	width: 154px;
-/* 	margin: 19px 0 0 19px; */
-	padding: 0px 18px 18px 0px;
-	/*     height: 154px; */
-	/*     width: 154px; */
-	/*     margin: 19px 0 0 19px; */
-	/*     padding: 18px; */
-}
-
 /* no space around the content block */
 .entry .post-content {
 	padding: 0px 0px 0px 0px;
@@ -172,7 +167,6 @@ div.wrapper div#container div#content div#loop.grid div.post {
 .entry .page .post-content > p {
 	display: none;
 }
-
 .wrapper .footer {
 	height: 30px;
 }

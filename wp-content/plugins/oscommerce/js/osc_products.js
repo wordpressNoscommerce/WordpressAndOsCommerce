@@ -47,7 +47,6 @@ jQuery.noConflict();
 
 		$('.wpui-light').removeClass('wpui-light').addClass('shit-theme');	// change theme for us
 		attachNavClickHandler();
-
 		var curTabCtx = getTabCtx(location.href);	// current Ctx is the one location... we are just being loaded
 		if (renderJsonData(curTabCtx)) {		// returns false if wrong context
 			fixWpTabHeader(curTabCtx); 	// modify formating of tabs
@@ -95,60 +94,30 @@ jQuery.noConflict();
 				//manufacturersSets
 			} else
 				return false; // ABORT nothing to do
+			// cleanup DOM struct from wordpress to match grid page
+			$('#content .entry .page').appendTo('#content').prev('.entry').remove();
+			hideAllTabs(curTabCtx);
+
 			// now inject the JSON data as given (could be scaled up)
 			for ( var tab in json) { // TODO what about the page number?
 				var newItems = json[tab];
 				addToCache(newItems);
 				renderItemsInTab(curTabCtx,newItems,tab,pageno,templateName);
-				renderPagination(curTabCtx,pageSize, totalItems, newItems, 1);
+				renderPagination(getTabSelector(curTabCtx,tab),pageSize, totalItems, newItems, 1);
 				// put a clickhandler in new pagination divs
 				$(curTabCtx+' div.pagination a').unbind('click').click(changeStateHandler);
-
 			}
 			return true;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// called to rebuild the page also from tab click handlers
+		// called to rebuild the page also from click handlers
 		function initPage(href) {
 			console.log('initPage(%o)',href);
+			location.href = href;	// set location!!!!
 			var curTabCtx = getTabCtx(href);
 			var curTab = getTab(href);
 			var curLoader = getTabLoader(href);
 			curLoader(curTabCtx, curTab, paged);		// try to load the requested page
-
-			var clickHandler = getClickHandler(href);
-			// also replace wptabs clickhandler here
-			attachTabClickHandler(curTabCtx,curTab,curLoader, clickHandler);
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// use closure to pass artist_id TODO is this necessary as we have a global var
-		function renderProductsForArtist(artists_id) {
-			return renderItemsInTab;
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// generic render new prod data into named format tab
-		function renderItemsInTab(curTabCtx,newItems, tabName, pageno,templateName) {
-			console.assert(newItems != undefined && newItems.length);
-			var fixedTabName = tabName.toLowerCase().replace(/ /g, '_');
-			// the id property gets garbled when tabs get regenerated... so match it instead
-			var tabDivSel = getTabSelector(curTabCtx,tabName);
-			var template = $(templateName);
-			console.assert(template.length); // make sure its found
-			var loopDiv = prepareLoopDiv(tabDivSel);
-//			console.trace();
-			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artist_set,paged,pageno);
-			// the template
-			$.each(newItems, function(i, v) {
-				v.format = fixedTabName;
-				v.artist_set = artist_set;
-				v.paged = (templateName == '#release-box-template')?paged:pageno;	// special case for artist releases
-				v.rpage = pageno;
-				});
-			// show title for artist grid underneath the artist release tabset append text also
-			if (templateName == '#release-box-template') {
-				showArtistGridHeader();
-			}
-			template.tmpl(newItems).appendTo(loopDiv); // simply render the old ones
 		}
 		// ###############################################################################
 		// ###############################################################################
@@ -165,7 +134,6 @@ jQuery.noConflict();
 					fetchurl += "&paged=" + pageno; // append extra param
 				// the url returns a tuple with record count and result
 				console.log('loading more products' + fetchurl);
-//				$('div.pagination').addClass('ui-tabs-hide'); // hide all before loading
 				$.ajax({
 					type : 'GET',
 					url : fetchurl,
@@ -289,6 +257,36 @@ jQuery.noConflict();
 			return result;
 		}
 		// ##########################################################################
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// use closure to pass artist_id TODO is this necessary as we have a global var
+		function renderProductsForArtist(artists_id) {
+			return renderItemsInTab;
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// generic render new prod data into named format tab
+		function renderItemsInTab(curTabCtx,newItems, tabName, pageno,templateName) {
+			console.assert(newItems != undefined && newItems.length);
+			var fixedTabName = tabName.toLowerCase().replace(/ /g, '_');
+			// the id property gets garbled when tabs get regenerated... so match it instead
+			var tabDivSel = getTabSelector(curTabCtx,tabName);
+			var template = $(templateName);
+			console.assert(template.length); // make sure its found
+			var loopDiv = prepareLoopDiv(tabDivSel);
+//			console.trace();
+			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artist_set,paged,pageno);
+			// the template
+			$.each(newItems, function(i, v) {
+				v.format = fixedTabName;
+				v.artist_set = artist_set;
+				v.paged = (templateName == '#release-box-template')?paged:pageno;	// special case for artist releases
+				v.rpage = pageno;
+				});
+			// show title for artist grid underneath the artist release tabset append text also
+			if (templateName == '#release-box-template') {
+				showArtistGridHeader();
+			}
+			template.tmpl(newItems).appendTo(loopDiv); // simply render the old ones
+		}
 		// ##########################################################################
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// this is depending on the wpui tab code which arranges the elems around
@@ -300,7 +298,7 @@ jQuery.noConflict();
 				return; // nothing more to do we are active already
 			}
 			// replace wptabs clickhandler so we can fuck around with it
-			attachTabClickHandler(curTabCtx,tabName,loadItemsForTab, clickHandler);
+			// attachTabClickHandler(curTabCtx);	// now done with fidxtabheaders
 
 			// remove previous jplayer first TODO check when and how its necessary
 			if (products_id != undefined && products_id != 0 && $(playerSelector).length) {
@@ -311,16 +309,14 @@ jQuery.noConflict();
 				$('#product-detail').empty(); // clear prod detail when showing new tab
 				lastProductId = 0; // clear the state
 			}
-
-			// tabGroupSelector == '#product-format-tabs' &&
 			if (curTabCtx == '#release-format-tabs') {
-				//				console.debug('found artist-detail %d with content %s', $('#artist-detail').length, $('#artist-detail').html());
 				// remove the title from the tab also
 				$('div#artist-set-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible').find('h3').html(
 						function(i, html) {
 							return html.replace(/ Artist Overview/, '');
 						}).css('display', 'none');
 				$('#artist-detail').empty(); // clear artist detail only when not showing releases
+				// TODO check for duplicate ID here
 			}
 
 			// remove selection for ALL tab header LI
@@ -331,18 +327,9 @@ jQuery.noConflict();
 			// set active class for LI link immediately
 			$(curTabCtx).find('LI.ui-state-default').has('A[href=#'+tabName+']')
 													.addClass( 'ui-tabs-selected ui-state-active');
+			hideAllTabs(curTabCtx);
 
-			// NOW USE EASING on the content DIVS
-			// remove selection for ALL tab-panel DiV and hide them (robuster version)
-			var selContDivs = $(curTabCtx).find('div.ui-tabs DIV.ui-tabs-panel');
-			selContDivs.removeClass('ui-tabs-selected ui-state-active').addClass('ui-tabs-hide');
-			console.log('hiding tabs for %o', selContDivs);
-
-//			if (selContDivs.length == 0) {
-//				$(curTabCtx + ' DIV.pagination').addClass('ui-tabs-hide');
-//				console.log('NO SELECTION %s so remove pagination div', tabName);
-//			}
-
+			// TODO USE EASING on the content DIVS
 			// remove hidden class add set new selection for tab
 			var newSelTab = $(tabSelector);
 			newSelTab.removeClass('ui-tabs-hide').addClass('ui-tabs-selected');
@@ -356,8 +343,8 @@ jQuery.noConflict();
 			console.log('finishTab (%o,%o,%o)',curTabCtx, tabSelector, tabName);//, loadItemsForTab, clickHandler);
 			// remove pagination if we loaded last page
 //			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
-			// dont forget to walk the grid and fix detail
-			attachClickhandlerToGrid(tabSelector, clickHandler);
+			// dont forget to walk the attachGridClickhandler and fix detail
+			attachGridClickhandler(tabSelector, clickHandler);
 			// go deeper in the data when needed (this may create recursion)
 			// this uses the urlparms for page
 			if (curTabCtx == '#artist-set-tabs') {
@@ -913,29 +900,9 @@ jQuery.noConflict();
 		// all formats are merged in there
 		function getProductMaster(prod_id) {
 			if (prod_id == undefined) return;
-			// fill prod_id hashmap with data from injected array
-			// by looping over formats (=properties of products) (normally one)
-			for ( var f in products) {
-//				console.log('loading ' + f);
-//				if (products[f] != undefined)
-//					console.log('products[' + f + '] = ' + products[f].length);
-//				else
-//					console.log('no products for format ' + f);
-				if (prodmap == undefined)
-					prodmap = new Object;
-//				else
-//					console.log('found previous productmap');
-//				console.log('mapping ' + f);
-				for ( var i = 0; i < products[f].length; i++) {
-					var prod = products[f][i];
-					prodmap[prod.products_id] = prod;
-				}
-				delete products[f]; // remove after mapping into prodmap ????
-//				console.log('removed products for %s', f);
-			}
 			var thisProd = prodmap[prod_id];
 			if (thisProd == undefined) {
-				console.log('getProductMaster(%d): undefined',prod_id);
+//				console.log('getProductMaster(%d): undefined',prod_id);
 				return;
 			}
 			thisProd.products_description = unescape(thisProd.products_description);
@@ -982,10 +949,7 @@ jQuery.noConflict();
 		function countProperties(obj) {
 			var count = 0;
 			for ( var prop in obj)
-				if (obj.hasOwnProperty(prop)) {
-//					console.log('found Property :' + prop);
-					++count;
-				}
+				if (obj.hasOwnProperty(prop)) ++count;
 			return count;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1053,7 +1017,7 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// copied from themes/sight/js/script.js for adaption as we have to use
 		// more specific selectors inside tabs
-		function attachClickhandlerToGrid(target, clickHandler) {
+		function attachGridClickhandler(target, clickHandler) {
 			var loopSel = target + ' #loop';
 			$(loopSel).addClass('grid').removeClass('list'); // make sure its a grid
 
@@ -1091,6 +1055,9 @@ jQuery.noConflict();
 			$(loopSel+' .post').click(clickHandler); // set new one
 			$.cookie('mode', 'grid'); // store the mode in a cookie
 		}
+		// ###############################################################################
+		// #### FORMATTING HELPER ###########################################################
+		// ###############################################################################
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// remove header line of artist grid
 		function removeArtistGridHeader() {
@@ -1126,6 +1093,39 @@ jQuery.noConflict();
 			console.assert(loopDiv.length); // make sure its found
 			return loopDiv;
 		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// wrap LI entries within UL block into H3 tags for wp-ui tab processing
+		// ==> wrap anchors within LI inside an extra H3 tag (sharing sight CSS)
+		function fixWpTabHeader(curTabCtx) {
+			var anchors = $(curTabCtx + ' li.ui-state-default a');
+			console.log('found %d anchors in ', anchors.length, curTabCtx);
+			anchors.each(function(i, e) {
+			$(e).parent().html(function(i, html) {
+				return '<h3>'+html+'</h3>';
+				console.log('wptabHeader in %s : %s', curTabCtx, html);
+				});
+			});
+			// also replace wptabs clickhandler here
+			attachTabClickHandler(curTabCtx);
+		}
+		// wrap the entries into H3 to use existing CSS
+		function wrapHtmlInTag(selector, tag) {
+			$(selector).each(function(i, e) {
+				$(e).parent().html(function(i, html) {
+					return '<'+tag+'>'+html+'</'+tag+'>';
+					console.log($(e).attr('href'));
+				});
+			});
+		}
+		// remove selection for ALL tab-panel DiV and hide them (robuster version)
+		function hideAllTabs(curTabCtx) {
+			var selContDivs = $(curTabCtx).find('div.ui-tabs DIV.ui-tabs-panel');
+			selContDivs.removeClass('ui-tabs-selected ui-state-active').addClass('ui-tabs-hide');
+			console.log('hiding tabs for %o', selContDivs);
+		}
+		// ###############################################################################
+		// #### HANDLER HELPER ###########################################################
+		// ###############################################################################
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show a video in some cases
 		function extractVideoHandlerFromInfoText(curTabCtx,seltor) {
@@ -1163,7 +1163,7 @@ jQuery.noConflict();
 		// attach click handler to all tab links for product formats
 		// this has to be called AFTER wpui which changes the DOM so this selector works
 		// dont add without removing the previous wpui click handler
-		function attachTabClickHandler(curTabCtx, tabName, loadItemsForTab, clickHandler) {
+		function attachTabClickHandler(curTabCtx) {
 			var anchors = $(curTabCtx + ' > .ui-tabs > UL.ui-tabs-nav > LI  A');
 			console.log('attachTabClickHandler found %d tabs in %s', anchors.length,curTabCtx);
 			anchors.unbind('click').click(changeStateHandler);
@@ -1215,29 +1215,9 @@ jQuery.noConflict();
 					lastProductId = 0;
 				});
 		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// wrap LI entries within UL block into H3 tags for wp-ui tab processing
-		// ==> wrap anchors within LI inside an extra H3 tag (sharing sight CSS)
-		function fixWpTabHeader(curTabCtx) {
-			var anchors = $(curTabCtx + ' li.ui-state-default a');
-			console.log('found %d anchors in ', anchors.length, curTabCtx);
-			anchors.each(function(i, e) {
-			$(e).parent().html(function(i, html) {
-				return '<h3>'+html+'</h3>';
-				console.log('wptabHeader in %s : %s', curTabCtx, html);
-				});
-			});
-		}
-		// wrap the entries into H3 to use existing CSS
-		function wrapHtmlInTag(selector, tag) {
-			$(selector).each(function(i, e) {
-				$(e).parent().html(function(i, html) {
-					return '<'+tag+'>'+html+'</'+tag+'>';
-					console.log($(e).attr('href'));
-				});
-			});
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// ###############################################################################
+		// #### GETTER HELPER ############################################################
+		// ###############################################################################
 		// to deal with funny modifications -- space in front for concatenation
 		function getTabSelector(curTabCtx, tabName) {
 			return curTabCtx + ' div[id^='+tabName.toLowerCase().replace(/ /g, '_')+']';

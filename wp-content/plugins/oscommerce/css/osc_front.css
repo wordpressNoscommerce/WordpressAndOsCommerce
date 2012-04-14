@@ -10,9 +10,9 @@ body {
 }
 /**************************************************************************************/
 /** PRODUCT formatting **/
-div.post-content div#loop.grid div.product-box { /*     padding-top: 0px; */
-  padding: 0px 0px 0px 0px;
-}
+/* div.post-content div#loop.grid div.product-box { */
+/*   padding: 0px 0px 0px 0px; */
+/* } */
 
 /* limit depth to ui tabs only */
 div#product-format-tabs.wp-tabs .ui-tabs>ul {
@@ -439,18 +439,17 @@ div#encoding {
 /* } */
 
 
-.product-thumb {
-  float: left;
-  /* 	display: inline; */
-  cursor: pointer;
-}
+/* .product-thumb { */
+/*   float: left; */
+/*   cursor: pointer; */
+/* } */
 
-.product-thumb img {
-  width: 190px;
-  height: 190px;
-  border: none;
-  margin-bottom: 0px;
-}
+/* .product-thumb img { */
+/*   width: 190px; */
+/*   height: 190px; */
+/*   border: none; */
+/*   margin-bottom: 0px; */
+/* } */
 
 div.product-info {
   float: left;
