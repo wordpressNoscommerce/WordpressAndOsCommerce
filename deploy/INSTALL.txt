@@ -32,3 +32,6 @@ transferNews.sql
 8. check home and siteurl
 
 9. check oscommerce DB access
+
+10. check item IDs used to apply specific styles in wp-content/themes/sight/custom.css
+
