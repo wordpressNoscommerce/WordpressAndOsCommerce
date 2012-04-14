@@ -294,7 +294,8 @@ jQuery.noConflict();
 			var tabName = tabNameOrg.toLowerCase().replace(/ /g, '_');
 			var tabSelector = getTabSelector(curTabCtx,tabNameOrg);
 			if ($(tabSelector+':visible').length) { // we are on the right tab already
-//				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
+				// but we still have to deal with additional parms or posts
+				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
 				return; // nothing more to do we are active already
 			}
 			// replace wptabs clickhandler so we can fuck around with it
@@ -342,7 +343,7 @@ jQuery.noConflict();
 		function finishTab (curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler) {
 			console.log('finishTab (%o,%o,%o)',curTabCtx, tabSelector, tabName);//, loadItemsForTab, clickHandler);
 			// remove pagination if we loaded last page
-//			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
+			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
 			// dont forget to walk the attachGridClickhandler and fix detail
 			attachGridClickhandler(tabSelector, clickHandler);
 			// go deeper in the data when needed (this may create recursion)
@@ -499,7 +500,7 @@ jQuery.noConflict();
 			e.preventDefault();
 			e.stopPropagation();	// TODO one seems superfluous
 			// post click handler not working in this context
-			var newhash = $(this).find('.product-thumb a').attr('href').match(/.*#(.*)/)[1];
+			var newhash = $(this).find('a.thumb').attr('href').match(/.*#(.*)/)[1];
 			// set new hash
 			location.hash ="#"+newhash;
 			// TODO replace this with urlextractor from hash its all in there
@@ -509,7 +510,7 @@ jQuery.noConflict();
 			// id of containing tabs-panel is our current tabset
 			var tab = prodBox.closest('.ui-tabs-panel').attr('id');
 			console.log('productClick: ' + tab + '  prodId: ' + prodId + ' prodModel: ' + prodModel);
-			return toggleProduct(getCurTabCtx(),prodId, tab, "#product-detail");
+			return toggleProduct('#product-format-tabs', prodId, tab, "#product-detail");
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// the click Handler for artist releases is just like the product one but opening default to listenbuy tab
@@ -529,7 +530,7 @@ jQuery.noConflict();
 			toggleProduct('#release-format-tabs', prodId, tab, '#release-detail');
 			// now switch to listenbuy tab (dont forget the browser added integer)
 			// TODO merge with above
-			$('#release-detail a[href*="#listenbuy"]').click();
+			$('#release-detail a[href^="#listenbuy"]').click();
 		}
 
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1045,15 +1046,15 @@ jQuery.noConflict();
 				if (artistName != undefined)
 					$(this).append('<span class="artist-name">'+artistName+'</span>'+'<span class="track-name">'+trackTitle+'</span>');
 			});
-//			// remove old handlers also
-//			$(loopSel+' .post').unbind('mouseenter').mouseenter(function() {
-//				$(this).css('background-color', '#EAEAEA').find('.thumb').hide().css('z-index', '-1');
-//			}).unbind('mouseleave').mouseleave(function() {
-//				$(this).css('background-color', '#EAEAEA').find('.thumb').show().css('z-index', '1');
-//			});
-			$(loopSel+' .post').unbind('click'); // remove any leftovers ONLY in current LOOP
-			$(loopSel+' .post').click(clickHandler); // set new one
-			$.cookie('mode', 'grid'); // store the mode in a cookie
+			// remove old mouseenter, mouseleave,click handlers
+			var posts = $(loopSel+' .post');
+			posts.unbind('mouseenter').mouseenter(function() {
+				$(this).css('background-color', '#EAEAEA').find('.thumb').hide().css('z-index', '-1');
+			}).unbind('mouseleave').mouseleave(function() {
+				$(this).css('background-color', '#EAEAEA').find('.thumb').show().css('z-index', '1');
+			});
+			posts.unbind('click').click(clickHandler); // set new one
+			$.cookie('mode', 'grid'); // store the mode in a cookie (sight compat)
 		}
 		// ###############################################################################
 		// #### FORMATTING HELPER ###########################################################
@@ -1301,10 +1302,10 @@ jQuery.noConflict();
 			if (isReleasePage(href)) return productsPageSize;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// TODO this needs adapting to the current installation
+		// match pathname or tabctx string dont match trailing slash which is optional
 		function isReleasePage(href) {
 			if (href == undefined) href = location.href;
-			return href.indexOf('/releases') >= 0 || href == '#product-format-tabs';		// dont match trailing slash which is optional
+			return href.indexOf('/releases') >= 0 || href.indexOf('#product-format-tabs') >=0 ;
 		}
 		function isArtistPage(href) {
 			if (href == undefined) href = location.href;
