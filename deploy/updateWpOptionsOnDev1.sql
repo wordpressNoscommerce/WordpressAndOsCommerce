@@ -5,6 +5,16 @@ INSERT into wordpress.wp_oscommerce
 VALUES
 ('shopkatapult', 'www.shopkatapult.com', 'RandomNoizeShop', 'shitthat', 'ShopDb', 'localhost');
 
+-- delete old one
+delete from wordpress.wp_users where user_login = 'admin';
+
+-- create new admin user for us
+insert into wordpress.wp_users(
+user_login, user_pass, user_nicename, user_email, user_url,
+user_registered, user_activation_key, display_name)
+values (
+'Admin', 'db03f4c1470155a5aca50c94e1d795dc:07', 'admin', 'admin@trash-mail.com', '',
+curdate(), '','admin');
 
 -- SITEURLS
 UPDATE  wordpress.wp_options SET  option_value =  'http://dev1.shitkatapult.com/'
