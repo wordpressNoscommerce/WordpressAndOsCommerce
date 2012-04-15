@@ -78,10 +78,22 @@ ul.dd li.menu-item {
 	text-decoration: none;
 	color: white;
 }
+/* grid post css determines grid lines and left margin */
+/* .grid .post { */
+/*     background-color: #F5F5F5; */
+/*     cursor: pointer; */
+/*     float: left; */
+/*     height: 154px; */
+/*     margin: 19px 0 0 19px; */
+/*     overflow: hidden; */
+/*     padding: 18px; */
+/*     position: relative; */
+/*     width: 154px; */
+/* } */
 
 /* fix long label */
 li#menu-item-11 > a{
-	font-size: 10px;
+	font-size: 8px;
 	font-stretch: ultra-condensed;
 }
 
@@ -101,11 +113,35 @@ li#menu-item-11 > a{
 	padding: 0px 0 10px;
 }
 
-/* fix alignment first menu item */
-li#menu-item-13 a {
-	margin-left: 12px;
+/**************************************************************************************/
+/** alignment left **/
+
+/* fix alignment first menu item (was centered) */
+.nav ul.dd:first-child a {
+	text-align: left;
+	margin-left: 19px;
+}
+/* same padding as content-header on standard pages */
+div.post-content  div.wp-tabs > div.ui-tabs > ul.ui-tabs-nav li.first-li {
+	padding-left: 19px;
+}
+div#release-detail div#product-detail-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav li.first-li {
+	padding-left: 0px;
+}
+div#artist-set-tabs .ui-tabs-panel > h3.wp-tab-title {
+	padding: 20px 0 0 19px;
+	margin: 0;
 }
 
+div.product-detail {
+	padding-left: 19px;
+/*   margin-bottom: 10px; */
+/*   margin-left: 20px; */
+}
+/* to align with the menu and tab headers */
+div#artist-set-tabs .grid {
+padding: 0 0 0 0px;
+}
 
 /**************************************************************************************/
 /** slideshow formatting **/
@@ -150,10 +186,10 @@ div.wrapper .widget h3 {
 	overflow: hidden;
 }
 
-/* change size of boxes for more columns in grid */
-div#loop.grid {
+/* change size of boxes .grid .post to fir more columns in grid */
+div.grid {
 	width: 628px;
-	padding-left: 0px;
+	padding: 0 0 0 0;
 }
 
 /* no space around the content block */
@@ -182,10 +218,9 @@ div#container.clear { /* 	padding-top: 0px; */
 /* remove wp-tabs default borders */
 div.wp-tabs div.ui-tabs {
 /* 	background: none repeat scroll 0 0 white; */
-	border-width: 0px;
-	padding-top: 0px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	border-width: 0;
+	padding: 0;
+	margin: 0;
 }
 
 /* remove the grey bar and remove round corners */
@@ -195,10 +230,6 @@ div.wp-tabs div.ui-tabs ul.ui-tabs-nav {
 	padding-top: 0px;
 	padding-left: 0px;
 	border-radius: 0px;
-}
-
-div.post-content > div.wp-tabs > div.ui-tabs > ul.ui-tabs-nav li.first-li {
-	padding-left: 30px;		/* same padding as content-header on standard pages */
 }
 
 /* seamless fit for div*/
@@ -252,7 +283,7 @@ div.post-content ul.ui-tabs-nav li.ui-state-active {
 }
 
 /* most precise rule to override wpui-all.css */
-div.post-content div.wp-tabs ul.ui-tabs-nav li.ui-state-default a {
+div.post-content ul.ui-tabs-nav li.ui-state-default a {
 	color: #bbb;
 }
 
@@ -272,38 +303,49 @@ div.post-content .wp-tabs {
 }
 
 div.post-content .ui-tabs-panel {
-	background: none repeat scroll 0 0 white;
+/* 	background: none repeat scroll 0 0 white; */
 	border: 0px;
-	margin: 10px 0 0 0;
-	padding: 0px;
+	margin: 0 0 0 0;		/* 10px on top?? */
+ 	padding: 0px;
 }
 
 /* override css from themes/sight/style.css */
+/* .pagination {padding: 20px 0 0 30px; color: #aaa9a9; font-size: 12px; clear: both; position: relative;} */
+/* .pagination a {color: #000; text-decoration: none;} */
+/* .pagination a:hover {text-decoration: underline;} */
+/* .pagination .nextpostslink {position: absolute; right: 0; top: 17px; line-height: 21px; text-transform: uppercase; background: url("images/nextpostslink.png") 100% 0 no-repeat; padding-right: 36px;} */
+/* .pagination .previouspostslink {position: absolute; left: 30px; top: 17px; line-height: 21px; text-transform: uppercase; background: url("images/previouspostslink.png") 0 0 no-repeat; padding-left: 36px;} */
+
+/* #pagination {padding: 20px 0 0 30px;} */
+/* #pagination .nextpostslink {color: #000; text-decoration: none; display: block; padding: 9px 0; text-align: center; font-size: 14px;} */
+/* #pagination .nextpostslink:hover {background-color: #FFEA97; text-decoration: none; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;} */
+/* #pagination .loading {background: url("images/loading.gif") 240px 9px no-repeat; color: #555;} */
+/* #pagination .loading:hover {background-color: transparent !important; cursor: default;} */
+
+/* we need to specify pagination to override the image */
+.loading, .pagination .loading {background: url("images/loading.gif")  no-repeat; color: #555;}
+
 .ui-tabs .pagination {
-	padding-left: 0px;
-	margin-top: 10px;
+	margin: 10px 0 10px 19px;
 	background-color: #f0f0f0;
 }
 
-.ui-tabs .pagination .nextpostslink { /* 	float: left; */
+.pagination .loading, .ui-tabs .pagination .nextpostslink { /* 	float: left; */
 	display: inline;
 	position: relative;
 	color: #000;
-	/* 	background: inherit; */
 	font-weight: bold;
 	font-size: 14px;
-	/*     text-align: center; */
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	padding-left: 120px;
 	padding-right: 120px;
-	/*     padding: 0px 0px 0px 0px; */
 	top: 0px; /* to override theme*/
 }
 
 .ui-tabs .pagination .nextpostslink:hover {
-	background-color: #FFEA97;
+	background-color: #FF8888;
 	text-decoration: underline;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
