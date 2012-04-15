@@ -35,13 +35,12 @@ class osc_manufacturer_templates extends osc_product_templates // we need all of
         echo '<script id="release-box-template" type="text/x-jquery-tmpl">
 '; ?>
 <div class="release-box product-box post hentry type-post status-publish format-standard">
-  <div class="product-thumb">
-    <a href="#listenbuy&artistSet=${artist_set}&paged=${paged}&format=${format}&artistId=${manufacturers_id}&products_id=${products_id}&rpage=${rpage}" class="product-thumb"><img src="${products_image_url}" alt="${products_name}" title="${products_name}" /> </a>
-  </div>
+  <a href="#listenbuy&artistSet=${artist_set}&paged=${paged}&format=${format}&artistId=${manufacturers_id}&products_id=${products_id}&rpage=${rpage}" class="product-thumb thumb">
+    <img src="${products_image_url}" alt="${products_name}" title="${products_name}" /> </a>
   <div class="product-info clear">
+    <span class="product-id">${products_id}</span>
     <span class="product-model">${products_model}</span><br />
     <span class="product-title">${products_name}</span>
-    <span class="product-id">${products_id}</span>
   </div>
 </div><!-- end release-box -->
         <?php   echo '</script>
@@ -53,9 +52,8 @@ class osc_manufacturer_templates extends osc_product_templates // we need all of
         echo '<script id="manufacturer-box-template" type="text/x-jquery-tmpl">
 '; ?>
 <div class="artist-box post hentry type-post status-publish format-standard">
-  <div class="artist-thumb product-thumb">
-    <a href="#all_releases_of_artist&artistSet=${artist_set}&paged=${paged}&artistId=${manufacturers_id}" class="product-thumb"><img src="${manufacturers_image_url}" alt="${manufacturers_name}" title="${manufacturers_name}" /> </a>
-  </div>
+ <a href="#all_releases_of_artist&artistSet=${artist_set}&paged=${paged}&artistId=${manufacturers_id}" class="product-thumb thumb">
+    <img src="${manufacturers_image_url}" alt="${manufacturers_name}" title="${manufacturers_name}" /> </a>
   <div class="product-info clear">
     <span class="artist-name product-title">${manufacturers_name}</span>
     <span class="artist-id product-id">${manufacturers_id}</span>
