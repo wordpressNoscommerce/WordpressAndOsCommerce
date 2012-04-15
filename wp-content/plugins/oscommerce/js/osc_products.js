@@ -270,7 +270,6 @@ jQuery.noConflict();
 				var curPage = getLastPageOfTab(tabSelector);
 				result = pageno > curPage;
 			}
-			console.trace();
 			return result;
 		}
 		// ##########################################################################
@@ -617,8 +616,8 @@ jQuery.noConflict();
 
 			if (seltor.indexOf('product') >=0)
 				$(seltor+' a[href^="#listenbuy"]').click(); // show tracks
-			else // scroll into view
-				document.getElementById('prod-detail-header').scrollIntoView(true);
+			// always scroll into view
+			document.getElementById('product-detail').scrollIntoView(true);
 			$(seltor).fadeIn(fadeintime); //show active tab
 			lastProductId = prodId;
 		}
@@ -717,6 +716,10 @@ jQuery.noConflict();
 		// ###############################################################################
 		/** render product formats (CD, LP) into listenbuy tab * */
 		function renderProductFormats(target, formatList) {
+			$.each(formatList, function(i,e){
+				console.log('price %s',e.products_price);
+				e.products_price = Math.floor(e.products_price * 119)/100;
+			});
 			console.log('renderProductFormats(%o)', formatList);
 			var template = $('#product-format-template'); // new version
 			console.assert(template.length);
@@ -1307,7 +1310,7 @@ jQuery.noConflict();
 		}
 		function isArtistPage(href) {
 			if (href == undefined) href = location.href;
-			return href.indexOf('/artists') >= 0 || href == '#artist-set-tabs';		// dont match trailing slash which is optional
+			return href.indexOf('/artists') >= 0 || href.indexOf('#artist-set-tabs') >= 0;
 		}
 		// checks if location.hash and href are in the same page context
 		// TODO this has to go when we render everything from this script
