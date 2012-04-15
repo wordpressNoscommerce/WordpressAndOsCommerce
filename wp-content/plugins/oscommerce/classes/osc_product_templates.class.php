@@ -78,7 +78,7 @@ class osc_product_templates
 
     <div id="tab-info-text" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">InfoText</h3>
-      <div class="wp-tab-content">{{html products_description}}</div>
+      <div class="wp-tab-content textwidget">{{html products_description}}</div>
     </div> <!-- tab-info-text -->
 
     <div id="tab-listen-buy" class="ui-tabs-panel ui-widget-content ui-corner-bottom">

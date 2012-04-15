@@ -328,7 +328,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     if (empty($this->artist_set)) $this->artist_set = "Main"; // debugging
     ?>
 <div
-  class="wp-tabs wpui-light wpui-styles"
+  class="wp-tabs wpui-styles"
 >
   <!--  the product details DIV are right below the format tab header-->
   <div id="artist-details" class="product-details"></div>
@@ -355,7 +355,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     if (empty($this->artist_set)) $this->artist_set = "Main"; // debugging
     //    the product details DIV are right below the artist_set tab header
     ?>
-<div id="artist-set-tabs" class="wp-tabs wpui-light wpui-styles widget">
+<div id="artist-set-tabs" class="wp-tabs wpui-styles widget">
   <div id="artist-detail" class="artist-detail"></div>
   <?php 	    foreach ($this->artist_sets as $artist_set) { ?>
   <div id="<?php echo $artist_set;?>" class="ui-tabs-panel ui-widget-content">
@@ -447,7 +447,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
       // this is where the product details are shown
       ?>
 <div id="prod-details" class="product-details"></div>
-<div class="wp-tabs wpui-light wpui-styles">
+<div class="wp-tabs wpui-styles">
   <div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
     <ul class="ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
       <li class="ui-state-default ui-corner-top first-li"><a href="#manufacturers">manufacturers</a></li>

@@ -68,13 +68,13 @@ class osc_manufacturer_templates extends osc_product_templates // we need all of
             // hack to trick eclipse into formatting the HTML
             echo '<script id="artist-detail-template" type="text/x-jquery-tmpl">
 '; ?>
-<div id="artist-detail" class="product-detail format-standard">
+<div id="artist-header-detail" class="product-detail format-standard">
   <div id="artist-name-detail" class="artist-name">${manufacturers_name}</div>
   <div id="artist-image-big" class="product-image-wide">
     <img class="prod-image-wide" src="${manufacturers_image_url}" alt="${manufacturers_name} ">
   </div>
-  <div id="artist-text" class="artist-text">{{html manufacturers_description}}</div>
-</div><!-- artist-detail -->
+  <div id="artist-text" class="artist-text textwidget">{{html manufacturers_description}}</div>
+</div><!-- artist-header-detail -->
             <?php echo '</script>';
         }
 
@@ -84,7 +84,7 @@ class osc_manufacturer_templates extends osc_product_templates // we need all of
             // hack to trick eclipse into formatting the HTML
             echo '<script id="release-format-tabs-template" type="text/x-jquery-tmpl">
 '; ?>
-<div id="release-format-tabs" class="wp-tabs wpui-light wpui-styles widget">
+<div id="release-format-tabs" class="wp-tabs wpui-styles widget">
   <div id="release-detail" class="release-detail product-detail"></div>
 </div>
             <?php echo '</script>';

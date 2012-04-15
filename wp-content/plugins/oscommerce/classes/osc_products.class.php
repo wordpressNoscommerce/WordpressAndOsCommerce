@@ -274,7 +274,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
     if (empty($this->format)) $this->format = "Vinyl"; // debugging
     ?>
 <div
-  class="wp-tabs wpui-light wpui-styles"
+  class="wp-tabs wpui-styles"
 >
   <!--  the product details DIV are right below the format tab header-->
   <div id="product-detail" class="product-detail"></div>
@@ -305,7 +305,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
     //    the DIV#product-detail is right below the format tab header
 ?>
 <div id="product-format-tabs"
-	class="wp-tabs wpui-light wpui-styles widget">
+	class="wp-tabs wpui-styles widget">
 	<div id="product-detail" class="product-detail"></div>
 <?php
 	foreach ($this->release_formats as $format) {	// loop over configured formats
