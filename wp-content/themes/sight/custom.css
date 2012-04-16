@@ -197,7 +197,7 @@ div.grid {
 }
 
 /* no space around the content block */
-.entry .post-content {
+.page .post-content , .entry .post-content {
 	padding: 0px 0px 0px 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
@@ -574,4 +574,12 @@ li.shr-comfeed {
 }
 li.shr-comfeed:hover {
     background-position: -780px top !important;
+}
+
+/* minimal versioning tag */
+#filetime {
+	position: absolute;
+	right: 0;
+	font-family: Verdana, sans-serif;
+	color: #f0f0f0;
 }
