@@ -121,12 +121,12 @@ li#menu-item-11 > a{
 	text-align: left;
 	margin-left: 19px;
 }
+div.post-content  div#product-detail-tabs.wp-tabs > div.ui-tabs > ul.ui-tabs-nav li.first-li {
+	padding-left: 0px;
+}
 /* same padding as content-header on standard pages */
 div.post-content  div.wp-tabs > div.ui-tabs > ul.ui-tabs-nav li.first-li {
 	padding-left: 19px;
-}
-div#release-detail div#product-detail-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav li.first-li {
-	padding-left: 0px;
 }
 div#artist-set-tabs .ui-tabs-panel > h3.wp-tab-title {
 	padding: 20px 0 0 19px;
@@ -433,4 +433,154 @@ div.post-content .ui-tabs-panel {
 img#uv {
 	height: 20px;
 	width: 20px;
+}
+
+/* ######################################################################## */
+/* ######################################################################## */
+/* ######################################################################## */
+/* SHARE BOOKMARKS */
+/* ######################################################################## */
+/* ######################################################################## */
+/* ######################################################################## */
+div.shr-bookmarks {
+    clear: both !important;
+    margin: 0 0;
+}
+div.shr-bookmarks-expand {
+    height: 32px;
+    overflow: hidden;
+}
+div.shr-bookmarks ul.socials li {
+    background-image: url("images/shr-custom-sprite.png") !important;
+    background-repeat: no-repeat !important;
+}
+div.shr-bookmarks-bg-knowledge {
+    background: url("images/share-knowledge.png") no-repeat scroll 0 0 transparent !important;
+    padding: 35px 0 0 10px !important;
+}
+div.shr-bookmarks ul.socials {
+    float: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+div.shr-bookmarks ul.socials {
+    background: none repeat scroll 0 0 transparent !important;
+    border: 0 none !important;
+    outline: 0 none !important;
+}
+div.shr-bookmarks ul.socials li {
+    background-color: transparent !important;
+    border: 0 none !important;
+    clear: none !important;
+    cursor: pointer !important;
+    display: inline !important;
+    float: left !important;
+    height: 29px !important;
+    list-style-type: none !important;
+    margin: 3px 0 0 !important;
+    outline: 0 none !important;
+    padding: 0 !important;
+    width: 60px !important;
+}
+div.shr-bookmarks ul.socials li:before, div.shr-bookmarks ul.socials li:after, div.shr-bookmarks ul.socials li a:before, div.shr-bookmarks ul.socials li a:after {
+    content: "" !important;
+}
+div.shr-bookmarks ul.socials a, div.shr-bookmarks ul.socials a:hover {
+    background-color: transparent !important;
+    border: 0 none !important;
+    display: block !important;
+    height: 29px !important;
+    text-decoration: none !important;
+    text-indent: -9999px !important;
+    width: 60px !important;
+}
+div.shr-bookmarks ul.socials a:hover, div.shr-bookmarks ul.socials li:hover {
+    background-color: transparent !important;
+    border: 0 none !important;
+    outline: 0 none !important;
+}
+li.shr-facebook {
+    background-position: 0 bottom !important;
+}
+li.shr-facebook:hover {
+    background-position: 0 top !important;
+}
+li.shr-twitter {
+    background-position: -60px bottom !important;
+}
+li.shr-twitter:hover {
+    background-position: -60px top !important;
+}
+li.shr-delicious {
+    background-position: -120px bottom !important;
+}
+li.shr-delicious:hover {
+    background-position: -120px top !important;
+}
+li.shr-stumbleupon {
+    background-position: -180px bottom !important;
+}
+li.shr-stumbleupon:hover {
+    background-position: -180px top !important;
+}
+li.shr-digg {
+    background-position: -240px bottom !important;
+}
+li.shr-digg:hover {
+    background-position: -240px top !important;
+}
+li.shr-gmail {
+    background-position: -300px bottom !important;
+}
+li.shr-gmail:hover {
+    background-position: -300px top !important;
+}
+li.shr-linkedin {
+    background-position: -360px bottom !important;
+}
+li.shr-linkedin:hover {
+    background-position: -360px top !important;
+}
+li.shr-googlebuzz {
+    background-position: -420px bottom !important;
+}
+li.shr-googlebuzz:hover {
+    background-position: -420px top !important;
+}
+li.shr-googlebookmarks {
+    background-position: -480px bottom !important;
+}
+li.shr-googlebookmarks:hover {
+    background-position: -480px top !important;
+}
+li.shr-hotmail {
+    background-position: -540px bottom !important;
+}
+li.shr-hotmail:hover {
+    background-position: -540px top !important;
+}
+li.shr-technorati {
+    background-position: -600px bottom !important;
+}
+li.shr-technorati:hover {
+    background-position: -600px top !important;
+}
+li.shr-reddit {
+    background-position: -660px bottom !important;
+}
+li.shr-reddit:hover {
+    background-position: -660px top !important;
+}
+li.shr-diigo {
+    background-position: -720px bottom !important;
+}
+li.shr-diigo:hover {
+    background-position: -720px top !important;
+}
+li.shr-comfeed {
+    background-position: -780px bottom !important;
+}
+li.shr-comfeed:hover {
+    background-position: -780px top !important;
 }
