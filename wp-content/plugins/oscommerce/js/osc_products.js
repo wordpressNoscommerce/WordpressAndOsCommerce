@@ -151,10 +151,12 @@ jQuery.noConflict();
 					fetchurl += "&paged=" + pageno; // append extra param
 				// the url returns a tuple with record count and result
 				console.log('loading more products' + fetchurl);
+				getTabLnk(curTabCtx,tabName).addClass('loading');
 				$.ajax({
 					type : 'GET',
 					url : fetchurl,
 					success : function(data, textStatus, jqXHR) {
+						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						if (data.indexOf('No Records found') >= 0) {
 							console.error(data);
 							$('#product-detail').html(data).addClass('error');
@@ -167,6 +169,12 @@ jQuery.noConflict();
 							// scroll box to bottom
 							$(curTabCtx).get(0).scrollIntoView(0);
 						}
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						getTabLnk(curTabCtx,tabName).removeClass('loading');
+						console.error('request(%s) error(%o)',fetchurl, jqXHR);
+						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
+						$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
 			} else { // check if its rendered already
@@ -188,11 +196,12 @@ jQuery.noConflict();
 					fetchurl += "&artistId=" + artists_id; // append extra param
 				// the url returns a tuple with record count and result
 //				$('div.pagination').addClass('ui-tabs-hide'); // hide all before loading
-				console.trace();
+				getTabLnk(curTabCtx,tabName).addClass('loading');
 				$.ajax({
 					type : 'GET',
 					url : fetchurl,
 					success : function(data, textStatus, jqXHR) {
+						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						if (data.indexOf('No Records found') >= 0) {
 							console.error(data);
 							$('#artist-detail').html(data).addClass('error');
@@ -205,6 +214,12 @@ jQuery.noConflict();
 							// scroll curTabCtx box to bottom
 							$(curTabCtx).get(0).scrollIntoView(0);
 						}
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						getTabLnk(curTabCtx,tabName).removeClass('loading');
+						console.error('request(%s) error(%o)',fetchurl, jqXHR);
+						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
+						$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
 			} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
@@ -221,22 +236,24 @@ jQuery.noConflict();
 		function loadProductsForArtist(artistId) { 	// use closure to supply the extra artistId
 			return function(curTabCtx, tabName, rpage) {
 				if (relemap[artistId] == undefined)
-					relemap[artistId] = {}; // init empty object before loading
+					relemap[artistId] = []; // init empty release ARRAY before loading
 				// load new data if empty or next page (as this is an object now count the props instead of length)
-				if (countProperties(relemap[artistId])|| rpage > 1) {
+				if (relemap[artistId] == undefined || countProperties(relemap[artistId]) == 0 || rpage > 1) {
 					var fetchurl = oscPrefix + "/get_product_page.php?json=1&artistId=" + artistId;
 					fetchurl += "&format=All"; // TODO read all formats for now
 					fetchurl += "&pagesize=3"; // only 3 at a time
 					if (rpage != undefined)
 						fetchurl += "&paged=" + rpage; // append extra param
 					// DATA = array($this->records_per_page,$this->product_count, $this->max_page, $this->result,$this->release_formats);
+					getTabLnk(curTabCtx,tabName).addClass('loading');
 					$.ajax({
 						type : 'GET',
 						url : fetchurl,
 						success : function(data, textStatus, jqXHR) {
+							getTabLnk(curTabCtx,tabName).removeClass('loading');
 							if (data.indexOf('No Records found') >= 0) {
 								console.error(data);
-								$('#release-detail').html(data).addClass('error');
+								$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ data+'</h3>').addClass('error');
 							} else {
 								var result = eval('(' + data + ')'); // eval json array
 								addToCache(result[3], artistId); // this is the product list and artist relation
@@ -247,6 +264,12 @@ jQuery.noConflict();
 								// scroll box to bottom
 								$('#release-format-tabs').get(0).scrollIntoView(0);
 							}
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							getTabLnk(curTabCtx,tabName).removeClass('loading');
+							console.error('request(%s) error(%o)',fetchurl, jqXHR);
+							var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + manumap[artistId].manufacturers_name;
+							$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 						}
 					});
 				} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
@@ -359,7 +382,7 @@ jQuery.noConflict();
 		function finishTab (curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler) {
 			console.log('finishTab (%o,%o,%o)',curTabCtx, tabSelector, tabName);//, loadItemsForTab, clickHandler);
 			// remove pagination if we loaded last page
-			attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab);
+			showPagination(curTabCtx, tabSelector, tabName, loadItemsForTab);
 			// dont forget to walk the attachGridClickhandler and fix detail
 			attachGridClickhandler(tabSelector, clickHandler);
 			// go deeper in the data when needed (this may create recursion)
@@ -421,8 +444,8 @@ jQuery.noConflict();
 			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// attach click handler for pagination link only if there is another page to load
-		function attachPaginationHandler(curTabCtx, tabSelector, tabName, loadItemsForTab) {
+		// show pagination link only if there is another page to load
+		function showPagination(curTabCtx, tabSelector, tabName, loadItemsForTab) {
 			var lastPage = getLastPageOfTab(tabSelector);
 			var maxpage = getMaxPageOfTab(tabSelector);
 			var pageDiv = $(tabSelector + ' div.pagination');
@@ -443,7 +466,7 @@ jQuery.noConflict();
 			e.preventDefault();
 			e.stopPropagation();	// TODO one seems superfluous
 			// post click handler not working in this context
-			var newhash = $(this).find('.product-thumb a').attr('href').match(/.*#(.*)/)[1];
+			var newhash = $(this).find('a.thumb').attr('href').match(/.*#(.*)/)[1];
 			// set new hash
 			location.hash ="#"+newhash;
 			// TODO replace this with urlextractor from hash its all in there
@@ -501,8 +524,8 @@ jQuery.noConflict();
 			loadProductsForArtist(artistId)(curTabCtx, allArtReleases,rpage);
 
 			// and activate tabs
-			$(seltor).fadeIn(fadeintime);
 			$(seltor).get(0).scrollIntoView();
+			$(seltor).fadeIn(fadeintime);
 			lastArtistId = artistId;
 			return;
 		}
@@ -616,8 +639,8 @@ jQuery.noConflict();
 
 			if (seltor.indexOf('product') >=0)
 				$(seltor+' a[href^="#listenbuy"]').click(); // show tracks
-			// always scroll into view
-			document.getElementById('product-detail').scrollIntoView(true);
+			// always scroll into view (its a DOM function not jquery
+			$(curTabCtx).parent().get(0).scrollIntoView(true);	// top end
 			$(seltor).fadeIn(fadeintime); //show active tab
 			lastProductId = prodId;
 		}
@@ -626,34 +649,42 @@ jQuery.noConflict();
 		/** load listenbuy tab including the jplayer */
 		function load_listenbuy_tab(curTabCtx,e, prod) {
 			// TODO check if content is there already
-			var lstbuytab = getTabSelector(curTabCtx,'listenbuy');
-			if ($('#product-detail-tabs'+lstbuytab+' #loadingProds').length == 0)
-				return;
-			if ($('DIV#products-buy-list').length)
-				// set loading image to the H2 tag in tab
-				$(lstbuytab+' #loadingProds').addClass('loading');
-			var fetchProdDataUrl = oscPrefix + "/get_product_data.php?json=1&pid=" + prod.products_id + '&mdl='
-					+ prod.products_model;
+			var lstbuytab = $(getTabSelector(curTabCtx,'listenbuy'));
+			var loadMsg = lstbuytab.find('#loadingProds');
+			var errorMsg = lstbuytab.find('.error');
+			if (loadMsg.length == 0 && errorMsg.length == 0)
+				return; // this means the ajax call back has found useful data
+			else loadMsg.addClass('loading');
+			var fetchurl = oscPrefix + "/get_product_data.php?json=1&pid=" + prod.products_id
+										+ '&mdl=' + prod.products_model;
 			// the url returns a tuple of record count and result lists for formats and xsell
 			$.ajax({
 				type : 'GET',
-				url : fetchProdDataUrl,
+				url : fetchurl,
 				success : function(data, textStatus, jqXHR) {
 					if (data.indexOf('No Records found') >= 0) {
 						console.error(data);
-						$('#product-detail').html(data).addClass('error');
+						lstbuytab.html(data).addClass('error');
 					} else { // stop loading image
 						var result = eval('(' + data + ')'); // eval json data
 						// merge named members to local database TODO check if this is useful
 						addToCache(result.formats);
 						addToCache(result.xsell);
 						console.log('got product data %o', result);
-						var target = $(lstbuytab + ' div.wp-tab-content'); // select the content div!!!
+						var target = lstbuytab.find(' div.wp-tab-content'); // select the content div!!!
 						target.empty();
 						if (result.xsell != undefined)
 							renderPlaylistPlayer(target, prod, result.xsell);
 						renderProductFormats(target, result.formats);
 					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.error('request(%s) error(%o)',fetchurl, jqXHR);
+					var msg = "status="+jqXHR.status+"   "+errorThrown+" <br>when trying to load Release Formats for " + prod.products_model;
+					lstbuytab.html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+					lstbuytab.append('<A class="error">Click to Retry</a>').click (function (e) {
+						load_listenbuy_tab(curTabCtx,e, prod);
+					});
 				}
 			});
 		}
@@ -1050,9 +1081,9 @@ jQuery.noConflict();
 			// remove old mouseenter, mouseleave,click handlers
 			var posts = $(loopSel+' .post');
 			posts.unbind('mouseenter').mouseenter(function() {
-				$(this).css('background-color', '#EAEAEA').find('.thumb').hide().css('z-index', '-1');
+				$(this).find('.thumb').fadeOut(300).css('z-index', '-1');
 			}).unbind('mouseleave').mouseleave(function() {
-				$(this).css('background-color', '#EAEAEA').find('.thumb').show().css('z-index', '1');
+				$(this).find('.thumb').fadeIn(300).css('z-index', '1');
 			});
 			posts.unbind('click').click(clickHandler); // set new one
 			$.cookie('mode', 'grid'); // store the mode in a cookie (sight compat)
@@ -1176,6 +1207,9 @@ jQuery.noConflict();
 //			if (location.hash.indexOf('#') >= 0)
 				$('div.nav ul.sub-menu li.menu-item a').unbind('click').click(changeStateHandler);
 		}
+		// ##############################################################################
+		// ### MAIN CLICK HANDLER #######################################################
+		// ##############################################################################
 		function changeStateHandler(e) {
 			var href = $(e.currentTarget).attr('href');
 			if (href.indexOf('#')== 0)
@@ -1185,10 +1219,12 @@ jQuery.noConflict();
 			getStateFromUrl(href);
 			e.preventDefault();
 			e.stopPropagation();
+//			$(this).addClass('loading');
+			$(this).find('.pagination').text('LOADING...');
 			initPage(href); // open page for href parms... dont reload
 			return false;
 		}
-
+		// ##############################################################################
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		var flatImage = { 'height' : '200px' };
 		var bigImage = { 'height' : 'auto' }; // just change the enclosing DIVs height
@@ -1223,6 +1259,9 @@ jQuery.noConflict();
 		// to deal with funny modifications -- space in front for concatenation
 		function getTabSelector(curTabCtx, tabName) {
 			return curTabCtx + ' div[id^='+tabName.toLowerCase().replace(/ /g, '_')+']';
+		}
+		function getTabLnk(curTabCtx, tabName) {
+			return $(curTabCtx).find('ul.ui-tabs-nav li a[href^=#'+tabName.toLowerCase().replace(/ /g, '_')+']');
 		}
 		function getTabFromSelector(tabSelector) {
 			var left = tabSelector.indexOf('div[id^=');
@@ -1318,5 +1357,11 @@ jQuery.noConflict();
 		function isCurCtx(href) {
 			return ((isReleasePage() && isReleasePage(href)) || (isArtistPage() && isArtistPage(href)));
 		}
+		var cnt = 0;
+		$(window).scroll(function () {
+		   if ($(window).scrollTop() >= $(document).height() - $(window).height() - 5) {
+		      console.log('trigger pageload NOW %d %s ?????',cnt);
+		   }
+		});
 	});
 })(jQuery);

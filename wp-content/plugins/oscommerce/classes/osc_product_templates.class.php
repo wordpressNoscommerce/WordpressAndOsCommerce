@@ -299,6 +299,7 @@ class osc_product_templates
 				<div class="jp-progress">
 					<div class="jp-seek-bar">
 						<div class="jp-play-bar"></div>
+						<div class="jp-play-handle"></div>
 					</div>
 				</div>
  				<div class="jp-volume-bar">

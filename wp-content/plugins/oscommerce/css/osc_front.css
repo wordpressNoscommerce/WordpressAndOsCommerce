@@ -1,12 +1,16 @@
 @charset "utf-8";
 /* CSS Document */
 body {
-  padding-top: 0px;
-  padding-bottom: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.ui-tabs .textwidget {
+	font: 12px/1.3 'Verdana', sans-serif;
 }
 
 #content .entry {
-  margin-bottom: 0px;
+	margin-bottom: 0px;
 }
 /**************************************************************************************/
 /** PRODUCT formatting **/
@@ -21,141 +25,142 @@ body {
 
 /* TODO dont override the jplayer lists */
 div#product-detail-tabs.wp-tabs ul.ui-tabs-nav li {
-  border-bottom: 0px;
+	border-bottom: 0px;
 }
 
 /* no shadow after prodimage */
 div#product-detail-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav {
-  box-shadow: 0 0px 0 #FFFFFF inset;
+	box-shadow: 0 0px 0 #FFFFFF inset;
 }
 /* no rounded corners  */
 .wp-tabs .wpui-styles .ui-corner-top a {
-  border-radius: 0 0 0 0;
+	border-radius: 0 0 0 0;
 }
 
 .wp-tabs .wpui-light ul.ui-tabs-nav {
-  box-shadow: 0 1px 0 #FFFFFF inset;
-  padding-left: 10px;
-  padding-top: 10px;
+	box-shadow: 0 1px 0 #FFFFFF inset;
+	padding-left: 10px;
+	padding-top: 10px;
 }
 
 div#product-format-tabs.wp-tabs li.ui-state-default a {
-  padding-top: 0px;
-  /*     border-bottom: 0px; */
+	padding-top: 0px;
+	/*     border-bottom: 0px; */
 }
 
 div#product-format-tabs.wp-tabs li.ui-state-default h3,div#artist-set-tabs.wp-tabs li.ui-state-default h3 {
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  border-bottom-width: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	border-bottom-width: 0px;
 }
 
 div#container.clear div#content div.entry {
-  max-width: 628px;
+	max-width: 628px;
 }
 
 .product-xsell-box {
-  border-bottom-width: 1px;
-  margin-top: 2px;
-  height: 22px;
-  border-color: #eaeaea;
-  background: transparent url(../images/rightArrow.png) center left no-repeat;
+	border-bottom-width: 1px;
+	margin-top: 2px;
+	height: 22px;
+	border-color: #eaeaea;
+	background: transparent url(../images/rightArrow.png) center left no-repeat;
 }
 
 .product-xsell-box:hover {
-  cursor: pointer;
-  background: #eaeaea url(../images/rightArrow.png) center left no-repeat;
+	cursor: pointer;
+	background: #eaeaea url(../images/rightArrow.png) center left no-repeat;
 }
 
-div.player-block {
+/* div.player-block { } */
+div.wp-tabs div.ui-tabs div.wp-tab-content {
 
 }
 
 /* ############################################################## */
 /* jplayer */
 div.wp-tabs div.jp-audio {
-  width: auto;
-  border-width: 0px;
-  background-color: white;
-  font-family: 'Crimson Text', serif;
+	width: auto;
+	border-width: 0px;
+	background-color: white;
+	font-family: 'Crimson Text', serif;
 }
 
 img.prod-image-small {
-  height: 80px;
-  width: 80px;
-  margin-bottom: 0px;
-  float: left;
+	height: 80px;
+	width: 80px;
+	margin-bottom: 0px;
+	float: left;
 }
 /*                 <div id="jp-track-info"> */
 /*                     <div id="jp-track-artist"></div> */
 /*                     <div id="jp-track-name"></div> */
 /*                 </div> */
 .post-content div#jp-track-info {
-  position: relative;
-  top: 0px;
-  height: 26px;
-  white-space: nowrap;
-  width: 518px;
-  overflow: hidden;
+	position: relative;
+	top: 0px;
+	height: 26px;
+	white-space: nowrap;
+	width: 518px;
+	overflow: hidden;
 }
 
 .post-content div#jp-track-artist { /* 	float: left; */
-  margin-right: auto;
-  padding-left: 10px;
-  padding-top: 5px;
-  font-weight: bold;
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	margin-right: auto;
+	padding-left: 10px;
+	padding-top: 5px;
+	font-weight: bold;
+	text-transform: uppercase;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .post-content div#jp-track-name { /* 	padding-left: 10px; */
-  padding-right: 20px;
-  padding-top: 5px;
-  font-style: italic;
-  float: right;
-  max-width: 400px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+	padding-right: 20px;
+	padding-top: 5px;
+	font-style: italic;
+	float: right;
+	max-width: 400px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .post-content div.jp-title,.post-content div.jp-playlist {
-  width: 100%;
-  border-top-width: 0;
-  background-color: white;
+	width: 100%;
+	border-top-width: 0;
+	background-color: white;
 }
 
 div.wp-tabs div.ui-tabs div.jp-interface {
-  background-color: #bfbfbf;
+	background-color: #bfbfbf;
 }
 
 div.wp-tabs div.ui-tabs div.jp-type-playlist div.jp-playlist a.jp-playlist-current {
-  color: #333333;
-  text-decoration: underline;
+	color: #333333;
+	text-decoration: underline;
 }
 
 /* TODO fix positioning of icon by changing image file */
 div.wp-tabs div.ui-tabs div.jp-playlist ul {
-  list-style-image: url(../images/rightArrowDark.png);
-  list-style-position: inside;
-  padding: 0 0 0 0;
-  border-bottom: 0px;
+	list-style-image: url(../images/rightArrowDark.png);
+	list-style-position: inside;
+	padding: 0 0 0 0;
+	border-bottom: 0px;
 }
 
 /* jplayer controls */
 div.wp-tabs div.ui-tabs div.jp-audio ul.jp-controls {
-  position: absolute;
-  top: 20px;
-  left: 80px;
+	position: absolute;
+	top: 20px;
+	left: 80px;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio a.jp-play,div.wp-tabs div.ui-tabs div.jp-audio a.jp-pause {
-  margin-top: 6px;
-  height: 28px;
-  width: 28px;
+	margin-top: 6px;
+	height: 28px;
+	width: 28px;
 }
 /* TODO only needed for some browsers ?? */
 div.wp-tabs div.ui-tabs div.jp-audio a.jp-pause { /* 	display: none; */
@@ -163,72 +168,89 @@ div.wp-tabs div.ui-tabs div.jp-audio a.jp-pause { /* 	display: none; */
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-volume-bar {
-  top: 60px;
-  left: 420px;
-  width: 70px;
+	top: 60px;
+	left: 420px;
+	width: 70px;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio a.jp-mute,div.wp-tabs div.ui-tabs div.jp-audio a.jp-unmute {
-  margin-left: 210px;
+	margin-left: 210px;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio a.jp-unmute {
-  display: none;
+	display: none;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-time-holder {
-  top: 55px;
-  left: 500px;
-  width: 70px;
-  font-weight: bold;
+	top: 55px;
+	left: 500px;
+	width: 70px;
+	font-weight: bold;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-slash-time {
-  padding-left: 10px;
-  float: left;
-  font-weight: bold;
-  font-size: .72em;
+	padding-left: 10px;
+	float: left;
+	font-weight: bold;
+	font-size: .72em;
 }
 
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress {
-  top: 30px;
-  left: 120px;
-  width: 495px;
-  left: 90px;
-  height: 12px;
+	top: 30px;
+	left: 120px;
+	width: 495px;
+	left: 90px;
+	height: 12px;
 }
-
+div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress div.jp-play-bar {
+	display: inline-block;
+	vertical-align: top;
+}
+div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress div.jp-play-handle {
+	position: relative;
+	width: 0px;
+	left: -10px;
+	line-height: 12px;
+	height: 12px;
+	display: inline-block;
+	vertical-align: top;
+}
+div.jp-play-handle:after {
+	content: url("../images/dot_icon.png");
+}
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-current-time,div.wp-tabs div.ui-tabs div.jp-audio div.jp-duration {
-  width: 25px;
-  font-size: .72em;
-  font-style: normal;
+	width: 25px;
+	font-size: .72em;
+	font-style: normal;
 }
 
 /* TODO listenbuy not unique!!!! so use id match or better css path */
 div.wp-tabs div.ui-tabs div.jp-playlist ul li { /*     list-style-type:  inherit; */
-  border-bottom: 1px solid #bfbfbf;
-  /* 	font-weight: bold; */
-  padding: 0 0 0 0;
-  margin: 0 0 0 0;
+	border-bottom: 1px solid #bfbfbf;
+	/* 	font-weight: bold; */
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
 }
+
 div.wp-tabs div.ui-tabs div.jp-playlist li:last-child {
-  border-bottom: 1px solid #bfbfbf;
-  padding: 0 0 0 0;
-  margin: 0 0 0 0;
+	border-bottom: 1px solid #bfbfbf;
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
 }
+
 div.wp-tabs div.ui-tabs div.jp-type-playlist div.jp-playlist a:hover {
-  color: rgb(51, 51, 51);
-  text-decoration: underline;
+	color: rgb(51, 51, 51);
+	text-decoration: underline;
 }
 
 div.wp-tabs div.ui-tabs div.jp-type-playlist div.jp-playlist li.jp-playlist-current { /*     list-style-type:  none; */
-  /* 	margin-top: 2px; */
-  background-color: #eaeaea;
-  /*     background: white url(../images/rightArrow.png) center left no-repeat;	 */
+	/* 	margin-top: 2px; */
+	background-color: #eaeaea;
+	/*     background: white url(../images/rightArrow.png) center left no-repeat;	 */
 }
 
 div#jp-playlist span.product-model {
-  display: none;
+	display: none;
 }
 
 /* ############################################################## */
@@ -236,167 +258,167 @@ div#jp-playlist span.product-model {
 /* ############################################################## */
 /* ############################################################## */
 .product-detail-header span#product-release {
-  padding-top: 5px;
-  float: right;
-  font-size: 12px;
-  display: block;
+	padding-top: 5px;
+	float: right;
+	font-size: 12px;
+	display: block;
 }
 
 span.product-icon {
-  padding-left: 20px; /* make space for image */
+	padding-left: 20px; /* make space for image */
 }
 /* used as parameter field */
 span.product-id {
-  display: none;
+	display: none;
 }
 
 span.product-name {
-  max-width: 400px;
+	max-width: 400px;
 }
 
 span.product-prelisten {
-  display: none;
+	display: none;
 }
 
 #format-buy-box {
-  background-color: #bfbfbf;
-  height: 24px;
-  float: right;
+	background-color: #bfbfbf;
+	height: 24px;
+	float: right;
 }
 
-input.checkbox {
-/*   vertical-align: middle; */
-/*   border: none; */
+input.checkbox { /*   vertical-align: middle; */
+	/*   border: none; */
+
 }
 
 span.products-format {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 span.products-price {
-  padding-left: 3px;
+	padding-left: 3px;
 }
 
 div[id ^="listenbuy"] #buyline {
-  height: 24px;
-  background-color: #bfbfbf;
+	height: 24px;
+	background-color: #bfbfbf;
 }
 
 span.format-selector { /*     vertical-align: middle; */
-  background-color: #bfbfbf;
-  margin-left: 15px;
-  margin-right: 15px;
+	background-color: #bfbfbf;
+	margin-left: 15px;
+	margin-right: 15px;
 }
 
-span#buy-format-btn {
-/*   height: 24px; */
-  padding: 1px 9px 0px 6px;
-  background-color: #333333;
-  font-weight: bold;
-  color: #bfbfbf;
-/*   width: 45px; */
-  float: right;
+span#buy-format-btn { /*   height: 24px; */
+	padding: 1px 9px 0px 6px;
+	background-color: #333333;
+	font-weight: bold;
+	color: #bfbfbf;
+	/*   width: 45px; */
+	float: right;
 }
 
 span.buy-mp3-btn {
-  padding: 1px 4px 1px 1px;
-  font-weight: bold;
-  color: #333333;
-  width: 50;
-  float: right;
+	padding: 1px 4px 1px 1px;
+	font-weight: bold;
+	color: #333333;
+	width: 50;
+	float: right;
 }
 
 span#buy-format-btn:after { /*arrow added to buy button */
-    border-color: transparent #333333 transparent transparent;
-    border-style: solid;
-    border-width: 11px;
-    content: "";
-    display: inline-block;
-    height: 0;
-    left: -52px;
-    margin-right: 0;
-    position: relative;
-    top: 0;
-    width: 0;
-    vertical-align: middle;
+	border-color: transparent #333333 transparent transparent;
+	border-style: solid;
+	border-width: 11px;
+	content: "";
+	display: inline-block;
+	height: 0;
+	left: -52px;
+	margin-right: 0;
+	position: relative;
+	top: 0;
+	width: 0;
+	vertical-align: middle;
 }
 
 span.buy-mp3-btn:hover,span#buy-format-btn:hover {
-  color: #999999;
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: bolder;
+	color: #999999;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bolder;
 }
 
 .triangle {
-  margin: 3em;
-  width: 0; /*set dimensions of DIV to 0 so its borders collapse and touch one
+	margin: 3em;
+	width: 0; /*set dimensions of DIV to 0 so its borders collapse and touch one
 another*/
-  height: 0;
-  border-color: red blue green yellow; /*top, right, bottom, and left border*/
-  border-style: solid;
-  border-width: 24px; /*width of each border*/
+	height: 0;
+	border-color: red blue green yellow; /*top, right, bottom, and left border*/
+	border-style: solid;
+	border-width: 24px; /*width of each border*/
 }
 
 div#encoding {
-  font-size: 10px;
-  color: #bfbfbf;
-  clear: both;
+	font-size: 10px;
+	color: #bfbfbf;
+	/*   background: white; */
+	clear: both;
 }
 /******************************* shopping cart ************************/
 /******************************* shopping cart ************************/
 /******************************* shopping cart ************************/
 #cartId {
-  color: #ddd;
+	color: #ddd;
 }
 
 .format-standard {
-  max-width:
+	max-width:
 }
 
 .buy-button {
-  background-color: transparent;
-  text-transform: uppercase;
-  font-weight: bold;
+	background-color: transparent;
+	text-transform: uppercase;
+	font-weight: bold;
 }
 
 .buy-button:hover {
-  text-decoration: underline;
-  background-color: #eaeaea;
+	text-decoration: underline;
+	background-color: #eaeaea;
 }
 
 .buy-product,.buy-button,.box-button {
-  cursor: pointer;
-  display: inline;
-  float: right;
-  /*     border-radius: 5px 5px 5px 5px; */
+	cursor: pointer;
+	display: inline;
+	float: right;
+	/*     border-radius: 5px 5px 5px 5px; */
 }
 
 .update {
-  color: #202020;
-  background-color: #d2d2d2;
+	color: #202020;
+	background-color: #d2d2d2;
 }
 
 .box-button {
-  padding: 2px;
-  font-size: 120%;
-  font-weight: bold;
-  color: #fff;
+	padding: 2px;
+	font-size: 120%;
+	font-weight: bold;
+	color: #fff;
 }
 
 #edit-box {
-  background-color: #800;
+	background-color: #800;
 }
 
 #check-out {
-  float: left;
-  background-color: #080;
+	float: left;
+	background-color: #080;
 }
 
 .cart {
-  padding: 3px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+	padding: 3px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 /******************************* artist grid ************************/
@@ -414,7 +436,6 @@ div#encoding {
 /*   padding-left: 30px; */
 /* } */
 
-
 /* artist & product grid */
 /* div.post-content div#loop div.product-box,div.post-content div#loop div.artist-box { */
 /*   height: 230px; */
@@ -431,12 +452,11 @@ div#encoding {
 /* 	width: 154px; */
 /* 	margin: 19px 0 0 19px; */
 /* 	padding: 0px 18px 18px 0px; */
-	/*     height: 154px; */
-	/*     width: 154px; */
-	/*     margin: 19px 0 0 19px; */
-	/*     padding: 18px; */
+/*     height: 154px; */
+/*     width: 154px; */
+/*     margin: 19px 0 0 19px; */
+/*     padding: 18px; */
 /* } */
-
 
 /* .product-thumb { */
 /*   float: left; */
@@ -449,82 +469,83 @@ div#encoding {
 /*   border: none; */
 /*   margin-bottom: 0px; */
 /* } */
-
 div.product-info {
-  float: left;
-  overflow: hidden;
+	float: left;
+	overflow: hidden;
 }
 
 span.product-model {
-  padding-left: 5px;
-  color: #595959;
-  font-size: 80%;
+	padding-left: 5px;
+	color: #595959;
+	font-size: 80%;
 }
 
 /* not in listing but used for the product popup */
 #product-text {
-  position: relative;
-  clear: both;
-  float: left;
-  width: 115px;
-  height: 20px;
-  /* 	width      : 410px; */
-  /* 	height     : auto; */
-  /* 	min-height : 200px; */
-  display: inline;
-  overflow: hidden;
+	position: relative;
+	clear: both;
+	float: left;
+	width: 115px;
+	height: 20px;
+	/* 	width      : 410px; */
+	/* 	height     : auto; */
+	/* 	min-height : 200px; */
+	display: inline;
+	overflow: hidden;
 }
 
 #product-text .bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
 }
 
 .product-special {
-  color: #FF0000;
+	color: #FF0000;
 }
 
 #product-detail { /*   max-height: 200px; */
-  color: #595959;
-  /*   overflow: hidden; */
-  margin-left: 20px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
+	color: #595959;
+	/*   overflow: hidden; */
+	padding-left: 25px;
+	/*   margin-bottom: 20px; */
+	padding-bottom: 20px;
 }
 
 div#product-detail-tabs {
-  font-size: small;
+	font-size: small;
 }
 
 div#product-detail-tabs .ui-tabs {
-  padding: 0;
+	padding: 0;
 }
 
 div.product-image-wide {
-  height: 200px;
-  text-align: center;
-  background-color: black;
-  overflow: hidden;
+	height: 200px;
+	text-align: center;
+	background-color: black;
+	overflow: hidden;
 }
 
-img.prod-image-wide { /* 	height: 100%; */
-  width: 100%;
-  /* 	max-height: 200px; */
-  margin-bottom: 0px;
+/* to override .post-content img for the header */
+.post-content img.prod-image-wide {
+	width: 100%;
+	max-width: inherit;
+	margin-bottom: 0px;
 }
 
 span.recordCount {
-  display: block;
-  font-size: 50%;
+	display: block;
+	font-size: 50%;
 }
 
 /* try to limit size of infotext */
 div#product-detail-tabs.wp-tabs div[id ^=infotext] div.wp-tab-content {
-  max-height: 200px;
-  /*   	float: left; */
-  overflow-y: scroll;
-  font-size: 12px;
+	padding-top: 10px;
+	max-height: 200px;
+	/*   	float: left; */
+	overflow-y: scroll;
+	font-size: 12px;
 }
 
 /**************************************************************************************/
@@ -532,116 +553,122 @@ div#product-detail-tabs.wp-tabs div[id ^=infotext] div.wp-tab-content {
 /* fix layout on release page */
 /* format tab links under the product details */
 div#product-detail-tabs.wp-tabs div.ui-tabs  ul.ui-tabs-nav {
-  background-color: #333333;
-  /* 	vertical-align: top; */
+	background-color: #333333;
+	/* 	vertical-align: top; */
 }
 
 /* set the background for the tabmenu under the product image */
 div#product-detail-tabs.wp-tabs>ul {
-  background-color: #333333;
-  vertical-align: top;
+	background-color: #333333;
+	vertical-align: top;
 }
+
 div.post-content #product-detail-tabs .ui-tabs-panel {
 	margin: 0;
 }
 
 div#product-detail-tabs.wp-tabs li.ui-state-active a {
-  color: #bbbbbb;
-  background: #333333 url(../images/downArrow.png) center left no-repeat;
+	color: #bbbbbb;
+	background: #333333 url(../images/downArrow.png) center left no-repeat;
 }
 
 /* make sure we only get he wanted ones */
 div#product-detail-tabs.wp-tabs>div>ul>li>a {
-  text-transform: uppercase;
-  padding-left: 20px; /* make space for image */
-  background: #333333 url(../images/rightArrow.png) center left no-repeat;
-  text-shadow: none;
+	text-transform: uppercase;
+	padding-left: 20px; /* make space for image */
+	background: #333333 url(../images/rightArrow.png) center left no-repeat;
+	text-shadow: none;
 }
 
 div.ui-tabs-panel>h3 {
-  padding-bottom: 5px;
-  margin-bottom: 10px;
+	padding-bottom: 5px;
+	margin-bottom: 10px;
 }
 /**************************************************************************************/
 /* product-box css */
 .post-content .product-box,.post-content .artist-box {
-  font: 12px 'Crimson Text', serif;
-  line-height: 12px;
+	font: 12px 'Crimson Text', serif;
+	line-height: 12px;
 }
 
 span.artist-name {
-  font-weight: bold;
-  text-transform: uppercase;
-  padding-left: 5px;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding-left: 5px;
 }
 
 .product-box span.artist-name {
-  white-space: nowrap;
-  overflow: scroll;
+	white-space: nowrap;
+	overflow: scroll;
 }
 
 .artist-box span.product-title {
-  display: block;
+	display: block;
 }
 
 .product-box span.product-title {
-  display: none;
+	display: none;
 }
 
 span.track-name {
-  display: block;
-  padding-left: 5px;
-  font-size: 10px;;
+	display: block;
+	padding-left: 5px;
+	font-size: 10px;;
 }
 
 .product-box span.product-title {
-  padding-left: 5px;
-  /*     font-size: 13px; */
-  vertical-align: top;
+	padding-left: 5px;
+	/*     font-size: 13px; */
+	vertical-align: top;
 }
 
 /**************************************************************************************/
 /* artist pages css */
 .artist-box .product-info { /*   width: 100px; */
-  padding-top: 5px;
-}
-
-div#artist-detail {
-  margin-bottom: 10px;
+	padding-top: 5px;
 }
 
 div.artist-text {
-  max-height: 200px;
-  width: 100%;
-  overflow-y: auto;
-  font-size: 12px;
+	max-height: 200px;
+	width: 100%;
+	overflow-y: auto;
+	font-size: 12px;
 }
 
 div#prod-detail-header span.product-title {
-  padding-left: 10px;
-  font-style: italic;
+	padding-left: 10px;
+	font-style: italic;
 }
 
-div#artist-detail>.artist-name {
-  padding-top: 10px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333333;
-  line-height: 22px;
-  text-transform: uppercase;
-  padding-bottom: 10px;
+div#artist-name-detail {
+	padding-top: 10px;
+	font-size: 20px;
+	font-weight: bold;
+	color: #333333;
+	line-height: 22px;
+	text-transform: uppercase;
+	padding-bottom: 10px;
 }
+
+#release-format-tabs .ui-tabs-panel h3 {
+	margin: 0;
+}
+
+#release-format-tabs .ui-tabs-panel .wp-tab-content {
+	margin: 0;
+}
+
 /**************************************************************************************/
 /* pagination css */
 .pagination {
-  clear: both;
-  padding: 0px 0px 0px 0px;
-  position: relative;
-  font-size: 11px;
-  line-height: 13px;
+	clear: both;
+	padding: 0px 0px 0px 0px;
+	position: relative;
+	font-size: 11px;
+	line-height: 13px;
 }
 
 /* TODO fix font display */
 .wpui-light .ui-tabs-panel {
-  text-shadow: none;
+	text-shadow: none;
 }

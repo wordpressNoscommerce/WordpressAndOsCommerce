@@ -12,6 +12,10 @@
 	font-size: 11px;
 }
 
+.error {
+	color: red	!important;
+	background-color: black;
+}
 /**************************************************************************************/
 /* header formatting */
 .logo {
@@ -323,40 +327,27 @@ div.post-content .ui-tabs-panel {
 /* #pagination .loading:hover {background-color: transparent !important; cursor: default;} */
 
 /* we need to specify pagination to override the image */
-.loading, .pagination .loading {background: url("images/loading.gif")  no-repeat; color: #555;}
+.loading, .post-content .pagination .loading {background: url("images/loading.gif")  100% 0 no-repeat ; }
 
 .ui-tabs .pagination {
 	margin: 10px 0 10px 19px;
 	background-color: #f0f0f0;
 }
 
-.pagination .loading, .ui-tabs .pagination .nextpostslink { /* 	float: left; */
+.ui-tabs .pagination .nextpostslink {
 	display: inline;
 	position: relative;
 	color: #000;
 	font-weight: bold;
 	font-size: 14px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	padding-left: 120px;
-	padding-right: 120px;
-	top: 0px; /* to override theme*/
+	top: 0px; /* needed to override theme */
+	margin-left: 50px;
+	padding-left:10px;
 }
 
 .ui-tabs .pagination .nextpostslink:hover {
 	background-color: #FF8888;
 	text-decoration: underline;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-}
-
-/* try generic loading */
-.loading {
-	background: url("/images/loading.gif") no-repeat;
-	/* 	240px 9px */
-	/*   color: #555; */
 }
 
 .ui-tabs .pagination .loading:hover {
