@@ -332,7 +332,7 @@ class osc_product_templates
     <div class="pagination">
       <span class="pages">loaded <span class="thispage">${paged}</span>
       out of <span class="maxpage">${maxpage}</span> pages
-      (<span class="loaded">${loaded}</span>/<span class="reccount">${reccount}</span>&nbsp;items) </span> <a class="nextpostslink" href="#">LOAD MORE</a>
+      (<span class="loaded">${loaded}</span>/<span class="reccount">${reccount}</span>&nbsp;items) </span> <a class="nextpostslink" href="${href}">LOAD MORE</a>
     </div>
 <?php       echo '</script>
 ';

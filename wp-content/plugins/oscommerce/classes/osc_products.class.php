@@ -177,7 +177,13 @@ LEFT JOIN specials s ON p.products_id = s.products_id
 LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
     // general conditions
     $where = "
-WHERE p.products_status = '1' and p.products_parent = '' ";
+WHERE p.products_status = '1' and p.products_parent = ''
+AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('LP',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('EP',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('Vinyl',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('MP3',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('Video',pd.products_head_keywords_tag) > 0)";
     if ($this->artist_id) {
 	    // show the products of a specified manufacturer
     	$where .= "
@@ -204,7 +210,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
     {
       $this->max_page = ceil($this->product_count/$this->records_per_page);
 
-      if($this->paged > $this->max_page) $this->paged = $this->max_page;
+      if($this->paged > $this->max_page) $this->paged = $this->max_page;	// show last page when overflow
 
       $firstRecordOfPage = $this->records_per_page * ($this->paged - 1);
 

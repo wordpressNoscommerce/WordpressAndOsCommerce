@@ -12,6 +12,7 @@ jQuery.noConflict();
 		// dont pollute global namespace!
 		// config values
 		var fadeintime = 500; 		// animation parameter
+		var loadingPage = false;
 		var artistPage = 20;
 		var releasePage = 19;
 		var playerId = 'jquery_jplayer_1';
@@ -35,12 +36,13 @@ jQuery.noConflict();
 
 		// URL Parms == application state
 //		var page_id = getParameterFromUrl('page_id');		// obsolete due to permalinks
+		var format;
 		var products_id;
-		var artists_id;
 		var paged;
 		var rpage;// different pageno for releases
+		var artRelTab;	// the tab of the artist releases
 		var artist_set;
-		var format;
+		var artists_id;
 		getStateFromUrl(location.href);	// set URL parms
 		// keep new and changed parameters in location.hash to avoid page reload
 		// TODO fix wp-ui problems with such a hash
@@ -63,10 +65,10 @@ jQuery.noConflict();
 
 		$('.wpui-light').removeClass('wpui-light').addClass('shit-theme');	// change theme for us
 		attachNavClickHandler();
-		var curTabCtx = getTabCtx(location.href);	// current Ctx is the one location... we are just being loaded
+		var curTabCtx = getTabCtx(location.href, true);	// we must load artist before artist releases!
 		if (renderJsonData(curTabCtx)) {		// returns false if wrong context
 			fixWpTabHeader(curTabCtx); 	// modify formating of tabs
-			initPage(location.href);
+			initPage(location.href, true);
 			var json = getJsonData();
 			for ( var tab in json) {
 				delete json[tab]; // remove container after loading page
@@ -126,20 +128,20 @@ jQuery.noConflict();
 			return true; // rendering OK
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// called to rebuild the page also from click handlers
-		function initPage(href) {
+		// called to rebuild the page also from click handlers - extra parm to distinguish
+		function initPage(href,isPageLoad) {
 			console.log('initPage(%o)',href);
 			if (location.href != href) 	// if we set this to same value the page reloads forever!!!
 				location.href = href;	// maintain restful state of javascript app in location.hash
-			var curTabCtx = getTabCtx(href);
-			var curTab = getTab(href);
-			var curLoader = getTabLoader(href);
-			curLoader(curTabCtx, curTab, paged);		// try to load the requested page
+			var curTabCtx = getTabCtx(href,isPageLoad);
+			var curTab = getTab(href,isPageLoad);
+			var curLoader = getTabLoader(href,isPageLoad);
+			curLoader(curTabCtx,curTab,paged);		// try to load the requested page
 		}
 		// ###############################################################################
 		// ###############################################################################
 		// called to show / extend another tab (artistId unused!!!)
-		function loadProductsForTab(curTabCtx,tabName, pageno) {
+		function loadProductsForTab(curTabCtx,tabName,pageno) {
 //			if (pageno == undefined) pageno = 1;
 //			if (tabName == undefined) tabName = 'vinyl';
 //			if (products == undefined) products = new Object; // init undefined object before accessing
@@ -399,42 +401,50 @@ jQuery.noConflict();
 						else
 							toggleProduct(curTabCtx, products_id, format, "#release-detail");
 			}
+			loadingPage = false;	// enable scrolling again
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		function renderPagination(tabSelector, pageSize, totalRecCount, newItems, pageno) {
 			var maxPage = Math.ceil(totalRecCount / pageSize);
-			var pager = $(tabSelector + ' div.pagination a');
-			if (pager.length == 0) {
+			var loaded = pageSize * pageno;
+			if (pageno == maxPage)
+				loaded = totalRecCount; // max loaded is totalRecCount on last page
+			var thisTab = $(tabSelector);
+			var pager = thisTab.find('div.pagination a');
+			// update previous pager
+			if (pager.length) {
+				pager.removeClass('loading').text('LOAD MORE'); // stop the loading image
+				// put data in right DIV for current curTabCtx
+				thisTab.find('span.thispage').html(pageno);
+				thisTab.find('span.loaded').html(loaded);
+				thisTab.find('span.maxpage').html(maxPage);
+				thisTab.find('span.reccount').html(totalRecCount);
+				// add tabname to anchor href to be picked up by the clickHandler
+				var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), getTab(tabSelector));
+				newHref = addHashParameter(newHref, 'paged', (+pageno)+1);	// link to the next page
+				pager.attr('href', newHref);
+			} else {	// write new one for ARTIST RELEASE PAGES
 				console.log('add missing pagination for ' + tabSelector);
 				var template = $('#pagination-template');
+//	      <span class="pages">loaded <span class="thispage">${paged}</span>
+//	      out of <span class="maxpage">${maxpage}</span> pages
+//	      (<span class="loaded">${loaded}</span>/<span class="reccount">${reccount}</span> items) </span>
+//				<a class="nextpostslink" href="${href}">LOAD MORE</a>
 				console.assert(template.length);
-				// append to div not to content div which will be overwritten
-				$(template).tmpl().appendTo(tabSelector + ' .ui-tabs-panel:visible');
-				// put a clickhandler in new pagination divs
+				// append to visible div.ui-tabs-panel for our tab
+				// all our parms other parms are already in location.hash except the new pageno
+				$(template).tmpl({ 	paged: (+pageno),
+														maxpage: maxPage,
+														loaded: loaded,
+														reccount:totalRecCount,
+														href: addHashParameter(location.hash, 'rpage', (+pageno)+1)
+														}).appendTo(tabSelector + ':visible');
+				// reload pager JQ after creation
+				pager = thisTab.find(' div.pagination a');
+				// put a clickhandler in new pagination div
 				pager.unbind('click').click(changeStateHandler);
-			} else // stop the loading image
-				pager.removeClass('loading').text('LOAD MORE');
-			if (pager.length == 0) {
-				console.log('cannot find new pagination');
-				return; // bail out nothing to do
 			}
-			// add tabname to anchor href to be picked up by the clickHandler
-			var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), getTab(tabSelector));
-			newHref = addHashParameter(newHref, 'paged', (+pageno)+1);	// link to the next page
-			pager.attr('href', newHref);
-
-			// put data in right DIV for current curTabCtx
-			if (pageno) {
-				var loaded = pageSize * pageno;
-				if (pageno == maxPage)
-					loaded = totalRecCount; // max is totalRecCount
-				$(tabSelector + ' span.thispage').html(pageno);
-				$(tabSelector + ' span.loaded').html(loaded); // total of loaded items
-			}
-			if (maxPage)
-				$(tabSelector + ' span.maxpage').html(maxPage);
-			if (totalRecCount)
-				$(tabSelector + ' span.reccount').html(totalRecCount);
+			console.assert(pager.length);
 
 			var pageDiv = pager.parent();
 			if (loaded < maxPage) {
@@ -507,18 +517,24 @@ jQuery.noConflict();
 			// products_id = null;	// reset previous product selection NOT HERE
 			// render template with artist data (header, image, text)
 			$('#artist-detail-template').tmpl(artist).appendTo(seltor);
-			// TODO fix repeated artistname
-			// render releases tabs for artist
+			// render releases tab container for artist
 			$('#release-format-tabs-template').tmpl(artist).appendTo(seltor);
-			// create release tabs TODO try to create only the ones needed
-			$('#release-format-inner-tab-template').tmpl(artReltabNames).appendTo('#release-format-tabs');
+
+			// created new tab context above
 			var curTabCtx = '#release-format-tabs';
+			var curTabCtxJq = $(curTabCtx);
+			// create release tabs inside TODO try to create only the ones needed
+			$('#release-format-inner-tab-template').tmpl(artReltabNames).appendTo(curTabCtx);
+
 			// fix hash for wptabs
 			var temphash = location.hash;
 			location.hash = location.hash.replace(/&.*/, '');
 			// apply tabs magic to the UL LI graph
-			$(curTabCtx).wptabs();
+			curTabCtxJq.wptabs();
 			location.hash = temphash;
+			// swap ui-tabs-nav and release-detail
+			$('#release-detail').insertBefore($(curTabCtx).find('ul.ui-tabs-nav'));
+
 			fixWpTabHeader(curTabCtx);
 			// load release page for artist
 			loadProductsForArtist(artistId)(curTabCtx, allArtReleases,rpage);
@@ -615,9 +631,9 @@ jQuery.noConflict();
 					}
 					return html;	// no change
 				});
-			// show title for releases
-			$('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
-				.find('h3').css( 'display', 'block');
+//			// show title for releases
+//			$('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
+//				.find('h3').css( 'display', 'block');
 
 			/** *************************************************************** */
 			/** * click handlers * */
@@ -670,12 +686,14 @@ jQuery.noConflict();
 						// merge named members to local database TODO check if this is useful
 						addToCache(result.formats);
 						addToCache(result.xsell);
-						console.log('got product data %o', result);
+						console.dir(result);
 						var target = lstbuytab.find(' div.wp-tab-content'); // select the content div!!!
 						target.empty();
 						if (result.xsell != undefined)
 							renderPlaylistPlayer(target, prod, result.xsell);
 						renderProductFormats(target, result.formats);
+						$('#artist-header-detail').toggle();
+						$(curTabCtx).parent().get(0).scrollIntoView(true);	// top end
 					}
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
@@ -821,10 +839,14 @@ jQuery.noConflict();
 			};
 			// cartId is new each time when not logged in (cart in session, basket in DB)
 			$.post(shoppingCartUrl, data, function(data, textStatus, jqXHR) {
+				if (jqXHR.status != 200) {
+					console.error('problem with shopping cart post %o', jqXHR);
+					throw 'problem with shopping cart post';
+				}
 				var result = eval('(' + data + ')'); // eval json data
 				console.log(result);
-				osCsid = result.osCsid;
 				cart = renderShoppingBox(result.cart, true); // keep cart in global
+				osCsid = result.osCsid;
 				if (prodlist.length)		// daisy chain adding the products
 					addProductsToCart(prodlist);
 				else {
@@ -999,6 +1021,7 @@ jQuery.noConflict();
 			products_id = getParameterFromUrl('products_id', undefined, url);
 			artist_set = getParameterFromUrl('artistSet', 'main', url);
 			artists_id = getParameterFromUrl('artistId', undefined, url);
+			artRelTab = getParameterFromUrl('artRelTab', allArtReleases, url);
 			paged = getParameterFromUrl('paged', 1, url);
 			rpage = getParameterFromUrl('rpage', 1, url);	// different pageno for only 4 releases
 			var tmp = getParameterFromUrl('osCsid');
@@ -1042,8 +1065,9 @@ jQuery.noConflict();
 			var value = decodeURI((RegExp('(&|#)'+name + '=' + '(.+?)(&|$)').exec(hash?hash:location.hash) || [ , , null])[2]);
 			if (value == "null" || value == undefined){
 				// if the hash is a single token (alphnumeric and  _) we use it for the respective parameter
-				if ((isReleasePage(hash) && name == 'format') ||(isArtistPage(hash) && name == 'artistSet'))
-					value = decodeURI((RegExp('[^#]*#([a-z0-9_]+)$').exec(hash?hash:location.hash) || [ , null])[1]);
+				if ((isReleasePage(hash) && name == 'format')
+						||(isArtistPage(hash) && (name == 'artistSet' || name == 'artRelTab')))
+					value = decodeURI((RegExp('[^#]*#([a-z0-9_]+)(&|$)').exec(hash?hash:location.hash) || [ , null])[1]);
 			}
 			return value;
 		}
@@ -1115,8 +1139,10 @@ jQuery.noConflict();
 		function prepareLoopDiv(tabDivSel) {
 			var tabSelector = tabDivSel + ' div.wp-tab-content';
 			var targetDiv = $(tabSelector);
-			if (targetDiv.length == 0)
-				throw "No div found for " + tabSelector; // make sure its found
+			if (targetDiv.length == 0) {
+				var thisline = new Error().lineNumber;
+				throw thisline+ " No div found for " + tabSelector; // make sure its found
+			}
 			// ...probably the bloody formater fucked it up again (osc_products.class.php #370)!
 			if (targetDiv.find('#loop').length == 0) {
 				// simply overwrite wp-tab-content if no loop found.
@@ -1257,11 +1283,14 @@ jQuery.noConflict();
 		// #### GETTER HELPER ############################################################
 		// ###############################################################################
 		// to deal with funny modifications -- space in front for concatenation
+		function fixTabName(tabName) {
+			return tabName.toLowerCase().replace(/ /g, '_');
+		}
 		function getTabSelector(curTabCtx, tabName) {
-			return curTabCtx + ' div[id^='+tabName.toLowerCase().replace(/ /g, '_')+']';
+			return curTabCtx + ' div[id^='+fixTabName(tabName)+']';
 		}
 		function getTabLnk(curTabCtx, tabName) {
-			return $(curTabCtx).find('ul.ui-tabs-nav li a[href^=#'+tabName.toLowerCase().replace(/ /g, '_')+']');
+			return $(curTabCtx).find('ul.ui-tabs-nav li a[href^=#'+fixTabName(tabName)+']');
 		}
 		function getTabFromSelector(tabSelector) {
 			var left = tabSelector.indexOf('div[id^=');
@@ -1270,52 +1299,66 @@ jQuery.noConflict();
 				return tabSelector.substring(left+8,right);
 		}
 		function getLastPageOfTab(tabSelector) {
-			return (+$(tabSelector + ' span.thispage').html());	// number conversion !!!
+			if (typeof tabSelector == 'string')
+				return (+$(tabSelector + ' span.thispage').html());	// number conversion !!!
+			else
+				return (+tabSelector.find('span.thispage').html());
 		}
 		function getMaxPageOfTab(tabSelector) {
 			return (+$(tabSelector + ' span.maxpage').html());	// number conversion !!!
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// context dependent values and functions
-		function getTabCtx(href) {
-			if (isReleasePage(href)) {
+		function getTabCtx(href,isPageLoad) {
+			if (isReleasePage(href))
 				return '#product-format-tabs';
-			} else if (isArtistPage(href)) {
-				return '#artist-set-tabs';
-			} else
-				return;
+			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
+						return '#release-format-tabs';
+			else if (isArtistPage(href))
+						return '#artist-set-tabs';
+			else
+				console.assert(false);
+			// "product-detail-tabs"
 		}
-		function getTab(href) {
-			if (isReleasePage(href)) {
+		function getTab(href,isPageLoad) {
+			if (isReleasePage(href))
 				return format;
-			} else if (isArtistPage(href)) {
+			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
+				return artRelTab;
+			else if (isArtistPage(href))
 				return artist_set;
-			} else
-				return;
+			else
+				console.assert(false);
 		}
-		function getTabParm(href) {
-			if (isReleasePage(href)) {
+		function getTabParm(href,isPageLoad) {
+			if (isReleasePage(href))
 				return 'format';
-			} else if (isArtistPage(href)) {
+			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
+				return 'artRelTab';
+			else if (isArtistPage(href))
 				return 'artistSet';
-			} else
-				return;
+			else
+				console.assert(false);
 		}
-		function getTabLoader(href) {
-			if (isReleasePage(href)) {
+		function getTabLoader(href,isPageLoad) {
+			if (isReleasePage(href))
 				return loadProductsForTab;
-			} else if (isArtistPage(href)) {
+			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
+				return loadProductsForArtist(artists_id);
+			else if (isArtistPage(href))
 				return loadArtistsForTab;
-			} else
-				return;
+			else
+				console.assert(false);
 		}
-		function getClickHandler(href) {
-			if (isReleasePage(href)) {
+		function getClickHandler(href,isPageLoad) {
+			if (isReleasePage(href))
 				return productClickHandler;
-			} else if (isArtistPage(href)) {
+			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
+					return releaseClickHandler;
+			else if (isArtistPage(href))
 				return artistClickHandler;
-			} else
-				return;
+			else
+				console.assert(false);
 		}
 		function getJsonData(href) {
 			if (isReleasePage(href)) {
@@ -1337,10 +1380,6 @@ jQuery.noConflict();
 			if (isArtistPage(href)) return artistsPageSize;
 			if (isReleasePage(href)) return productsPageSize;
 		}
-		function getPageSize(href) {
-			if (isArtistPage(href)) return artistsPageSize;
-			if (isReleasePage(href)) return productsPageSize;
-		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// match pathname or tabctx string dont match trailing slash which is optional
 		function isReleasePage(href) {
@@ -1351,6 +1390,18 @@ jQuery.noConflict();
 			if (href == undefined) href = location.href;
 			return href.indexOf('/artists') >= 0 || href.indexOf('#artist-set-tabs') >= 0;
 		}
+		function isArtistReleasePage(href) {
+			if (href == undefined) href = location.href;
+			var result = false;
+			$.each(artReltabNames, function (i,v) {	// look for a release tab link
+				if (href.indexOf(fixTabName(v.tab))>=0)	{// dont forget to normalize name
+					result = true;
+					return false;	// found
+				}
+			});
+			return result;
+		}
+
 		// checks if location.hash and href are in the same page context
 		// TODO this has to go when we render everything from this script
 		// instead of relying on the server to provide rudimentary but required HTML to render into
@@ -1359,8 +1410,14 @@ jQuery.noConflict();
 		}
 		var cnt = 0;
 		$(window).scroll(function () {
+			if (!loadingPage)
 		   if ($(window).scrollTop() >= $(document).height() - $(window).height() - 5) {
-		      console.log('trigger pageload NOW %d %s ?????',cnt);
+		      // find the only visible pager at the bottom of the page
+		      var pager = $(getTabCtx() + ' div.pagination a:visible').last();
+		      var page= getLastPageOfTab(pager.parent());
+		      console.log('%d.trigger pageload for page %d',cnt++, page);
+		      loadingPage = page;
+		      pager.click();
 		   }
 		});
 	});

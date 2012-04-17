@@ -18,12 +18,12 @@
   define('DIR_WS_LANGUAGES', DIR_WS_INCLUDES . 'languages/');
 
   define('DIR_WS_DOWNLOAD_PUBLIC', 'pub/');
-  define('DIR_FS_CATALOG', 'E:/Devel/shopkatapult/');
+  define('DIR_FS_CATALOG', 'E:/Space/Devel/wordpress/wp-content/plugins/oscommerce/catalog/');
   define('DIR_FS_DOWNLOAD', DIR_FS_CATALOG . 'download/');
   define('DIR_FS_DOWNLOAD_PUBLIC', DIR_FS_CATALOG . 'pub/');
 
   // define our database connection
-  define('DB_SERVER', 'localhost'); // eg, localhost - should not be empty for productive servers
+  define('DB_SERVER', 'dbhost'); // eg, localhost - should not be empty for productive servers
   define('DB_SERVER_USERNAME', 'RandomNoizeShop');
   define('DB_SERVER_PASSWORD', 'shitthat');
   define('DB_DATABASE', 'ShopDB');
