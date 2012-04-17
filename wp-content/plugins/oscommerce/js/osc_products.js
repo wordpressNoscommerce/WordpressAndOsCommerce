@@ -19,7 +19,9 @@ jQuery.noConflict();
 		var playerSelector = '#'+playerId;
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#'+playerContent;
+		var shopBoxSel = 'div#shop-cart';
 		var oscPrefix = '/wp-content/plugins/oscommerce';
+		var shoppingCartUrl = oscPrefix + '/catalog/handle_cart.php';
 		var allArtReleases = 'All Releases Of Artist';
 		// TODO deal with the tabnames better
 		var artReltabNames = [ { tab : allArtReleases } ];//, { tab : "Singles" }, { tab : "Albums" }, { tab : "Appears On" }, { tab : "Videos" } ];
@@ -176,7 +178,7 @@ jQuery.noConflict();
 						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						console.error('request(%s) error(%o)',fetchurl, jqXHR);
 						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
-						$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+						getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
 			} else { // check if its rendered already
@@ -221,12 +223,12 @@ jQuery.noConflict();
 						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						console.error('request(%s) error(%o)',fetchurl, jqXHR);
 						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
-						$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+						getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
 			} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
 				var tabSelector = getTabSelector(curTabCtx,tabName);
-				if ($(tabSelector + ' div.wp-tab-content').contents().length == 0) {
+				if (tabSelector.find('div.wp-tab-content').contents().length == 0) {
 					renderItemsInTab(curTabCtx,manufacturers[tabName],tabName,1,'#manufacturer-box-template');
 				}
 				// then show it
@@ -255,7 +257,7 @@ jQuery.noConflict();
 							getTabLnk(curTabCtx,tabName).removeClass('loading');
 							if (data.indexOf('No Records found') >= 0) {
 								console.error(data);
-								$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ data+'</h3>').addClass('error');
+								getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ data+'</h3>').addClass('error');
 							} else {
 								var result = eval('(' + data + ')'); // eval json array
 								addToCache(result[3], artistId); // this is the product list and artist relation
@@ -271,12 +273,12 @@ jQuery.noConflict();
 							getTabLnk(curTabCtx,tabName).removeClass('loading');
 							console.error('request(%s) error(%o)',fetchurl, jqXHR);
 							var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + manumap[artistId].manufacturers_name;
-							$(getTabSelector(curTabCtx,tabName)).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+							getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 						}
 					});
 				} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
 					var tabSelector = getTabSelector(curTabCtx,tabName);
-					if ($(tabSelector + ' div.wp-tab-content').contents().length == 0) {
+					if (tabSelector.find('div.wp-tab-content').contents().length == 0) {
 						renderItemsInTab(curTabCtx, relemap[artistId], tabName, 1, '#release-box-template');
 					}
 					selectTab(curTabCtx, tabName, loadProductsForArtist(artistId), releaseClickHandler);
@@ -288,7 +290,7 @@ jQuery.noConflict();
 		function needToLoad(curTabCtx,tabName, pageno) {
 			var result = false;
 			var tabSelector = getTabSelector(curTabCtx,tabName);
-			var numPosts = $(tabSelector+' .grid .post').length;
+			var numPosts = tabSelector.find(' .grid .post').length;
 			if (numPosts == 0) { // no posts in our tab
 				result = true;	// so need to load!
 			} else {
@@ -334,7 +336,7 @@ jQuery.noConflict();
 		function selectTab(curTabCtx,tabNameOrg, loadItemsForTab, clickHandler) {
 			var tabName = tabNameOrg.toLowerCase().replace(/ /g, '_');
 			var tabSelector = getTabSelector(curTabCtx,tabNameOrg);
-			if ($(tabSelector+':visible').length) { // we are on the right tab already
+			if (tabSelector.find(':visible').length) { // we are on the right tab already
 				// but we still have to deal with additional parms or posts
 				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
 				return; // nothing more to do we are active already
@@ -458,7 +460,7 @@ jQuery.noConflict();
 		function showPagination(curTabCtx, tabSelector, tabName, loadItemsForTab) {
 			var lastPage = getLastPageOfTab(tabSelector);
 			var maxpage = getMaxPageOfTab(tabSelector);
-			var pageDiv = $(tabSelector + ' div.pagination');
+			var pageDiv = tabSelector.find('div.pagination');
 			if (lastPage < maxpage) {
 				pageDiv.removeClass('ui-tabs-hide');
 			} else { // hide pagination if only single page!
@@ -571,9 +573,10 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show product data in product-detail or release-detail DIV
-		function toggleProduct(curTabCtx,prodId,format,seltor) {
+		function toggleProduct(curTabCtx,prodId,format,seltorName) {
+			var seltor = $(seltorName);
 			if (lastProductId == prodId) {
-				$(seltor).toggle(); // toggle if same
+				seltor.toggle(); // toggle if same
 				// remove artist tab title for releases
 				$('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible').find('h3')
 						.css('display', 'none');
@@ -583,7 +586,7 @@ jQuery.noConflict();
 					$(playerSelector).jPlayer( "destroy" ); // remove jplayer first TODO check when necessary
 					console.info('player for %d destroyed',lastProductId);
 				}
-				$(seltor).empty(); // clear if new prod after removing player
+				seltor.empty(); // clear if new prod after removing player
 			}
 			//			$(seltor).fadeOut(100); // make invisible before writing
 			var prod = getProductMaster(prodId, format);
@@ -601,17 +604,16 @@ jQuery.noConflict();
 			// TODO now remove unused tabs....
 
 			// apply tabs magic to the UL LI graph
-			var curTabCtx = '#product-detail-tabs';
+			var curTabCtxSel = '#product-detail-tabs';
+			var curTabCtx = $(curTabCtxSel);
 			// fix hash for wptabs
 			var temphash = location.hash;
 			location.hash = location.hash.replace(/&.*/, '');
-			$(curTabCtx).wptabs();
+			curTabCtx.wptabs();
 			location.hash = temphash;
 
 			// TODO fix links
-			$(curTabCtx+' ul.ui-tabs-nav li.ui-state-default a').each(function(i, e) {
-				console.log($(e).attr('href'));
-			});
+//			$(curTabCtx+' ul.ui-tabs-nav li.ui-state-default a').each(function(i, e) { console.log($(e).attr('href')); });
 
 			// fix artist display in product/release-detail TODO add link to artist page
 			$('#prod-detail-header #product-title').html(function (i, html) {
@@ -631,35 +633,40 @@ jQuery.noConflict();
 					}
 					return html;	// no change
 				});
-//			// show title for releases
-//			$('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
-//				.find('h3').css( 'display', 'block');
-
 			/** *************************************************************** */
 			/** * click handlers * */
 			/** *************************************************************** */
+			// load listenbuy immediately instead using the loaded product
+			load_listenbuy_tab(curTabCtxSel,0, prod);
+
 			if (prod.products_image_lrg_url != "")
 				addFullCoverHandler(seltor);
-			// add click to close handler to large image
-			$('div#prod-image-big').click(
-					function() {
-						$(seltor).hide(); // clear if nonempty
-						$('div#.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
-							.find( 'h3').css('display', 'none');
-						lastProductId = 0;
-					});
-			// load listenbuy immediately instead using the loaded product
-			load_listenbuy_tab(curTabCtx,0, prod);
 
-			extractVideoHandlerFromInfoText(seltor);
+			/** *************************************************************** */
+			/** * video handlers * */
+			/** *************************************************************** */
+			var hasVideo = false;
+			if (prod.products_upc != undefined) {
+				console.log('found a video link "%s"',prod.products_upc);
+				renderVideo(curTabCtxSel,prod.products_upc);
+				hasVideo = true;
+			} else
+				hasVideo = extractVideoHandlerFromInfoText(seltor);
 
-			if (seltor.indexOf('product') >=0)
-				$(seltor+' a[href^="#listenbuy"]').click(); // show tracks
-			// always scroll into view (its a DOM function not jquery
-			$(curTabCtx).parent().get(0).scrollIntoView(true);	// top end
-			$(seltor).fadeIn(fadeintime); //show active tab
+			// remove video tab if no video found
+			if (!hasVideo) {
+				$(getTabSelector(curTabCtxSel, 'video')).remove();
+				$(getTabLink(curTabCtxSel, 'video')).parent().remove();
+			}
+
+			if (seltorName.indexOf('product') >=0)
+				$(getTabSelector(curTabCtxSel, 'listenbuy')).click(); // show tracks
+			else	// scroll into view (its a DOM function not jquery
+				curTabCtx.parent().get(0).scrollIntoView(true);	// top end
+			seltor.fadeIn(fadeintime); //show active tab
 			lastProductId = prodId;
 		}
+
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		/** ************************************************************************** */
 		/** load listenbuy tab including the jplayer */
@@ -732,8 +739,8 @@ jQuery.noConflict();
 					backgroundColor : 	'#eaeaea',
 					swfPath: 			oscPrefix + "/jplayer",
 //					warningAlerts:		true,
-					errorAlerts : 		true,
-	                solution:     		'html,flash',
+//					errorAlerts : 		true,
+	        solution:     		'html,flash',
 					supplied: 			"mp3",
 					wmode: 				"window"	// needed for firefox flash
 				});
@@ -749,10 +756,12 @@ jQuery.noConflict();
 			});
 			// remove the handler moving to next
 			$(playerSelector).unbind($.jPlayer.event.ended);
+			// set default volume to 50%
+			// $(playerSelector).volume(50); TODO this is not working
 			// this is called after init... nothing to do with showing the tab
 			$(playerSelector).bind($.jPlayer.event.ready, function(event) {
-				console.log('received JPLAYER event %o',event);
-				console.log($(playerContentSelector + " div.jp-playlist ul li"));
+//				console.log('received JPLAYER event %o',event);
+//				console.log($(playerContentSelector + " div.jp-playlist ul li"));
 				$(playerContentSelector + " div.jp-playlist ul li div").each(function (i,e) {
 					var jQDiv = $(e);
 					jQDiv.find('a.jp-playlist-item').attr('tabindex',i);			// store index in tabindex
@@ -827,7 +836,6 @@ jQuery.noConflict();
 			addProductsToCart(prodlist);
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
-		var shoppingCartUrl = oscPrefix + '/catalog/handle_cart.php';
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// take the first element of list and add to cart
 		function addProductsToCart(prodlist) {
@@ -857,40 +865,23 @@ jQuery.noConflict();
 		}
 		;
 		// ###############################################################################
-		var shopBoxSel = 'div#shopping-box';
 		/** render shopping box / cart * */
 		function renderShoppingBox(cart, showBody) {
-			if ($(shopBoxSel).length == 0) {
+			var shopbox = $(shopBoxSel);
+			if (shopbox.length == 0) {
 				// place shopping box div in sidebar when missing
-				$('div.sidebar').html(function(i, html) {
-					return '<div id="shopping-box" class="box cart widget"></div>'+html;
-				});
+				$('div.sidebar').prepend('<div id="shopping-box" class="box cart widget"></div>');
+				var cart_tmpl = $('#shopcart-template');
+				cart_tmpl.tmpl(cart).appendTo('#shopping-box');
 			}
 			if ($(cart.contents).length) {
-				var cart_entry_tmpl = $('#cart-entry-template');
+				var cart_entry_tmpl = $('#shopcart-entry-template');
 				console.assert(cart_entry_tmpl.length);
 				// draw SHOPPING BOX
-				$(shopBoxSel).html('<h3>Your Shopping Box</h3>');
-				$(shopBoxSel).append('<div id="cartId">');
-				$(shopBoxSel).append('<span id="osCsid">' + osCsid + '</span>');
-				$(shopBoxSel).append('<span id="cartId">' + cart.cartID + '</span>');
-				$(shopBoxSel).append('</div>');
-
-				$(shopBoxSel).append('<div id="cart-body">');
-				if (showBody != undefined) {
-					addCartEntries(cart);
-					cart_entry_tmpl.tmpl(cart.entries).appendTo('#shopping-box');
-				}
-				$(shopBoxSel).append('</div');
-				$(shopBoxSel).append(
-						'<div id="total">You have <b>' + cart.total + '</b> item(s) in your box. <b>Total: '
-								+ cart.totalPrice + ' €</b></div>');
-
-				$(shopBoxSel).append('<span id="edit-box" class="box-button">Edit Box</span>');
-				$(shopBoxSel).append('<span id="check-out" class="box-button">Check Out</span>');
-				$(shopBoxSel+ ' #cartId').addClass('ui-icon-cart');
-				$(shopBoxSel).slideDown(500);
+				addCartEntries(cart);
+				cart_entry_tmpl.tmpl(cart.entries).appendTo('#cart-body');
 			}
+			shopbox.slideDown(fadeintime);
 			return cart;
 		}
 		// ###############################################################################
@@ -907,13 +898,13 @@ jQuery.noConflict();
 			$.each(cart.contents, function(key, e) {
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.log(e);
-				var charkey = key + '';
+//				var charkey = key + '';
 				if (cart.entries == undefined)
-					cart.entries = []; // init cart entry array if new
-				if (cart.entries[charkey] == undefined)
-					cart.entries[charkey] = new Object();
+					cart.entries = {}; // init cart entry array if new
+				if (cart.entries[key] == undefined)
+					cart.entries[key] = new Object();		// add properties
 				var p = getProductForCart(key, format);
-				var cartEntry = cart.entries[charkey];
+				var cartEntry = cart.entries[key];
 				cartEntry.index = i;
 				cartEntry.products_id = key;
 				cartEntry.products_qty = e.qty;
@@ -934,22 +925,20 @@ jQuery.noConflict();
 		}
 		// #################	##############################################################
 		/** render video object into video tab * */
-		var videoTemplateSel = '#product-youtube-template';
-		function renderVideo(curTabCtx,videoLink) {
-			var prod_youtube_tmpl = $(videoTemplateSel);
+		function renderVideo(curTabCtx,youTubeId) {
+			var prod_youtube_tmpl = $('#product-youtube-template');	// variables need to be defined before
 			if (prod_youtube_tmpl.length == 0) {
-				var msg = '#prod_youtube_tmpl NOT FOUND!!!!!!!!!!!!! STOP';
+				var msg = '#product-youtube-template NOT FOUND!!!!!!!!!!!!! STOP';
 				alert(msg);
 				console.log(msg);
 				return false;
 			}
-			var target = $(getTabSelector(curTabCtx,'video')); // browser can append suffixes
+			var target = getTabSelector(curTabCtx,'video'); // browser can append suffixes
 			target.empty();
 			prod_youtube_tmpl.tmpl({
-				'youTubeUrl' : videoLink
+				'youTubeId' : youTubeId
 			}).appendTo(target);
 		}
-
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// create a hashmap == product_cache within this scope to lookup detail via prod_id
 		// all formats are merged in there
@@ -998,20 +987,6 @@ jQuery.noConflict();
 				if (o.products_id != undefined) 		prodmap[o.products_id] = o;
 				if (o.manufacturers_id != undefined)	manumap[o.manufacturers_id] = o;
 			}
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// helper to count properties
-		function countProperties(obj) {
-			var count = 0;
-			for ( var prop in obj)
-				if (obj.hasOwnProperty(prop)) ++count;
-			return count;
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		function hasProperties(obj) {
-			for ( var p in obj)
-				return true;
-			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// read parms from location or passed parameter
@@ -1074,12 +1049,12 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// copied from themes/sight/js/script.js for adaption as we have to use
 		// more specific selectors inside tabs
-		function attachGridClickhandler(target, clickHandler) {
-			var loopSel = target + ' #loop';
-			$(loopSel).addClass('grid').removeClass('list'); // make sure its a grid
+		function attachGridClickhandler(tabSelector, clickHandler) {
+			var loopSel = tabSelector.find('#loop');
+			loopSel.find('#loop').addClass('grid').removeClass('list'); // make sure its a grid
 
 			// fix formatting of product names in product box
-			$(loopSel+' .product-box .product-info').each(function (i,e) {
+			loopSel.find('.product-box .product-info').each(function (i,e) {
 				var artistName;
 				var trackTitle;
 				$(this).find('span.product-title').html(function (i, html) {
@@ -1094,7 +1069,7 @@ jQuery.noConflict();
 					if (sl >= 0) {
 						artistName = html.substring(0,sl-1);
 						trackTitle = html.substring(sl+1);
-						console.log('found artist (%s) title (%s)',artistName, trackTitle);
+//						console.log('found artist (%s) title (%s)',artistName, trackTitle);
 						return '';
 					}
 					return html;	// no change
@@ -1103,7 +1078,7 @@ jQuery.noConflict();
 					$(this).append('<span class="artist-name">'+artistName+'</span>'+'<span class="track-name">'+trackTitle+'</span>');
 			});
 			// remove old mouseenter, mouseleave,click handlers
-			var posts = $(loopSel+' .post');
+			var posts = loopSel.find('.post');
 			posts.unbind('mouseenter').mouseenter(function() {
 				$(this).find('.thumb').fadeOut(300).css('z-index', '-1');
 			}).unbind('mouseleave').mouseleave(function() {
@@ -1137,11 +1112,10 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// create the html to place the boxes in
 		function prepareLoopDiv(tabDivSel) {
-			var tabSelector = tabDivSel + ' div.wp-tab-content';
-			var targetDiv = $(tabSelector);
+			var targetDiv = tabDivSel.find('div.wp-tab-content');
 			if (targetDiv.length == 0) {
 				var thisline = new Error().lineNumber;
-				throw thisline+ " No div found for " + tabSelector; // make sure its found
+				throw thisline+ " No div found for " + targetDiv.selector; // make sure its found
 			}
 			// ...probably the bloody formater fucked it up again (osc_products.class.php #370)!
 			if (targetDiv.find('#loop').length == 0) {
@@ -1216,7 +1190,9 @@ jQuery.noConflict();
 				// clean the string
 				var videoLink = param[0].replace(/'/g, " ").replace(/"/g, " ").trim();
 				renderVideo(videoLink);
+				return true;
 			}
+			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// attach click handler to all tab links for product formats
@@ -1252,162 +1228,55 @@ jQuery.noConflict();
 		}
 		// ##############################################################################
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		var flatImage = { 'height' : '200px' };
-		var bigImage = { 'height' : 'auto' }; // just change the enclosing DIVs height
 		// attach special toggle handler to show large image after making tabs
 		function addFullCoverHandler(seltor) {
-			$(seltor + ' li.ui-state-default a[href*="#full_cover"]')
-					.click(function() {
-								var bigimg = $('div#prod-image-big');
-								var newCSS = flatImage;
-								if (bigimg.css('height') == '200px')
-									newCSS = bigImage;
-								bigimg.css(newCSS);	// only the div
-								bigimg.parent().get(0).scrollIntoView(true);
-							});
-			// attach close handler to tab links
-			$(seltor + ' #prod-image-big').click(
-				function() {
-					$(seltor).hide();
-					// dont forget to remove the wp-tab-title we added under the detail while unfolding
-					var headers = $('div#release-format-tabs.wp-tabs  > div.ui-tabs')
-							.children('div.ui-tabs-panel:visible').find('h3');
-					if (headers.length) {
-						headers .css('display', 'none');
-						console.log('removed headers ');
-					} else console.log('no release headers found to remove');
-					lastProductId = 0;
-				});
+			// add new fullcover handler but do not replace the wptab handler!!!
+//			seltor.find('li.ui-state-default a[href^="#full_cover"]').click(fullCoverHandler(seltor));
+			seltor.find('li.ui-state-default a').click(fullCoverHandler(seltor));
+			seltor.find('#prod-image-big').click(hideDetailDiv(seltor));
 		}
-		// ###############################################################################
-		// #### GETTER HELPER ############################################################
-		// ###############################################################################
-		// to deal with funny modifications -- space in front for concatenation
-		function fixTabName(tabName) {
-			return tabName.toLowerCase().replace(/ /g, '_');
-		}
-		function getTabSelector(curTabCtx, tabName) {
-			return curTabCtx + ' div[id^='+fixTabName(tabName)+']';
-		}
-		function getTabLnk(curTabCtx, tabName) {
-			return $(curTabCtx).find('ul.ui-tabs-nav li a[href^=#'+fixTabName(tabName)+']');
-		}
-		function getTabFromSelector(tabSelector) {
-			var left = tabSelector.indexOf('div[id^=');
-			var right= tabSelector.indexOf(']');
-			if (left >= 0)
-				return tabSelector.substring(left+8,right);
-		}
-		function getLastPageOfTab(tabSelector) {
-			if (typeof tabSelector == 'string')
-				return (+$(tabSelector + ' span.thispage').html());	// number conversion !!!
-			else
-				return (+tabSelector.find('span.thispage').html());
-		}
-		function getMaxPageOfTab(tabSelector) {
-			return (+$(tabSelector + ' span.maxpage').html());	// number conversion !!!
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// context dependent values and functions
-		function getTabCtx(href,isPageLoad) {
-			if (isReleasePage(href))
-				return '#product-format-tabs';
-			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
-						return '#release-format-tabs';
-			else if (isArtistPage(href))
-						return '#artist-set-tabs';
-			else
-				console.assert(false);
-			// "product-detail-tabs"
-		}
-		function getTab(href,isPageLoad) {
-			if (isReleasePage(href))
-				return format;
-			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
-				return artRelTab;
-			else if (isArtistPage(href))
-				return artist_set;
-			else
-				console.assert(false);
-		}
-		function getTabParm(href,isPageLoad) {
-			if (isReleasePage(href))
-				return 'format';
-			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
-				return 'artRelTab';
-			else if (isArtistPage(href))
-				return 'artistSet';
-			else
-				console.assert(false);
-		}
-		function getTabLoader(href,isPageLoad) {
-			if (isReleasePage(href))
-				return loadProductsForTab;
-			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
-				return loadProductsForArtist(artists_id);
-			else if (isArtistPage(href))
-				return loadArtistsForTab;
-			else
-				console.assert(false);
-		}
-		function getClickHandler(href,isPageLoad) {
-			if (isReleasePage(href))
-				return productClickHandler;
-			else if (isArtistReleasePage(href) && !isPageLoad)		// when we need to load artists from json first
-					return releaseClickHandler;
-			else if (isArtistPage(href))
-				return artistClickHandler;
-			else
-				console.assert(false);
-		}
-		function getJsonData(href) {
-			if (isReleasePage(href)) {
-			  // proper empty test
-					if (typeof products === 'undefined' || products == undefined || countProperties(products) == 0)
-						return {};
-					else
-						return products;
-			} else if (isArtistPage(href)) {
-			  // proper empty test
-					if (typeof manufacturers === 'undefined' || manufacturers == undefined || countProperties(manufacturers) == 0)
-						return {};
-					else
-						return manufacturers;
-			} else
-				return {};
-		}
-		function getPageSize(href) {
-			if (isArtistPage(href)) return artistsPageSize;
-			if (isReleasePage(href)) return productsPageSize;
-		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// match pathname or tabctx string dont match trailing slash which is optional
-		function isReleasePage(href) {
-			if (href == undefined) href = location.href;
-			return href.indexOf('/releases') >= 0 || href.indexOf('#product-format-tabs') >=0 ;
-		}
-		function isArtistPage(href) {
-			if (href == undefined) href = location.href;
-			return href.indexOf('/artists') >= 0 || href.indexOf('#artist-set-tabs') >= 0;
-		}
-		function isArtistReleasePage(href) {
-			if (href == undefined) href = location.href;
-			var result = false;
-			$.each(artReltabNames, function (i,v) {	// look for a release tab link
-				if (href.indexOf(fixTabName(v.tab))>=0)	{// dont forget to normalize name
-					result = true;
-					return false;	// found
+		// we can just read the height of the contained image to get its real height
+		function fullCoverHandler(seltor) {
+			var flatImgCss = { 'height' : '200px' };
+			var bigImgCss = {};
+			return function() {
+				var divImg = $('div#prod-image-big');
+				var bigimg = divImg.find('img');
+				var newCss = flatImgCss;
+				var realHeight = 0;
+				// we make big only if we are small and the full cover link has been clicked
+				if (divImg.css('height') == '200px' && this.hash.indexOf('full_cover') >=0) {
+					bigImgCss.height = bigimg.css('height'); // read and keep realheight
+					newCss = bigImgCss;
+					// dont forget to remove the other handler
+					divImg.unbind('click').click(fullCoverHandler(seltor));
+				} else {	// establish previous click handler = hide div
+					divImg.unbind('click').click(hideDetailDiv(seltor));
 				}
-			});
-			return result;
+				divImg.animate(newCss, fadeintime);
+				divImg.parent().get(0).scrollIntoView(true);
+			};
 		}
-
-		// checks if location.hash and href are in the same page context
-		// TODO this has to go when we render everything from this script
-		// instead of relying on the server to provide rudimentary but required HTML to render into
-		function isCurCtx(href) {
-			return ((isReleasePage() && isReleasePage(href)) || (isArtistPage() && isArtistPage(href)));
+		function hideDetailDiv(seltor) {
+			return function() {
+			$(seltor).hide();
+			removeReleaseTabHeader();
+			};
 		}
+		// this removes the wp-tab-title we added under the detail while unfolding
+		function removeReleaseTabHeader() {
+			var headers = $('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
+					.find('h3');
+			if (headers.length) {
+				headers.css('display', 'none');
+				console.log('removed headers ');
+			} else
+				console.log('no release headers found to remove');
+			lastProductId = 0;
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// the trigger to scroll when hitting bottom of page
 		var cnt = 0;
 		$(window).scroll(function () {
 			if (!loadingPage)

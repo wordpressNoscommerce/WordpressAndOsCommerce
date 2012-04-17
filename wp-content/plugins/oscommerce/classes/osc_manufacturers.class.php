@@ -48,10 +48,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     if (empty($this->paged)) $this->paged = 1;	// default is first page
     $this->artist_sets = array('Main','Alumni');
   }
-	// draw our shopping cart
-  function osc_show_shopping_cart($db, $shop_id, $label_id){
-  	echo '<h1>This will be the shopping cart for shopId:'.$shop_id.'</h1>';
-  }
+
   // limit counting to same conditions as display
   function osc_count_manufacturers_from($from)
   {

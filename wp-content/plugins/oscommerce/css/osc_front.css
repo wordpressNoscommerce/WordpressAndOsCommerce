@@ -421,54 +421,42 @@ div#encoding {
 	text-overflow: ellipsis;
 }
 
+/* <div id="shop-cart" class="box cart widget"> */
+/* 	<h3 class="shop-box-header">YOUR SHOPPING BOX (Change Content or amount of products)</h3> */
+/* 	<div id="shop-cart-table"> */
+/* <div id="shop-cart-header"> */
+/* 		<span id="shop-cart-hd-remove">Remove</span> */
+/* 		<span id="shop-cart-hd-products">Products</span> */
+/* 		<span id="shop-cart-hd-quantity">Quantity</span> */
+/* 		<span id="shop-cart-hd-total">Total</span> */
+/* </div> */
+/* 		<div id="shop-cart-total"> */
+/* 			<span id="order-minimum">A minimum order amount of 2.98€ is required in order to checkout!</span> */
+/* 			<span id="order-total">Sub-Total: <span id="order-total-amount"></span>€</span> */
+/* 		</div> */
+/* 		<div id="shop-cart-footer"> */
+/* 			<span id="shop-cart-update" class="button">update box</span> */
+/* 			<span id="shop-cart-continue" class="button">continue shopping</span> */
+/* 			<span id="shop-cart-checkout" class="button">check out</span> */
+/* 		</div> */
+/* 	</div> */
+/* </div> */
+#cart-body {
+	position: fixed;
+	left: 30px;
+	top: 50px;
+	background-color: grey;
+}
+
+span#order-minimum {
+	font-size: 8px;
+}
+#shop-cart-header,#shop-cart-footer, {
+	background-color: #bfbfbf;
+	text-transform: uppercase;
+}
 /******************************* artist grid ************************/
 
-/* reduce padding for tabs */
-/* div#post_108.post-108 div.post-content div.wp-tabs div.ui-tabs div#main.ui-tabs-panel div.wp-tab-content { */
-/*   margin-top: 0px; */
-/*   margin-bottom: 0px; */
-/*   padding-top: 0px; */
-/*   padding-bottom: 0px; */
-/* } */
-
-/* div.entry div.post-content { */
-/*   padding-top: 0px; */
-/*   padding-left: 30px; */
-/* } */
-
-/* artist & product grid */
-/* div.post-content div#loop div.product-box,div.post-content div#loop div.artist-box { */
-/*   height: 230px; */
-/*   width: 190px; */
-/*   margin: 0 13px 13px 0; */
-/*   float: left; */
-/*   padding: 0 0 0 0; */
-/* } */
-
-/* div.post-content div#loop.grid div.product-box,div.post-content div#loop.grid div.artist-box { } */
-
-/* div#content div#loop.grid div.post { */
-/* 	height: 154px; */
-/* 	width: 154px; */
-/* 	margin: 19px 0 0 19px; */
-/* 	padding: 0px 18px 18px 0px; */
-/*     height: 154px; */
-/*     width: 154px; */
-/*     margin: 19px 0 0 19px; */
-/*     padding: 18px; */
-/* } */
-
-/* .product-thumb { */
-/*   float: left; */
-/*   cursor: pointer; */
-/* } */
-
-/* .product-thumb img { */
-/*   width: 190px; */
-/*   height: 190px; */
-/*   border: none; */
-/*   margin-bottom: 0px; */
-/* } */
 div.product-info {
 	float: left;
 	overflow: hidden;

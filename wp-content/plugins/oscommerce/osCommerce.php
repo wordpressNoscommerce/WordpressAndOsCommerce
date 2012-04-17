@@ -98,8 +98,10 @@ function osc_init()
         // wp_enqueue_script('videobox', OSCOMMERCEVIDEOURL.'/js/videobox.js');
         // wp_enqueue_script('video.js', OSCOMMERCEVIDEOJSURL.'/video.js');
 
+        // helper functions extracted
+        wp_enqueue_script('helper', OSCOMMERCEJSURL.'/helper.js', array('jquery'));
         // our tabbed interface for products --  this has to depend on wpui-init for right inclusion order
-        wp_enqueue_script('osc_products', OSCOMMERCEJSURL.'/osc_products.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min'/*,'video.js', 'videobox'*/));
+        wp_enqueue_script('osc_products', OSCOMMERCEJSURL.'/osc_products.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
     }
 
     if(!$inadmin || ($inadmin && strstr($svr_uri, 'widget')))
@@ -231,14 +233,14 @@ function filterosCommerceShoppingCart($content)
     if(preg_match(OSC_SHOPPINGCART_TAG, $content))
     {
         $db = new osc_db();
-        $osc_manufacturers = new osc_manufacturers();
+        $osc_products = new osc_products();
         $osc_match_filter = '['.OSC_SHOPPINGCART_TAG.']';
         $shop_id = $_GET['shopID'];
         if (is_null($shop_id)) $shop_id = 1;        // default is shop 1
-        $label_id = $_GET['labelID'];
+        $oscSid  = $_GET['oscSid'];
 
         $content = osc_strstr($content, $osc_match_filter, true);
-        $osc_manufacturers->osc_show_shopping_cart($db, $shop_id, $label_id);
+        $osc_products->osc_show_shopping_cart($db, $shop_id, $oscSid);
 
         unset($db);
     }

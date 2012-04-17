@@ -30,11 +30,12 @@ class osc_product_templates
         $this->osc_inject_product_detail_template();
         $this->osc_inject_product_xsell_template();
         $this->osc_inject_product_formats_template();
-        $this->osc_inject_cart_entry_template();
         $this->osc_inject_jplayerplaylist_template();
         $this->osc_inject_videojs_template();
         $this->osc_inject_youtube_template();
         $this->osc_inject_pagination_template();
+        $this->osc_inject_shopcart_template();
+        $this->osc_inject_shopcart_entry_template();
     }
 
     /** jquery template for PRODUCT BOX in grid **/
@@ -62,9 +63,9 @@ class osc_product_templates
 
         ///////////////////////////////////////////////////////////////////////////
         /** jquery template for PRODUCT detail **/
-        function osc_inject_product_detail_template() {
+    function osc_inject_product_detail_template() {
             // hack to trick eclipse into formatting the HTML
-            echo '<script id="product-detail-template" type="text/x-jquery-tmpl">
+    	echo '<script id="product-detail-template" type="text/x-jquery-tmpl">
 '; ?>
   <div id="prod-detail-header" class="product-detail-header">
     <span id="product-meta" class="product-meta"></span><span id="product-release" class="product-model">${products_model}</span><br/>
@@ -110,22 +111,22 @@ class osc_product_templates
     </div> <!-- tab-dj-mix -->
   </div><!-- product-detail-tabs -->
             <?php echo '</script>';
-        }
+    }
 
-        ///////////////////////////////////////////////////////////////////////////
-        /** jquery template for PRODUCT XSELL listing in product-tab
-         * PROPERTIES
-         p.products_id          ,
-         p.products_model       ,
-         p.products_prelisten   ,
-         p.products_image       ,
-         p.products_for_free    ,
-         pd.products_name       ,
-         p.products_tax_class_id,
-         products_price	**/
-        function osc_inject_product_xsell_template() {
-            // hack to trick eclipse into formatting the HTML
-            echo '<script id="product-xsell-template" type="text/x-jquery-tmpl">
+    ///////////////////////////////////////////////////////////////////////////
+    /** jquery template for PRODUCT XSELL listing in product-tab
+     * PROPERTIES
+     p.products_id          ,
+     p.products_model       ,
+     p.products_prelisten   ,
+     p.products_image       ,
+     p.products_for_free    ,
+     pd.products_name       ,
+     p.products_tax_class_id,
+     products_price	**/
+    function osc_inject_product_xsell_template() {
+    	// hack to trick eclipse into formatting the HTML
+    	echo '<script id="product-xsell-template" type="text/x-jquery-tmpl">
 '; ?>
 <div class="product-xsell-box format-standard">
   <span class="product-id">${products_id}</span>
@@ -144,23 +145,23 @@ class osc_product_templates
 </div>
 
 <!-- end product-xsell -->
-            <?php   echo '</script>
+    	<?php   echo '</script>
 ';
-        }
+    }
 
-        ///////////////////////////////////////////////////////////////////////////
-        /** listing of the different product formats to buy....
-         * PROPERTIES
-         p.products_id,
-       		p.products_tax_class_id,
-       		p.products_parent products_model,
-       		pd.products_format,
-       		IF(s.status, s.specials_new_products_price, p.products_price) AS products_price **/
-        function osc_inject_product_formats_template() {
-            echo '<script id="product-formats-template" type="text/x-jquery-tmpl">
+    ///////////////////////////////////////////////////////////////////////////
+    /** listing of the different product formats to buy....
+     * PROPERTIES
+     p.products_id,
+     p.products_tax_class_id,
+     p.products_parent products_model,
+     pd.products_format,
+     IF(s.status, s.specials_new_products_price, p.products_price) AS products_price **/
+    function osc_inject_product_formats_template() {
+    	echo '<script id="product-formats-template" type="text/x-jquery-tmpl">
 ';
-            // osCsid=$this->osc_sid& TODO sort out the sessions
-            ?>
+    	// osCsid=$this->osc_sid& TODO sort out the sessions
+?>
 <div class="product-formats-entry format-standard">
   <span class="product-id">${products_id}</span>
   <span class="products-tax-class-id">${products_tax_class_id}</span>
@@ -194,56 +195,11 @@ class osc_product_templates
   </span>
             <?php   echo '</script>
 ';
-        }
+    }
 
-		///////////////////////////////////////////////////////////////////////////
-        /** listing of the different product formats to buy....
-         * cart entry PROPERTIES used in javascript parameter
-         	c.index
-	        c.products_id,
-       		c.products_thumb,
-       		c.products_tax_class_id,
-       		c.products_name,
-       		c.products_model,
-       		c.products_qty,
-       		c.products_format,
-       		c.products_price,
-       		c.products_price_tax
-       		**/
-        function osc_inject_cart_entry_template() {
-            echo '<script id="cart-entry-template" type="text/x-jquery-tmpl">
-';
-            ?>
-<div class="cart-entry format-standard">
-    <form action="<?php echo $this->cart_url; ?>" class="product-box-entry"
-      method="post" name="cart_quantity_${products_id}" target="shopping_cart">
-
-      <input type="hidden" name="products_id" value="${products_id}" />
-      <input type="hidden" name="action" value="update_product" />
-	  <input type="checkbox" class="cart_del" name="cart_delete" value="false"/>
-	  <span class="cart-index cart">${index}</span>
-	  <span class="product-id cart">${products_id}</span>
-	  <span class="product-thumb cart">${products_thumb}</span>
-	  <span class="product-name cart">${products_name}</span>
-	  <span class="products-model cart">${products_model}</span>
-	  <input type="text" class="cart_qty" name="cart_quantity" value="${products_qty}" size="1"/>
-	  <span class="products-format cart">${products_format}</span>
-	  <span class="products-price cart">${products_price}</span>
-	  <span class="products-price-tax cart">${products_price_tax} €</span>
-      <span class="update box-button cart"
-       onclick="javascript:document.forms['cart_quantity_${products_id}'].submit()"
-        onmouseout="this.style.color='#303030';this.style.backgroundColor='#d2d2d2'"
-        onmouseover="this.style.color='#d2d2d2';this.style.backgroundColor='#303030'" title="add to cart"
-        style="color: #303030; background-color: #d2d2d2;" >Update</span>
-    </form>
-</div><!-- end cart-entry-template -->
-            <?php   echo '</script>
-';
-        }
-
-        ///////////////////////////////////////////////////////////////////////////
-        function osc_inject_videojs_template() {
-            echo '<script id="product-videojs-template" type="text/x-jquery-tmpl">
+    ///////////////////////////////////////////////////////////////////////////
+    function osc_inject_videojs_template() {
+    	echo '<script id="product-videojs-template" type="text/x-jquery-tmpl">
 '; ?>
 <!-- Begin VideoJS -->
 <div class="video-js-box">
@@ -262,18 +218,19 @@ class osc_product_templates
 </div><!-- End VideoJS-->
 <?php       echo '</script>
 ';
-        }
+    }
 
-        function osc_inject_youtube_template() {
-            echo '<script id="product-youtube-template" type="text/x-jquery-tmpl">
+    function osc_inject_youtube_template() {
+    	echo '<script id="product-youtube-template" type="text/x-jquery-tmpl">
 '; ?>
-<iframe width="640" height="264" src="${youTubeUrl}" frameborder="0"></iframe>
-<?php       echo '</script>
+<iframe width="640" height="264" src="http://www.youtube.com/embed/${youTubeId}" frameborder="0" allowfullscreen>
+</iframe>
+    	<?php       echo '</script>
 ';
-        }
-        // to use is the javascript needs to be loaded
-        function osc_inject_jplayerplaylist_template() {
-            echo '<script id="product-jplayerplaylist-template" type="text/x-jquery-tmpl">
+    }
+    // to use is the javascript needs to be loaded
+    function osc_inject_jplayerplaylist_template() {
+    	echo '<script id="product-jplayerplaylist-template" type="text/x-jquery-tmpl">
 '; ?>
 <div id="player-block">
 	<div id="${jplayerId}" class="jp-jplayer"></div>
@@ -323,13 +280,13 @@ class osc_product_templates
 		</div>
 	</div>
 </div>
-<?php       echo '</script>
+<?php echo '</script>
 ';
-        }
-        function osc_inject_pagination_template() {
-            echo '<script id="pagination-template" type="text/x-jquery-tmpl">
+    }
+    function osc_inject_pagination_template() {
+    	echo '<script id="pagination-template" type="text/x-jquery-tmpl">
 '; ?>
-    <div class="pagination">
+<div class="pagination">
       <span class="pages">loaded <span class="thispage">${paged}</span>
       out of <span class="maxpage">${maxpage}</span> pages
       (<span class="loaded">${loaded}</span>/<span class="reccount">${reccount}</span>&nbsp;items) </span> <a class="nextpostslink" href="${href}">LOAD MORE</a>
@@ -337,6 +294,88 @@ class osc_product_templates
 <?php       echo '</script>
 ';
         }
-} // EOC osc_jquery_templates
+
+			///////////////////////////////////////////////////////////////////////////
+     function osc_inject_shopcart_template() {
+     	echo '<script id="shopcart-template" type="text/x-jquery-tmpl">
+';
+     	$this->osc_show_shopcart('');
+     	echo '</script>
+';
+     }
+
+			// 	draw our shopping cart, this is called from oscommerce.php
+		function osc_show_shopcart($oscSid){
+		?>
+<div id="shop-cart" class="box cart widget">
+	<h3 class="shop-cart-header">YOUR SHOPPING BOX
+		<span id="shop-cart-hd-txt">(Change Content or amount of products)</span></h3>
+	<div id="shop-cart-table">
+		<div id="shop-cart-header">
+		<span id="shop-cart-hd-remove">Remove</span>
+		<span id="shop-cart-hd-products">Products</span>
+		<span id="shop-cart-hd-quantity">Quantity</span>
+		<span id="shop-cart-hd-total">Total</span>
+		</div>
+		<div id="shop-cart-body"></div>
+		<div id="shop-cart-total">
+			<span id="order-minimum">A minimum order amount of 2.98€ is required in order to checkout!</span>
+			<span id="order-total">Total: <span id="order-total-amount">${totalPrice}</span>€</span>
+		</div>
+		<div id="shop-cart-footer">
+			<span id="shop-cart-update" class="button">update box</span>
+			<span id="shop-cart-continue" class="button">continue shopping</span>
+			<span id="shop-cart-checkout" class="button">check out</span>
+			<div class="debug"> <span id="oscSid"><?php echo $oscSid; ?>${totalPrice}</span> </div>
+		</div>
+	</div>
+</div>
+		<?php
+    }
+    ///////////////////////////////////////////////////////////////////////////
+    /** listing of the different product formats to buy....
+     * cart entry PROPERTIES used in javascript parameter
+     c.index
+     c.products_id,
+     c.products_thumb,
+     c.products_tax_class_id,
+     c.products_name,
+     c.products_model,
+     c.products_qty,
+     c.products_format,
+     c.products_price,
+     c.products_price_tax
+     **/
+    function osc_inject_shopcart_entry_template() {
+    	echo '<script id="shopcart-entry-template" type="text/x-jquery-tmpl">
+';
+    	?>
+<div class="shop-cart-entry format-standard">
+    <form action="<?php echo $this->cart_url; ?>" class="product-box-entry"
+      method="post" name="cart_quantity_${products_id}" target="shopping_cart">
+
+      <input type="hidden" name="products_id" value="${products_id}" />
+      <input type="hidden" name="action" value="update_product" />
+	  <input type="checkbox" class="cart_del" name="cart_delete" value="false"/>
+	  <span class="cart-index cart">${index}</span>
+	  <span class="product-id cart">${products_id}</span>
+	  <span class="product-thumb cart">${products_thumb}</span>
+	  <span class="product-name cart">${products_name}</span>
+	  <span class="products-model cart">${products_model}</span>
+	  <input type="text" class="cart_qty" name="cart_quantity" value="${products_qty}" size="1"/>
+	  <span class="products-format cart">${products_format}</span>
+	  <span class="products-price cart">${products_price}</span>
+	  <span class="products-price-tax cart">${products_price_tax} €</span>
+      <span class="update box-button cart"
+       onclick="javascript:document.forms['cart_quantity_${products_id}'].submit()"
+        onmouseout="this.style.color='#303030';this.style.backgroundColor='#d2d2d2'"
+        onmouseover="this.style.color='#d2d2d2';this.style.backgroundColor='#303030'" title="add to cart"
+        style="color: #303030; background-color: #d2d2d2;" >Update</span>
+    </form>
+</div><!-- end cart-entry-template -->
+<?php   echo '</script>
+';
+        }
+} // EOC osc_product_templates
 
 ?>
