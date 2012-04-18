@@ -5,7 +5,7 @@ body {
 	padding-bottom: 0px;
 }
 
-.ui-tabs .textwidget {
+.ui-tabs .textwidget , .ui-tabs .textwidget p, #shop-cart-hd-txt {
 	font: 12px/1.3 'Verdana', sans-serif;
 }
 
@@ -416,11 +416,14 @@ div#encoding {
 }
 
 .cart {
-	padding: 3px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
+#shop-cart-hd-txt {
+	text-transform: none;
+	font-size: 12px;
+}
 /* <div id="shop-cart" class="box cart widget"> */
 /* 	<h3 class="shop-box-header">YOUR SHOPPING BOX (Change Content or amount of products)</h3> */
 /* 	<div id="shop-cart-table"> */
@@ -447,13 +450,38 @@ div#encoding {
 	top: 50px;
 	background-color: grey;
 }
+.sidebar .notonsidebar {
+/* 	display: none; */
+	color: red;
+}
 
-span#order-minimum {
+.shop-cart-entry span.product-id {
+	display: inline;
+}
+
+#order-minimum {
 	font-size: 8px;
 }
-#shop-cart-header,#shop-cart-footer, {
-	background-color: #bfbfbf;
+#order-minimum:after {
+	content: "A minimum order amount of 2.98€ is required in order to checkout!";
+}
+
+.uc {
 	text-transform: uppercase;
+}
+.content #shop-cart-update:before {
+	content: "update ";
+}
+
+.sidebar #shop-cart-update:before {
+	content: "edit ";
+}
+
+#shop-cart-header,
+.sidebar #shop-cart-footer {
+	background-color: #bfbfbf;
+	font-size: 12px;
+	font-weight: bold;
 }
 /******************************* artist grid ************************/
 

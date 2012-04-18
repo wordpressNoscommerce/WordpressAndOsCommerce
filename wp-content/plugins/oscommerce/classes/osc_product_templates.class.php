@@ -316,23 +316,24 @@ class osc_product_templates
 		?>
 <div id="shop-cart" class="box cart widget">
 	<h3 class="shop-cart-header">YOUR SHOPPING BOX
-		<span id="shop-cart-hd-txt">(Change Content or amount of products)</span></h3>
-	<div id="shop-cart-table">
-		<div id="shop-cart-header">
+		<span id="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
+	</h3>
+	<div id="shop-cart-box">
+		<div id="shop-cart-header" class="notonsidebar uc">
 		<span id="shop-cart-hd-remove">Remove</span>
 		<span id="shop-cart-hd-products">Products</span>
 		<span id="shop-cart-hd-quantity">Quantity</span>
 		<span id="shop-cart-hd-total">Total</span>
 		</div>
-		<div id="shop-cart-body"></div>
+		<div id="shop-cart-body" class="notonsidebar"></div>
 		<div id="shop-cart-total">
-			<span id="order-minimum">A minimum order amount of 2.98€ is required in order to checkout!</span>
+			<span id="order-text" class="notonsidebar"></span>
 			<span id="order-total">Total: <span id="order-total-amount">${totalPrice}</span>€</span>
 		</div>
 		<div id="shop-cart-footer">
-			<span id="shop-cart-update" class="button">update box</span>
-			<span id="shop-cart-continue" class="button">continue shopping</span>
-			<span id="shop-cart-checkout" class="button">check out</span>
+			<span id="shop-cart-update" class="button uc">box</span>
+			<span id="shop-cart-continue" class="button notonsidebar uc"">continue shopping</span>
+			<span id="shop-cart-checkout" class="button uc">check out</span>
 			<div class="debug"> <span id="oscSid"><?php echo $oscSid; ?>${totalPrice}</span> </div>
 		</div>
 	</div>
