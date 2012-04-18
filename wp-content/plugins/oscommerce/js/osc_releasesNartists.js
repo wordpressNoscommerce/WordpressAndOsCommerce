@@ -835,9 +835,9 @@ jQuery.noConflict();
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// take the first element of list and add to cart
 		function addProductsToCart(prodlist) {
-			var products_id = prodlist.shift();
+			var productId = prodlist.shift();
 			var data = {
-				'products_id' : products_id,
+				'products_id' : productId,
 				'osCsid' : osCsid,
 				'action' : 'add_product'
 			};
@@ -864,6 +864,7 @@ jQuery.noConflict();
 		/** render shopping box / cart * */
 		function renderShoppingBox(cart, showBody) {
 			var shopbox = $(shopBoxSel);
+			addCartEntries(cart);
 			if (shopbox.length == 0) {
 				// place shopping box div in sidebar when missing
 				$('div.sidebar').prepend('<div id="shopping-box" class="box cart widget"></div>');
@@ -874,7 +875,6 @@ jQuery.noConflict();
 				var cart_entry_tmpl = $('#shopcart-entry-template');
 				console.assert(cart_entry_tmpl.length);
 				// draw SHOPPING BOX
-				addCartEntries(cart);
 				cart_entry_tmpl.tmpl(cart.entries).appendTo('#shop-cart-body');
 			}
 			shopbox.slideDown(fadeintime);
@@ -888,35 +888,37 @@ jQuery.noConflict();
 		 *      c.products_name, c.products_model, c.products_qty, c.products_format, c.products_price,
 		 *      c.products_price_tax
 		 **************************************************************************************************************/
-		function addCartEntries(cart, format) {
+		function addCartEntries(cart) {
 			var i = 0;
 			cart.total = 0;
+			cart.totalPrice = 0;
 			$.each(cart.contents, function(key, e) {
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.log(e);
-//				var charkey = key + '';
+				var charkey = key + '';
 				if (cart.entries == undefined)
-					cart.entries = {}; // init cart entry array if new
-				if (cart.entries[key] == undefined)
-					cart.entries[key] = new Object();		// add properties
-				var p = getProductForCart(key, format);
-				var cartEntry = cart.entries[key];
-				cartEntry.index = i;
-				cartEntry.products_id = key;
-				cartEntry.products_qty = e.qty;
-				cartEntry.products_thumb = p.products_thumb;
-				cartEntry.products_tax_class_id = p.products_tax_class_id;
-				cartEntry.products_name = p.products_name;
-				cartEntry.products_model = p.products_model;
-				// cartEntry.products_qty = p.products_qty;
-				cartEntry.products_format = p.products_format;
-				cartEntry.products_price = p.products_price;
-				cartEntry.products_price_tax = p.products_price_tax;
-				// add up items
-				cart.total += e.qty;
-				i++;
+					cart.entries = []; // init cart entry object if new
+				if (cart.entries[i] == undefined) {
+					var p = getProductForCart(key, format);
+					var cartEntry = new Object(); // add properties
+					cartEntry.index = i;
+					cartEntry.products_id = key;
+					cartEntry.products_qty = e.qty;
+					cartEntry.products_thumb = p.products_thumb;
+					cartEntry.products_tax_class_id = p.products_tax_class_id;
+					cartEntry.products_name = p.products_name;
+					cartEntry.products_model = p.products_model;
+					// cartEntry.products_qty = p.products_qty;
+					cartEntry.products_format = p.products_format;
+					cartEntry.products_price = p.products_price;
+					cartEntry.products_price_tax = p.products_price_tax;
+					// add up items
+					cart.total += e.qty;
+					cart.totalPrice += p.products_price;
+					cart.entries[i] = cartEntry;
+					i++;
+				}
 			});
-			cart.totalPrice = 'TBD';
 			console.log('fixed %d cart entries ', cart.entries.length);
 		}
 		// #################	##############################################################
