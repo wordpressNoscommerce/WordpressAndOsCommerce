@@ -136,8 +136,8 @@ jQuery.noConflict();
 			if (location.href != href) 	// if we set this to same value the page reloads forever!!!
 				location.href = href;	// maintain restful state of javascript app in location.hash
 			var curTabCtx = getTabCtx(href,isPageLoad);
-			var curTab = getTab(href,isPageLoad);
-			var curLoader = getTabLoader(href,isPageLoad);
+			var curTab = eval (getTabParm(href,isPageLoad));
+			var curLoader = eval (getTabLoaderFun(href,isPageLoad));
 			curLoader(curTabCtx,curTab,paged);		// try to load the requested page
 		}
 		// ###############################################################################
@@ -422,7 +422,7 @@ jQuery.noConflict();
 				thisTab.find('span.maxpage').html(maxPage);
 				thisTab.find('span.reccount').html(totalRecCount);
 				// add tabname to anchor href to be picked up by the clickHandler
-				var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), getTab(tabSelector));
+				var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), eval(getTabParm(tabSelector.selector)));
 				newHref = addHashParameter(newHref, 'paged', (+pageno)+1);	// link to the next page
 				pager.attr('href', newHref);
 			} else {	// write new one for ARTIST RELEASE PAGES
@@ -879,7 +879,7 @@ jQuery.noConflict();
 				console.assert(cart_entry_tmpl.length);
 				// draw SHOPPING BOX
 				addCartEntries(cart);
-				cart_entry_tmpl.tmpl(cart.entries).appendTo('#cart-body');
+				cart_entry_tmpl.tmpl(cart.entries).appendTo('#shop-cart-body');
 			}
 			shopbox.slideDown(fadeintime);
 			return cart;
@@ -1274,7 +1274,6 @@ jQuery.noConflict();
 				console.log('no release headers found to remove');
 			lastProductId = 0;
 		}
-		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// the trigger to scroll when hitting bottom of page
 		var cnt = 0;
