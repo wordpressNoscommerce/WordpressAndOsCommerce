@@ -80,35 +80,42 @@ class osc_product_templates
     <div id="tab-info-text" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">InfoText</h3>
       <div class="wp-tab-content textwidget">{{html products_description}}</div>
-    </div> <!-- tab-info-text -->
+    </div>
 
     <div id="tab-listen-buy" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">Listen/Buy</h3>
       <div class="wp-tab-content">
         <h4 id="loadingProds">Loading Products ... </h4>
       </div>
-    </div> <!-- tab-listen-buy -->
+    </div>
 
     <div id="tab-full-cover" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">Full Cover</h3>
       <div class="wp-tab-content"></div>
-    </div> <!-- tab-full-cover -->
+    </div>
 
     <div id="tab-video" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">Video</h3>
       <div class="wp-tab-content"></div>
       <!-- wp-tab-content -->
-    </div> <!-- tab-video -->
+    </div>
 
     <div id="tab-free-song" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">Free Song</h3>
-      <div class="wp-tab-content"> </div>
-    </div> <!-- tab-free-song -->
+      <div class="wp-tab-content">
+		<iframe width="100%" height="450" scrolling="no" frameborder="no"
+				src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F430866&show_artwork=true">
+				</iframe>
+      </div>
+    </div>
 
     <div id="tab-dj-mix" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
       <h3 class="wp-tab-title" style="display: none;">DJ-Mix</h3>
-      <div class="wp-tab-content"> </div>
-    </div> <!-- tab-dj-mix -->
+		<div class="wp-tab-content">
+			<iframe width="100%" height="166" scrolling="no" frameborder="no"
+				src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F43024792&show_artwork=true"></iframe>
+		</div>
+	</div> <!-- tab-dj-mix -->
   </div><!-- product-detail-tabs -->
             <?php echo '</script>';
     }
