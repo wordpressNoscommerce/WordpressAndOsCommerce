@@ -5,6 +5,11 @@
  * state is kept in location.hash to make local state bookmarkable (REST)
  * **/
 
+// lets pollute some global namespace :)
+var allArtReleases = 'All Releases Of Artist';
+// TODO deal with the tabnames better
+var artReltabNames = [ { tab : allArtReleases } ];//, { tab : "Singles" }, { tab : "Albums" }, { tab : "Appears On" }, { tab : "Videos" } ];
+
 jQuery.noConflict();
 (function($) { //this defines a scope so we cannot simply split this up into multiple files
 	$(function() {
@@ -22,9 +27,6 @@ jQuery.noConflict();
 		var shopBoxSel = 'div#shop-cart';
 		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var shoppingCartUrl = oscPrefix + '/catalog/handle_cart.php';
-		var allArtReleases = 'All Releases Of Artist';
-		// TODO deal with the tabnames better
-		var artReltabNames = [ { tab : allArtReleases } ];//, { tab : "Singles" }, { tab : "Albums" }, { tab : "Appears On" }, { tab : "Videos" } ];
 
 		// state variables
 		var osCsid = 0;
@@ -43,7 +45,7 @@ jQuery.noConflict();
 		var paged;
 		var rpage;// different pageno for releases
 		var artRelTab;	// the tab of the artist releases
-		var artist_set;
+		var artistSet;
 		var artists_id;
 		getStateFromUrl(location.href);	// set URL parms
 		// keep new and changed parameters in location.hash to avoid page reload
@@ -313,11 +315,11 @@ jQuery.noConflict();
 			console.assert(template.length); // make sure its found
 			var loopDiv = prepareLoopDiv(tabDivSel);
 //			console.trace();
-			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artist_set,paged,pageno);
+			console.log('renderItemsInTab %s with format %s, artistSet %s, paged = %d, pageno = %d',tabName,fixedTabName,artistSet,paged,pageno);
 			// the template
 			$.each(newItems, function(i, v) {
 				v.format = fixedTabName;
-				v.artist_set = artist_set;
+				v.artist_set = artistSet;
 				v.paged = (templateName == '#release-box-template')?paged:pageno;	// special case for artist releases
 				v.rpage = pageno;
 				});
@@ -391,7 +393,7 @@ jQuery.noConflict();
 			if (curTabCtx == '#artist-set-tabs') {
 				if (artists_id != undefined)
 					if (getArtistMaster(artists_id))
-						toggleArtist(artists_id, artist_set);
+						toggleArtist(artists_id, artistSet);
 			} else {
 				if (products_id != undefined)
 					if (getProductMaster(products_id)) 		// show product if available
@@ -436,7 +438,7 @@ jQuery.noConflict();
 														loaded: loaded,
 														reccount:totalRecCount,
 														href: addHashParameter(location.hash, 'rpage', (+pageno)+1)
-														}).appendTo(tabSelector + ':visible');
+														}).appendTo(tabSelector);	// never mind the visibility thats done later
 				// reload pager JQ after creation
 				pager = tabSelector.find(' div.pagination a');
 				// put a clickhandler in new pagination div
@@ -891,7 +893,7 @@ jQuery.noConflict();
 		function addCartEntries(cart) {
 			var i = 0;
 			cart.total = 0;
-			cart.totalPrice = 0;
+			cart.totalPrice = 0.0;	// use float
 			$.each(cart.contents, function(key, e) {
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.log(e);
@@ -992,7 +994,7 @@ jQuery.noConflict();
 //			page_id = getParameterFromUrl('page_id', undefined, url);
 			format = getParameterFromUrl('format','vinyl', url);
 			products_id = getParameterFromUrl('products_id', undefined, url);
-			artist_set = getParameterFromUrl('artistSet', 'main', url);
+			artistSet = getParameterFromUrl('artistSet', 'main', url);
 			artists_id = getParameterFromUrl('artistId', undefined, url);
 			artRelTab = getParameterFromUrl('artRelTab', allArtReleases, url);
 			paged = getParameterFromUrl('paged', 1, url);

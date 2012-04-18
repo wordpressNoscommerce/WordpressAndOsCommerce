@@ -71,7 +71,7 @@ function is_news() {
       </div>
       <div id="filetime">
 			<?php	// browser application date is most intesting to show in header
-					$filename = ABSPATH . 'wp-content/plugins/oscommerce/js/osc_products.js';
+					$filename = ABSPATH . 'wp-content/plugins/oscommerce/js//osc_releasesNartists.js';
 					echo basename($filename)." last modified on " . date ("F d Y H:i:s.", filemtime($filename)); ?>
 			</div>
       <?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('Site description') ) ?>

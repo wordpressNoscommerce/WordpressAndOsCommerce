@@ -53,7 +53,7 @@ function getTabCtx(href, isPageLoad) {
 	else if (isArtistPage(href))
 		return '#artist-set-tabs';
 	else
-		console.assert(false);
+		if (!isPageLoad) console.assert(false);
 	// "product-detail-tabs"
 }
 function getTabParm(href, isPageLoad) {
@@ -129,6 +129,10 @@ function isArtistReleasePage(href) {
 		href = location.href;
 	if (typeof href != 'string')
 		href = href.selector; // use the selector string of jQ object
+	if (href.indexOf('#') <0)
+		return false;	// no hash no releases
+	if (href.indexOf('#artist-set-tabs') >= 0)
+		return false;
 	var result = false;
 	jQuery.each(artReltabNames, function(i, v) { // look for a release tab link
 		if (href.indexOf(fixTabName(v.tab)) >= 0) {// dont forget to normalize name
