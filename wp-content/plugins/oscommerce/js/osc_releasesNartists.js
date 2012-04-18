@@ -123,7 +123,7 @@ jQuery.noConflict();
 				var newItems = json[tab];
 				addToCache(newItems);
 				renderItemsInTab(curTabCtx,newItems,tab,pageno,templateName);
-				renderPagination(getTabSelector(curTabCtx,tab),pageSize, totalItems, newItems, 1);
+				renderPagination(getTabDiv(curTabCtx,tab),pageSize, totalItems, newItems, 1);
 				// put a clickhandler in new pagination divs
 				$(curTabCtx+' div.pagination a').unbind('click').click(changeStateHandler);
 			}
@@ -168,7 +168,7 @@ jQuery.noConflict();
 							var result = eval('(' + data + ')'); // eval json array
 							addToCache(result[3]); // this is the product list
 							renderItemsInTab(curTabCtx,result[3], tabName, pageno,'#product-box-template');
-							renderPagination(getTabSelector(curTabCtx,tabName), result[0], result[1], result[3], pageno);
+							renderPagination(getTabDiv(curTabCtx,tabName), result[0], result[1], result[3], pageno);
 							selectTab(curTabCtx, tabName, loadProductsForTab, productClickHandler);
 							// scroll box to bottom
 							$(curTabCtx).get(0).scrollIntoView(0);
@@ -178,13 +178,10 @@ jQuery.noConflict();
 						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						console.error('request(%s) error(%o)',fetchurl, jqXHR);
 						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
-						getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+						getTabDiv(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
-			} else { // check if its rendered already
-//				if ($(getTabSelector(curTabCtx,tabName)+' div.wp-tab-content').contents().length == 0) {
-//					renderItemsInTab(curTabCtx,0,format,1,'#product-box-template');
-//				}
+			} else { // simply show the selected tab
 				selectTab(curTabCtx,format, loadProductsForTab, productClickHandler);
 			}
 		}
@@ -213,7 +210,7 @@ jQuery.noConflict();
 							var result = eval('(' + data + ')'); // eval json array
 							addToCache(result[3]);
 							renderItemsInTab(curTabCtx,result[3],tabName,paged,'#manufacturer-box-template');
-							renderPagination(getTabSelector(curTabCtx,tabName), result[0], result[1], result[3], paged);
+							renderPagination(getTabDiv(curTabCtx,tabName), result[0], result[1], result[3], paged);
 							selectTab(curTabCtx, tabName, loadArtistsForTab, artistClickHandler);
 							// scroll curTabCtx box to bottom
 							$(curTabCtx).get(0).scrollIntoView(0);
@@ -223,11 +220,11 @@ jQuery.noConflict();
 						getTabLnk(curTabCtx,tabName).removeClass('loading');
 						console.error('request(%s) error(%o)',fetchurl, jqXHR);
 						var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + tabName;
-						getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+						getTabDiv(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 					}
 				});
 			} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
-				var tabSelector = getTabSelector(curTabCtx,tabName);
+				var tabSelector = getTabDiv(curTabCtx,tabName);
 				if (tabSelector.find('div.wp-tab-content').contents().length == 0) {
 					renderItemsInTab(curTabCtx,manufacturers[tabName],tabName,1,'#manufacturer-box-template');
 				}
@@ -257,13 +254,13 @@ jQuery.noConflict();
 							getTabLnk(curTabCtx,tabName).removeClass('loading');
 							if (data.indexOf('No Records found') >= 0) {
 								console.error(data);
-								getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ data+'</h3>').addClass('error');
+								getTabDiv(curTabCtx,tabName).html('<h3 class="error">'+ data+'</h3>').addClass('error');
 							} else {
 								var result = eval('(' + data + ')'); // eval json array
 								addToCache(result[3], artistId); // this is the product list and artist relation
 								renderItemsInTab(curTabCtx, result[3],tabName,rpage,'#release-box-template');	// use rpage nos
 								// 	function renderPagination(curTabCtx, pageSize, totalRecCount, newItems, paged)
-								renderPagination(getTabSelector(curTabCtx,tabName), result[0], result[1], result[3], rpage);
+								renderPagination(getTabDiv(curTabCtx,tabName), result[0], result[1], result[3], rpage);
 								selectTab(curTabCtx,  tabName, loadProductsForArtist(artistId), releaseClickHandler);
 								// scroll box to bottom
 								$('#release-format-tabs').get(0).scrollIntoView(0);
@@ -273,11 +270,11 @@ jQuery.noConflict();
 							getTabLnk(curTabCtx,tabName).removeClass('loading');
 							console.error('request(%s) error(%o)',fetchurl, jqXHR);
 							var msg = "status="+jqXHR.status+" "+errorThrown+" when trying to load Releases for " + manumap[artistId].manufacturers_name;
-							getTabSelector(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
+							getTabDiv(curTabCtx,tabName).html('<h3 class="error">'+ msg+'</h3>').addClass('error');
 						}
 					});
 				} else { // check if it has been rendered if not do so 	... use id matching as we have suffixes
-					var tabSelector = getTabSelector(curTabCtx,tabName);
+					var tabSelector = getTabDiv(curTabCtx,tabName);
 					if (tabSelector.find('div.wp-tab-content').contents().length == 0) {
 						renderItemsInTab(curTabCtx, relemap[artistId], tabName, 1, '#release-box-template');
 					}
@@ -289,7 +286,7 @@ jQuery.noConflict();
 		// check if more data is needed for current tab
 		function needToLoad(curTabCtx,tabName, pageno) {
 			var result = false;
-			var tabSelector = getTabSelector(curTabCtx,tabName);
+			var tabSelector = getTabDiv(curTabCtx,tabName);
 			var numPosts = tabSelector.find(' .grid .post').length;
 			if (numPosts == 0) { // no posts in our tab
 				result = true;	// so need to load!
@@ -311,7 +308,7 @@ jQuery.noConflict();
 			console.assert(newItems != undefined && newItems.length);
 			var fixedTabName = tabName.toLowerCase().replace(/ /g, '_');
 			// the id property gets garbled when tabs get regenerated... so match it instead
-			var tabDivSel = getTabSelector(curTabCtx,tabName);
+			var tabDivSel = getTabDiv(curTabCtx,tabName);
 			var template = $(templateName);
 			console.assert(template.length); // make sure its found
 			var loopDiv = prepareLoopDiv(tabDivSel);
@@ -335,7 +332,7 @@ jQuery.noConflict();
 		// this is depending on the wpui tab code which arranges the elems around
 		function selectTab(curTabCtx,tabNameOrg, loadItemsForTab, clickHandler) {
 			var tabName = tabNameOrg.toLowerCase().replace(/ /g, '_');
-			var tabSelector = getTabSelector(curTabCtx,tabNameOrg);
+			var tabSelector = getTabDiv(curTabCtx,tabNameOrg);
 			if (tabSelector.find(':visible').length) { // we are on the right tab already
 				// but we still have to deal with additional parms or posts
 				finishTab(curTabCtx, tabSelector, tabName, loadItemsForTab, clickHandler);
@@ -411,16 +408,15 @@ jQuery.noConflict();
 			var loaded = pageSize * pageno;
 			if (pageno == maxPage)
 				loaded = totalRecCount; // max loaded is totalRecCount on last page
-			var thisTab = $(tabSelector);
-			var pager = thisTab.find('div.pagination a');
+			var pager = tabSelector.find('div.pagination a');
 			// update previous pager
 			if (pager.length) {
 				pager.removeClass('loading').text('LOAD MORE'); // stop the loading image
 				// put data in right DIV for current curTabCtx
-				thisTab.find('span.thispage').html(pageno);
-				thisTab.find('span.loaded').html(loaded);
-				thisTab.find('span.maxpage').html(maxPage);
-				thisTab.find('span.reccount').html(totalRecCount);
+				tabSelector.find('span.thispage').html(pageno);
+				tabSelector.find('span.loaded').html(loaded);
+				tabSelector.find('span.maxpage').html(maxPage);
+				tabSelector.find('span.reccount').html(totalRecCount);
 				// add tabname to anchor href to be picked up by the clickHandler
 				var newHref = addHashParameter(pager.attr('href'), getTabParm(tabSelector), eval(getTabParm(tabSelector.selector)));
 				newHref = addHashParameter(newHref, 'paged', (+pageno)+1);	// link to the next page
@@ -442,7 +438,7 @@ jQuery.noConflict();
 														href: addHashParameter(location.hash, 'rpage', (+pageno)+1)
 														}).appendTo(tabSelector + ':visible');
 				// reload pager JQ after creation
-				pager = thisTab.find(' div.pagination a');
+				pager = tabSelector.find(' div.pagination a');
 				// put a clickhandler in new pagination div
 				pager.unbind('click').click(changeStateHandler);
 			}
@@ -645,22 +641,22 @@ jQuery.noConflict();
 			/** *************************************************************** */
 			/** * video handlers * */
 			/** *************************************************************** */
-			var hasVideo = false;
-			if (prod.products_upc != undefined) {
+			var removeVideo = false;
+			if (prod.products_upc) {
 				console.log('found a video link "%s"',prod.products_upc);
 				renderVideo(curTabCtxSel,prod.products_upc);
-				hasVideo = true;
+				removeVideo = false;
 			} else
-				hasVideo = extractVideoHandlerFromInfoText(seltor);
+				removeVideo = extractVideoHandlerFromInfoText(seltor);
 
 			// remove video tab if no video found
-			if (!hasVideo) {
-				$(getTabSelector(curTabCtxSel, 'video')).remove();
-				$(getTabLink(curTabCtxSel, 'video')).parent().remove();
+			if (removeVideo) {
+				getTabDiv(curTabCtxSel, 'video').remove();
+				getTabLnk(curTabCtxSel, 'video').parent().remove();
 			}
 
 			if (seltorName.indexOf('product') >=0)
-				$(getTabSelector(curTabCtxSel, 'listenbuy')).click(); // show tracks
+				getTabDiv(curTabCtxSel, 'listenbuy').click(); // show tracks
 			else	// scroll into view (its a DOM function not jquery
 				curTabCtx.parent().get(0).scrollIntoView(true);	// top end
 			seltor.fadeIn(fadeintime); //show active tab
@@ -672,7 +668,7 @@ jQuery.noConflict();
 		/** load listenbuy tab including the jplayer */
 		function load_listenbuy_tab(curTabCtx,e, prod) {
 			// TODO check if content is there already
-			var lstbuytab = $(getTabSelector(curTabCtx,'listenbuy'));
+			var lstbuytab = getTabDiv(curTabCtx,'listenbuy');
 			var loadMsg = lstbuytab.find('#loadingProds');
 			var errorMsg = lstbuytab.find('.error');
 			if (loadMsg.length == 0 && errorMsg.length == 0)
@@ -933,7 +929,7 @@ jQuery.noConflict();
 				console.log(msg);
 				return false;
 			}
-			var target = getTabSelector(curTabCtx,'video'); // browser can append suffixes
+			var target = getTabDiv(curTabCtx,'video'); // browser can append suffixes
 			target.empty();
 			prod_youtube_tmpl.tmpl({
 				'youTubeId' : youTubeId
@@ -1165,7 +1161,7 @@ jQuery.noConflict();
 			// search for video link in infotext and fix it
 			// (always use matching for id tags - they are not unique so browser
 			// generates suffixes
-			var infotextId = $(seltor + getTabSelector(curTabCtx,'infotext')).attr('id');
+			var infotextId = $(seltor + getTabDiv(curTabCtx,'infotext')).attr('id');
 			// browser might append suffixes
 			var vidImgSel = seltor + ' #' + infotextId + ' a img[src$="watch_it.jpg"]';
 			var vidLink = $(vidImgSel).parent();
@@ -1174,7 +1170,7 @@ jQuery.noConflict();
 				// first copy click action from attribute
 				var videoboxLink = vidLink.attr('onclick');
 				// browser might append suffixes
-				var videoId = $(seltor + getTabSelector(curTabCtx,'video')).attr('id');
+				var videoId = $(seltor + getTabDiv(curTabCtx,'video')).attr('id');
 				// remove click handler from attributes
 				vidLink.attr('href', '#' + videoId).attr('onclick', "");
 				// add new click handler to switch tabs (easing)
@@ -1190,9 +1186,9 @@ jQuery.noConflict();
 				// clean the string
 				var videoLink = param[0].replace(/'/g, " ").replace(/"/g, " ").trim();
 				renderVideo(videoLink);
-				return true;
+				return false;	// dont remove the video
 			}
-			return false;
+			return true;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// attach click handler to all tab links for product formats

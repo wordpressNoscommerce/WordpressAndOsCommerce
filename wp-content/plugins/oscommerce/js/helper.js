@@ -9,7 +9,7 @@ function fixTabName(tabName) {
 	return tabName.toLowerCase().replace(/ /g, '_');
 }
 
-function getTabSelector(curTabCtx, tabName) {
+function getTabDiv(curTabCtx, tabName) {
 	var divsel = 'div[id^=' + fixTabName(tabName) + ']';
 	if (typeof curTabCtx == 'string')
 		return jQuery(curTabCtx).find(divsel);
