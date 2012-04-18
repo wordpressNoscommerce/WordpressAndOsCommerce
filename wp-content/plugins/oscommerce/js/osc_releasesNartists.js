@@ -24,7 +24,8 @@ jQuery.noConflict();
 		var playerSelector = '#'+playerId;
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#'+playerContent;
-		var shopBoxSel = 'div#shop-cart';
+//		var shopBoxSel = '.sidebar div.shop-cart';
+//		var shopCartSel = '.post-content div.shop-cart';
 		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var shoppingCartUrl = oscPrefix + '/catalog/handle_cart.php';
 
@@ -368,8 +369,9 @@ jQuery.noConflict();
 			console.log('removing selection for %o', selNavLi);
 
 			// set active class for LI link immediately
-			$(curTabCtx).find('LI.ui-state-default').has('A[href=#'+tabName+']')
-													.addClass( 'ui-tabs-selected ui-state-active');
+			var selLi = $(curTabCtx).find('LI.ui-state-default').has('A[href=#'+tabName+']');
+			console.assert(selLi.length);
+			selLi.addClass( 'ui-tabs-selected ui-state-active');
 			hideAllTabs(curTabCtx);
 
 			// TODO USE EASING on the content DIVS
@@ -611,7 +613,21 @@ jQuery.noConflict();
 			location.hash = temphash;
 
 			// TODO fix links
-//			$(curTabCtx+' ul.ui-tabs-nav li.ui-state-default a').each(function(i, e) { console.log($(e).attr('href')); });
+			curTabCtx.find('ul.ui-tabs-nav li.ui-state-default a').each(function(i, e) {
+				var anchor = $(e);
+				console.log('CLICK added for anchor %s', anchor.attr('href'));
+				anchor.click(function(e){	// update hash = REST parms for these links
+					var anchor = $(this);
+
+					var newHref = anchor.attr('href');
+					newHref = addHashParameter(newHref, 'format', format);
+					newHref = addHashParameter(newHref, 'paged', paged);
+					newHref = addHashParameter(newHref, 'products_id', prodId);
+					location.hash = newHref;
+					anchor.attr('href',newHref)
+					console.log('anchor %s clicked and locaton.hash set', anchor.attr('href'));
+				});
+			});
 
 			// fix artist display in product/release-detail TODO add link to artist page
 			$('#prod-detail-header #product-title').html(function (i, html) {
@@ -816,9 +832,8 @@ jQuery.noConflict();
 		var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
 		function playlistBuyClickHandler(e) {
 			var index = $(e.currentTarget).prev('a.jp-playlist-item').attr('tabindex');
-			console.assert(index);
-			if(!index) console.error('no index found in Playlist');
-			console.log('buy click on index %d for mp3 %o', index, curMP3list[index]);
+			console.assert(index >= 0);
+//			console.log('buy click on index %d for mp3 %o', index, curMP3list[index]);
 			addProductsToCart([curMP3list[index].products_id]);	// make array of prod id
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
@@ -827,10 +842,9 @@ jQuery.noConflict();
 			console.log($(this).parent());
 //			$().addClass('loading').text('LOADING...');
 			var prodlist = [];
-			$(e.currentTarget).parent().find('input.checkbox:checked')
-					.each(function(i,e){
+			$(e.currentTarget).parent().find('input.checkbox:checked').each(function(i,e){
 						prodlist[i] = $(e).attr('value');});
-			console.log('buy %d products %o', prodlist.length, prodlist);
+//			console.log('buy %d products %o', prodlist.length, prodlist);
 			addProductsToCart(prodlist);
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
@@ -851,7 +865,7 @@ jQuery.noConflict();
 				}
 				var result = eval('(' + data + ')'); // eval json data
 				console.log(result);
-				cart = renderShoppingBox(result.cart, true); // keep cart in global
+				cart = renderShoppingBox(result.cart); // keep cart in global
 				osCsid = result.osCsid;
 				if (prodlist.length)		// daisy chain adding the products
 					addProductsToCart(prodlist);
@@ -863,20 +877,21 @@ jQuery.noConflict();
 		}
 		;
 		// ###############################################################################
-		/** render shopping box / cart * */
-		function renderShoppingBox(cart, showBody) {
-			var shopbox = $(shopBoxSel);
-			addCartEntries(cart);
-			if (shopbox.length == 0) {
-				// place shopping box div in sidebar when missing
+		/** render shopping box / cart  showing the body is controlled via CSS sidebar/post-content **/
+		function renderShoppingBox(cart) {
+			var shopbox = $('#shopping-box');
+			if (shopbox.length == 0) { // place shopping box div in the top of sidebar when missing
 				$('div.sidebar').prepend('<div id="shopping-box" class="box cart widget"></div>');
-				var cart_tmpl = $('#shopcart-template');
-				cart_tmpl.tmpl(cart).appendTo('#shopping-box');
 			}
+			prepareCartEntries(cart);
+			var cart_tmpl = $('#shopcart-template');
+			$('#shopping-box').empty(); 	// clean up previous one
+			cart_tmpl.tmpl(cart).appendTo('#shopping-box');
+			// we paint the content even when not seen for now
 			if ($(cart.contents).length) {
 				var cart_entry_tmpl = $('#shopcart-entry-template');
 				console.assert(cart_entry_tmpl.length);
-				// draw SHOPPING BOX
+				$('#shop-cart-body').empty();  // cleanup first
 				cart_entry_tmpl.tmpl(cart.entries).appendTo('#shop-cart-body');
 			}
 			shopbox.slideDown(fadeintime);
@@ -890,38 +905,46 @@ jQuery.noConflict();
 		 *      c.products_name, c.products_model, c.products_qty, c.products_format, c.products_price,
 		 *      c.products_price_tax
 		 **************************************************************************************************************/
-		function addCartEntries(cart) {
-			var i = 0;
-			cart.total = 0;
-			cart.totalPrice = 0.0;	// use float
+		function prepareCartEntries(cart) {
+			// read contents and create the entries list for display in the shopcart
+			if (cart.entries == undefined) 		cart.entries = []; // init cart entry array
+			if (cart.totalPrice == undefined) cart.totalPrice = 0.;
+			if (cart.total == undefined) 			cart.total = 0;
+ 			var i = 0;
 			$.each(cart.contents, function(key, e) {
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.log(e);
 				var charkey = key + '';
-				if (cart.entries == undefined)
-					cart.entries = []; // init cart entry object if new
 				if (cart.entries[i] == undefined) {
-					var p = getProductForCart(key, format);
 					var cartEntry = new Object(); // add properties
 					cartEntry.index = i;
 					cartEntry.products_id = key;
 					cartEntry.products_qty = e.qty;
+					// now get the product data
+					var p = getProductForCart(key, format);
 					cartEntry.products_thumb = p.products_thumb;
 					cartEntry.products_tax_class_id = p.products_tax_class_id;
 					cartEntry.products_name = p.products_name;
 					cartEntry.products_model = p.products_model;
 					// cartEntry.products_qty = p.products_qty;
 					cartEntry.products_format = p.products_format;
-					cartEntry.products_price = p.products_price;
 					cartEntry.products_price_tax = p.products_price_tax;
+					cartEntry.products_price = p.products_price;
+					cartEntry.products_price_gross = p.products_price;
+					if (p.products_tax_class_id == 2)	{	// vat depending on tax class: 2 => 19%
+						cartEntry.products_price_gross = Math.ceil(p.products_price * 119)/100;
+						cartEntry.products_price_tax = Math.ceil(p.products_price * 19)/100;
+					}
 					// add up items
 					cart.total += e.qty;
-					cart.totalPrice += p.products_price;
+					// messy float operations watch the rounding
+					cart.totalPrice = parseFloat(cart.totalPrice) + (e.qty * cartEntry.products_price_gross);
 					cart.entries[i] = cartEntry;
 					i++;
 				}
 			});
-			console.log('fixed %d cart entries ', cart.entries.length);
+			cart.totalPrice = cart.totalPrice.toFixed(2);
+			console.log('fixed %d cart entries: total items %d Sum %s', cart.entries.length, cart.total, cart.totalPrice);
 		}
 		// #################	##############################################################
 		/** render video object into video tab * */
@@ -1131,7 +1154,7 @@ jQuery.noConflict();
 		// ==> wrap anchors within LI inside an extra H3 tag (sharing sight CSS)
 		function fixWpTabHeader(curTabCtx) {
 			var anchors = $(curTabCtx + ' li.ui-state-default a');
-			console.log('found %d anchors in ', anchors.length, curTabCtx);
+			console.log('fixWpTabHeader found %d anchors in ', anchors.length, curTabCtx);
 			anchors.each(function(i, e) {
 			$(e).parent().html(function(i, html) {
 				return '<h3>'+html+'</h3>';

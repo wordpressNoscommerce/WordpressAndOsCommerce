@@ -310,33 +310,34 @@ class osc_product_templates
      	echo '</script>
 ';
      }
-
 			// 	draw our shopping cart, this is called from oscommerce.php
+			// since we have two version of this cart on ein sidebar one in content-body we need to use classes only
 		function osc_show_shopcart($oscSid){
 		?>
-<div id="shop-cart" class="box cart widget">
+<div class="shop-cart" class="box cart widget">
 	<h3 class="shop-cart-header">YOUR SHOPPING BOX
-		<span id="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
+		<span class="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
 	</h3>
-	<div id="shop-cart-box">
-		<div id="shop-cart-header" class="notonsidebar uc">
-		<span id="shop-cart-hd-remove">Remove</span>
-		<span id="shop-cart-hd-products">Products</span>
-		<span id="shop-cart-hd-quantity">Quantity</span>
-		<span id="shop-cart-hd-total">Total</span>
+	<div class="shop-cart-box">
+		<div class="shop-cart-header notonsidebar uc">
+			<span class="shop-cart-hd-remove">Remove</span>
+			<span class="shop-classrt-hd-products">Products</span>
+			<span class="shop-cart-hd-quantity">Quantity</span>
+			<span class="shop-cart-hd-total">Total</span>
 		</div>
-		<div id="shop-cart-body" class="notonsidebar"></div>
-		<div id="shop-cart-total">
-			<span id="order-text" class="notonsidebar"></span>
-			<span id="order-total">Total: <span id="order-total-amount">${totalPrice}</span>€</span>
+		<div class="shop-cart-body notonsidebar"></div>
+		<div class="shop-cart-total">
+			<span class="order-text notonsidebar"></span>
+			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
+			<span class="order-total">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
 		</div>
-		<div id="shop-cart-footer">
-			<span id="shop-cart-update" class="button uc">box</span>
-			<span id="shop-cart-continue" class="button notonsidebar uc"">continue shopping</span>
-			<span id="shop-cart-checkout" class="button uc">check out</span>
-			<div class="debug"> <span id="oscSid"><?php echo $oscSid; ?>${totalPrice}</span> </div>
+		<div class="shop-cart-footer">
+			<span class="shop-cart-update button uc">box</span>
+			<span class="shop-cart-continue button notonsidebar uc"">continue shopping</span>
+			<span class="shop-cart-checkout button uc">check out</span>
+			<div class="debug clear"> <span class="oscSid"><?php echo $oscSid; ?>${oscSid}</span> </div>
 		</div>
-	</div>
+	</div><!-- shop-cart-box -->
 </div>
 		<?php
     }
@@ -374,11 +375,9 @@ class osc_product_templates
 	  <span class="products-format cart">${products_format}</span>
 	  <span class="products-price cart">${products_price}</span>
 	  <span class="products-price-tax cart">${products_price_tax} €</span>
-      <span class="update box-button cart"
+      <span class="update button cart" title="add to cart"
        onclick="javascript:document.forms['cart_quantity_${products_id}'].submit()"
-        onmouseout="this.style.color='#303030';this.style.backgroundColor='#d2d2d2'"
-        onmouseover="this.style.color='#d2d2d2';this.style.backgroundColor='#303030'" title="add to cart"
-        style="color: #303030; background-color: #d2d2d2;" >Update</span>
+				>Update</span>
     </form>
 </div><!-- end cart-entry-template -->
 <?php   echo '</script>

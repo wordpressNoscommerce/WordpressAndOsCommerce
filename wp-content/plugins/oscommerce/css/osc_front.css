@@ -368,62 +368,6 @@ div#encoding {
 /******************************* shopping cart ************************/
 /******************************* shopping cart ************************/
 /******************************* shopping cart ************************/
-#cartId {
-	color: #ddd;
-}
-
-.format-standard {
-	max-width:
-}
-
-.buy-button {
-	background-color: transparent;
-	text-transform: uppercase;
-	font-weight: bold;
-}
-
-.buy-button:hover {
-	text-decoration: underline;
-	background-color: #eaeaea;
-}
-
-.buy-product,.buy-button,.box-button {
-	cursor: pointer;
-	display: inline;
-	float: right;
-	/*     border-radius: 5px 5px 5px 5px; */
-}
-
-.update {
-	color: #202020;
-	background-color: #d2d2d2;
-}
-
-.box-button {
-	padding: 2px;
-	font-size: 120%;
-	font-weight: bold;
-	color: #fff;
-}
-
-#edit-box {
-	background-color: #800;
-}
-
-#check-out {
-	float: left;
-	background-color: #080;
-}
-
-.cart {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-#shop-cart-hd-txt {
-	text-transform: none;
-	font-size: 12px;
-}
 /* <div id="shop-cart" class="box cart widget"> */
 /* 	<h3 class="shop-box-header">YOUR SHOPPING BOX (Change Content or amount of products)</h3> */
 /* 	<div id="shop-cart-table"> */
@@ -444,45 +388,94 @@ div#encoding {
 /* 		</div> */
 /* 	</div> */
 /* </div> */
-#cart-body {
-	position: fixed;
-	left: 30px;
-	top: 50px;
-	background-color: grey;
+
+.uc {
+	text-transform: uppercase;
 }
 .sidebar .notonsidebar {
-/* 	display: none; */
-	color: red;
+	display: none;
+}
+
+.shop-cart {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.sidebar .shop-cart-hd-txt {
+	display: none;
+}
+.post-content .shop-cart-hd-txt {
+	text-transform: none;
+	font-size: 12px;
+}
+
+.post-content .shop-cart-entry .update {
+	color: #303030;
+	background-color: #808080;;
+}
+
+.button:hover {
+	text-decoration: underline;
+	background-color: #d0d0d0;
+	color: #f0f0f0;
+}
+
+.button {
+	background-color: #bfbfbf;
+	font-weight: bold;
+	cursor: pointer;
+	padding: 3px 5px 3px 5px;
+	font-weight: bold;
+}
+
+.shop-cart-continue {
+	background-color: #080;
+}
+
+.sidebar .shop-cart-update {
+	float: left;
+}
+.sidebar .shop-cart-checkout {
+	float: right;
 }
 
 .shop-cart-entry span.product-id {
 	display: inline;
 }
 
-#order-minimum {
-	font-size: 8px;
+.sidebar .order-text {
+	display: none;
 }
-#order-minimum:after {
+.post-content .order-text:after {
 	content: "A minimum order amount of 2.98€ is required in order to checkout!";
 }
-
-.uc {
-	text-transform: uppercase;
-}
-.content #shop-cart-update:before {
+.post-content .shop-cart-update:before {
 	content: "update ";
 }
 
-.sidebar #shop-cart-update:before {
+.sidebar .shop-cart-update:before {
 	content: "edit ";
 }
 
-#shop-cart-header,
-.sidebar #shop-cart-footer {
-	background-color: #bfbfbf;
+.sidebar .shop-cart-box {
+	background-color: #f2f2f2;
 	font-size: 12px;
+	padding: 10px;
+}
+.shop-cart-total {
+	margin: 4px 5px 10px 5px;
+}
+.sidebar .order-total {
+	float: right;
+}
+.sidebar .order-total, .sidebar .order-item-count {
 	font-weight: bold;
 }
+.shop-cart-footer {
+	margin: 4px 5px 4px 5px ;
+}
+/** ############################################################## **/
+/******************************* artist grid ************************/
 /******************************* artist grid ************************/
 
 div.product-info {
