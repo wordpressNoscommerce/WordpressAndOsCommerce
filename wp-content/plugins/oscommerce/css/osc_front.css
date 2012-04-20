@@ -379,23 +379,22 @@ div#encoding {
 		<span class="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
 	</h3>
 	<div class="shop-cart-box">
-		<div class="shop-cart-box-header notonsidebar uc">
-			<span class="shop-cart-hd-remove uc col1">Remove</span>
-			<span class="shop-cart-hd-products uc col2">Products</span>
-			<span class="shop-cart-hd-quantity uc col4">Quantity</span>
-			<span class="shop-cart-hd-total uc col5">Total</span>
+		<div class="shop-cart-box-header notonsidebar uc clear">
+			<span class="shop-cart-hd-total uc col right">Total</span>
+			<span class="shop-cart-hd-remove uc col col1">Remove</span>
+			<span class="shop-classrt-hd-products uc col col2">Products</span>
+			<span class="shop-cart-hd-quantity uc col col3">Quantity</span>
 		</div>
-		<div class="shop-cart-body notonsidebar"></div>
+		<div class="shop-cart-body notonsidebar clear"></div>
 		<div class="shop-cart-total">
-			<span class="order-text notonsidebar"></span>
-			<span class="order-total">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
 			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
+			<span class="order-text notonsidebar"></span>
+			<span class="order-total right bold">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
 		</div>
-		<div class="shop-cart-footer">
-			<span class="shop-cart-checkout button col4">check out</span>
+		<div class="shop-cart-footer clear">
+			<span class="shop-cart-checkout button right">check out</span>
 			<span class="shop-cart-update button col1">box</span>
 			<span class="shop-cart-continue button col3 notonsidebar">continue shopping</span>
-			<br class="clear"/>
 			<div class="debug clear"> <span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> </div>
 		</div>
 	</div><!-- shop-cart-box -->
@@ -443,9 +442,6 @@ div#encoding {
 	color: white;
 	font-weight: bold;
 	margin: 0px;
-}
-#content .shop-cart-box-header .shop-cart-hd-remove {
-	width: 70px;
 }
 #content .shop-cart-box-header .shop-cart-hd-products {
 	width: 420px;
@@ -546,7 +542,7 @@ div#encoding {
 #content .shop-cart-entry .cart-entry {
 	padding: 4px 5px 4px 5px;
 }
-#content .shop-cart-entry .cart-entry-delete {
+#content .shop-cart-box .shop-cart-entry .cart-entry-delete {
 	background-image: url('../images/deleteRed.png');
 	background-repeat: no-repeat;
 	background-size: contain;

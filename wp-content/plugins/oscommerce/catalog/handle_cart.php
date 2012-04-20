@@ -42,6 +42,33 @@ if (isset($action)) {
     }
   }
   switch ($action) {
+    // customer adds a product from the products page
+    case 'add_product' :
+      if (isset($products_id) && is_numeric($products_id)) {
+   		fb('add  product ' . $products_id);
+      	//small hack for salesbundles ????
+      if($_POST['sb_productscount'] && $_POST['sb_productscount'] > 0){
+        $sbct = $_POST['sb_productscount'];
+        $salesbundle = $_POST['sb_productsids'.$sbct];
+      }
+      //end small salesbundlehack
+      $cart->add_cart($products_id, $cart->get_quantity(tep_get_uprid($products_id, $HTTP_POST_VARS['id']))+1, $HTTP_POST_VARS['id'],true,$salesbundle);
+    }
+//    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+    break;
+  	// customer wants to remove a product from their shopping cart
+    case 'remove_product' :
+    	for ($i=0, $n=sizeof($products_id); $i<$n; $i++) {
+   		fb('update product * '.sizeof($products_id));
+			if (in_array($products_id[$i], (is_array($HTTP_POST_VARS['cart_delete']) ? $HTTP_POST_VARS['cart_delete'] : array()))) {
+		        $cart->remove($products_id[$i]);
+		    } else {
+		    	$attributes = ($HTTP_POST_VARS['id'][$products_id[$i]]) ? $HTTP_POST_VARS['id'][$products_id[$i]] : '';
+      		}
+      		$cart->add_cart($products_id[$i], $HTTP_POST_VARS['cart_quantity'][$i], $attributes, false, $HTTP_POST_VARS['salesbundle'][$i]);
+    	}
+    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+    break;
     // customer wants to update the product quantity in their shopping cart
     case 'update_product' :
     	for ($i=0, $n=sizeof($products_id); $i<$n; $i++) {
@@ -54,19 +81,6 @@ if (isset($action)) {
       		$cart->add_cart($products_id[$i], $HTTP_POST_VARS['cart_quantity'][$i], $attributes, false, $HTTP_POST_VARS['salesbundle'][$i]);
     	}
     	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
-    break;
-    // customer adds a product from the products page
-    case 'add_product' :
-      if (isset($products_id) && is_numeric($products_id)) {
-      //small hack for salesbundles
-      if($_POST['sb_productscount'] && $_POST['sb_productscount'] > 0){
-        $sbct = $_POST['sb_productscount'];
-        $salesbundle = $_POST['sb_productsids'.$sbct];
-      }
-      //end small salesbundlehack
-      $cart->add_cart($products_id, $cart->get_quantity(tep_get_uprid($products_id, $HTTP_POST_VARS['id']))+1, $HTTP_POST_VARS['id'],true,$salesbundle);
-    }
-//    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
     // performed by the 'buy now' button in product listings and review page
     case 'buy_now' :        if (isset($products_id)) {

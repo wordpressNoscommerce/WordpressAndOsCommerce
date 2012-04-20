@@ -856,6 +856,32 @@ jQuery.noConflict();
 			addProductsToCart(prodlist);
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+		function oscCartHandler(action,prodlist) {
+			var productId = prodlist.shift();
+			var data = {
+				'products_id' : productId,
+				'osCsid' : osCsid,
+				'action' : action			// add_product, update_product, buy_now, notify, notify_remove, cust_order
+			};
+			// cartId is new each time when not logged in (cart in session, basket in DB)
+			$.post(shoppingCartUrl, data, function(data, textStatus, jqXHR) {
+				if (jqXHR.status != 200) {
+					console.error('problem with shopping cart post %o', jqXHR);
+					throw 'problem with shopping cart post';
+				}
+				var result = eval('(' + data + ')'); // eval json data
+				osCsid = result.osCsid; // keep osCsid everywhere
+				location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+
+				renderShoppingBox(result.cart, '.sidebar');
+				if (prodlist.length) // daisy chain to handle the product list
+					oscCartHandler(action,prodlist);
+				else {
+					$('div.shop-cart').get(0).scrollIntoView();
+					// $('#artist-detail').addClass('ui-tabs-hide');
+				}
+			});
+		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// take the first element of list and add to cart
 		function addProductsToCart(prodlist) {
@@ -884,7 +910,6 @@ jQuery.noConflict();
 				}
 			});
 		}
-		;
 		// ###############################################################################
 		function shopBoxClickHandler(e) {
 			var button = $(e.currentTarget);
@@ -909,11 +934,16 @@ jQuery.noConflict();
 		// ###############################################################################
 		function showMainShoppingBox() {
 			var contentpage = $('#content .page');
-			if (!cart) {
-				console.error('no cart found %o for %s', cart, osCsid);
+			if (!cart)
+				if (osCsid) {
+					console.error('found %s - CAN LOAD CART', osCsid);
+				} else {
+					console.error('no cart found %o for %s', cart, osCsid);
 //				alert('you dont have a shopping cart!');
 				return;	// nothing to do
-			}
+				}
+			// add action parm
+			location.hash = addHashParm(location.hash,'action','show');
 			if (contentpage.is(":visible"))
 				$(contentpage).fadeOut(1000);
 			var sidebarbox = $('.sidebar .shopping-box');

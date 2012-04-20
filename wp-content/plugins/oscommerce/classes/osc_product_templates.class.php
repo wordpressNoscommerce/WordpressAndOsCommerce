@@ -330,7 +330,7 @@ class osc_product_templates
 		<div class="shop-cart-total">
 			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
 			<span class="order-text notonsidebar"></span>
-			<span class="order-total col5 bold">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
+			<span class="order-total right bold">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
 		</div>
 		<div class="shop-cart-footer clear">
 			<span class="shop-cart-checkout button right">check out</span>
