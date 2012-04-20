@@ -40,7 +40,7 @@ class osc_product_templates
 
     /** jquery template for PRODUCT BOX in grid **/
     function osc_inject_product_box_template() {
-        // hack to trick eclipse editor into better parsing
+    // hack to trick eclipse editor into better parsing
 /*
  * <div class="product-thumb thumb">
     <a href="#infotext&format=${format}&paged=${paged}&products_id=${products_id}" class="product-thumb thumb"><img src="${products_image_url}" alt="${products_name}" title="${products_name}" /> </a>

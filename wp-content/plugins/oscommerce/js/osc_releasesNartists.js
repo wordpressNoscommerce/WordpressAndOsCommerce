@@ -861,7 +861,7 @@ jQuery.noConflict();
 			var data = {
 				'products_id' : productId,
 				'osCsid' : osCsid,
-				'action' : action			// add_product, update_product, buy_now, notify, notify_remove, cust_order
+				'action' : action	// add_product, update_product, buy_now, notify, notify_remove, cust_order
 			};
 			// cartId is new each time when not logged in (cart in session, basket in DB)
 			$.post(shoppingCartUrl, data, function(data, textStatus, jqXHR) {

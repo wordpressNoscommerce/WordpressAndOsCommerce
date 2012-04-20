@@ -1,4 +1,6 @@
 <?php
+/** this is our entry point for dealing with the oscommerce shopping cart
+ * **/
 require_once ('debug.php');
 
 foreach($_POST as $key => $value) { fb('$_POST['.$key.']='.$value); }
