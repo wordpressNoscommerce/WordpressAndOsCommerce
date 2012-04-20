@@ -71,7 +71,8 @@ class osc_product_templates
     <span id="product-meta" class="product-meta"></span><span id="product-release" class="product-model">${products_model}</span><br/>
     <span id="artist-name-release" class="artist-name">${manufacturers_name}</span>
     <span id="product-title" class="product-title">${products_name}</span>
-  </div>
+    <span id="product-id" class="hidden">${products_id}</span>
+    </div>
   <div id="prod-image-big" class="product-image-wide">
     <img class="prod-image-wide" src="${products_image_url}" alt="${products_name} ">
   </div>
@@ -312,30 +313,30 @@ class osc_product_templates
      }
 			// 	draw our shopping cart, this is called from oscommerce.php
 			// since we have two version of this cart on ein sidebar one in content-body we need to use classes only
-		function osc_show_shopcart($oscSid){
+		function osc_show_shopcart($osCsid){
 		?>
 <div class="shop-cart" class="box cart widget">
-	<h3 class="shop-cart-header">YOUR SHOPPING BOX
+	<h3 class="shop-cart-header">Your Shopping Box
 		<span class="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
 	</h3>
 	<div class="shop-cart-box">
-		<div class="shop-cart-header notonsidebar uc">
-			<span class="shop-cart-hd-remove">Remove</span>
-			<span class="shop-classrt-hd-products">Products</span>
-			<span class="shop-cart-hd-quantity">Quantity</span>
-			<span class="shop-cart-hd-total">Total</span>
+		<div class="shop-cart-box-header notonsidebar uc clear">
+			<span class="shop-cart-hd-total uc col right">Total</span>
+			<span class="shop-cart-hd-remove uc col col1">Remove</span>
+			<span class="shop-classrt-hd-products uc col col2">Products</span>
+			<span class="shop-cart-hd-quantity uc col col3">Quantity</span>
 		</div>
-		<div class="shop-cart-body notonsidebar"></div>
+		<div class="shop-cart-body notonsidebar clear"></div>
 		<div class="shop-cart-total">
-			<span class="order-text notonsidebar"></span>
 			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
-			<span class="order-total">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
+			<span class="order-text notonsidebar"></span>
+			<span class="order-total col5 bold">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
 		</div>
-		<div class="shop-cart-footer">
-			<span class="shop-cart-update button uc">box</span>
-			<span class="shop-cart-continue button notonsidebar uc"">continue shopping</span>
-			<span class="shop-cart-checkout button uc">check out</span>
-			<div class="debug clear"> <span class="oscSid"><?php echo $oscSid; ?>${oscSid}</span> </div>
+		<div class="shop-cart-footer clear">
+			<span class="shop-cart-checkout button right">check out</span>
+			<span class="shop-cart-update button col1">box</span>
+			<span class="shop-cart-continue button col3 notonsidebar">continue shopping</span>
+			<div class="debug clear"> <span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> </div>
 		</div>
 	</div><!-- shop-cart-box -->
 </div>
@@ -360,25 +361,16 @@ class osc_product_templates
 ';
     	?>
 <div class="shop-cart-entry format-standard">
-    <form action="<?php echo $this->cart_url; ?>" class="product-box-entry"
-      method="post" name="cart_quantity_${products_id}" target="shopping_cart">
-
-      <input type="hidden" name="products_id" value="${products_id}" />
-      <input type="hidden" name="action" value="update_product" />
-	  <input type="checkbox" class="cart_del" name="cart_delete" value="false"/>
-	  <span class="cart-index cart">${index}</span>
-	  <span class="product-id cart">${products_id}</span>
-	  <span class="product-thumb cart">${products_thumb}</span>
-	  <span class="product-name cart">${products_name}</span>
-	  <span class="products-model cart">${products_model}</span>
-	  <input type="text" class="cart_qty" name="cart_quantity" value="${products_qty}" size="1"/>
-	  <span class="products-format cart">${products_format}</span>
-	  <span class="products-price cart">${products_price}</span>
-	  <span class="products-price-tax cart">${products_price_tax} €</span>
-      <span class="update button cart" title="add to cart"
-       onclick="javascript:document.forms['cart_quantity_${products_id}'].submit()"
-				>Update</span>
-    </form>
+	  <span class="products-price cart-entry col right bold">${products_price_gross}€</span>
+	  <span class="cart-entry-delete cart-entry button col "></span>
+	  <span class="products-thumb cart-entry col ext"><img src="${parents_thumb}"/></span>
+	  <span class="products-name cart-entry col col2">${parents_name}</span>
+	  <span class="products-model cart-entry ext">${products_model}</span>
+	  <span class="products-format cart-entry col col3">${products_format}</span>
+	  <span class="products-qty cart-entry col col4">${products_qty}</span>
+	  <span class="products-price-tax cart-entry hidden">${products_price_tax}</span>
+	  <span class="cart-index cart-entry hidden">${index}</span>
+	  <span class="products-id cart-entry hidden">${products_id}</span>
 </div><!-- end cart-entry-template -->
 <?php   echo '</script>
 ';

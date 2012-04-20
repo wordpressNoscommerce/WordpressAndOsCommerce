@@ -5,7 +5,7 @@ body {
 	padding-bottom: 0px;
 }
 
-.ui-tabs .textwidget , .ui-tabs .textwidget p, #shop-cart-hd-txt {
+.ui-tabs .textwidget,.ui-tabs .textwidget p,#shop-cart-hd-txt {
 	font: 12px/1.3 'Verdana', sans-serif;
 }
 
@@ -202,10 +202,12 @@ div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress {
 	left: 90px;
 	height: 12px;
 }
+
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress div.jp-play-bar {
 	display: inline-block;
 	vertical-align: top;
 }
+
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress div.jp-play-handle {
 	position: relative;
 	width: 0px;
@@ -215,9 +217,11 @@ div.wp-tabs div.ui-tabs div.jp-audio div.jp-type-playlist div.jp-progress div.jp
 	display: inline-block;
 	vertical-align: top;
 }
+
 div.jp-play-handle:after {
 	content: url("../images/dot_icon.png");
 }
+
 div.wp-tabs div.ui-tabs div.jp-audio div.jp-current-time,div.wp-tabs div.ui-tabs div.jp-audio div.jp-duration {
 	width: 25px;
 	font-size: .72em;
@@ -262,6 +266,10 @@ div#jp-playlist span.product-model {
 	float: right;
 	font-size: 12px;
 	display: block;
+}
+
+.product-detail-header .hidden {
+	display: none;
 }
 
 span.product-icon {
@@ -365,92 +373,301 @@ div#encoding {
 	/*   background: white; */
 	clear: both;
 }
-/******************************* shopping cart ************************/
-/******************************* shopping cart ************************/
-/******************************* shopping cart ************************/
-/* <div id="shop-cart" class="box cart widget"> */
-/* 	<h3 class="shop-box-header">YOUR SHOPPING BOX (Change Content or amount of products)</h3> */
-/* 	<div id="shop-cart-table"> */
-/* <div id="shop-cart-header"> */
-/* 		<span id="shop-cart-hd-remove">Remove</span> */
-/* 		<span id="shop-cart-hd-products">Products</span> */
-/* 		<span id="shop-cart-hd-quantity">Quantity</span> */
-/* 		<span id="shop-cart-hd-total">Total</span> */
-/* </div> */
-/* 		<div id="shop-cart-total"> */
-/* 			<span id="order-minimum">A minimum order amount of 2.98€ is required in order to checkout!</span> */
-/* 			<span id="order-total">Sub-Total: <span id="order-total-amount"></span>€</span> */
-/* 		</div> */
-/* 		<div id="shop-cart-footer"> */
-/* 			<span id="shop-cart-update" class="button">update box</span> */
-/* 			<span id="shop-cart-continue" class="button">continue shopping</span> */
-/* 			<span id="shop-cart-checkout" class="button">check out</span> */
-/* 		</div> */
-/* 	</div> */
-/* </div> */
-
-.uc {
+/******************************* shopping cart **********************
+<div class="shop-cart" class="box cart widget">
+	<h3 class="shop-cart-header">Your Shopping Box
+		<span class="shop-cart-hd-txt" class="notonsidebar">(Change Content or amount of products)</span>
+	</h3>
+	<div class="shop-cart-box">
+		<div class="shop-cart-box-header notonsidebar uc">
+			<span class="shop-cart-hd-remove uc col1">Remove</span>
+			<span class="shop-cart-hd-products uc col2">Products</span>
+			<span class="shop-cart-hd-quantity uc col4">Quantity</span>
+			<span class="shop-cart-hd-total uc col5">Total</span>
+		</div>
+		<div class="shop-cart-body notonsidebar"></div>
+		<div class="shop-cart-total">
+			<span class="order-text notonsidebar"></span>
+			<span class="order-total">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
+			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
+		</div>
+		<div class="shop-cart-footer">
+			<span class="shop-cart-checkout button col4">check out</span>
+			<span class="shop-cart-update button col1">box</span>
+			<span class="shop-cart-continue button col3 notonsidebar">continue shopping</span>
+			<br class="clear"/>
+			<div class="debug clear"> <span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> </div>
+		</div>
+	</div><!-- shop-cart-box -->
+</div>
+ ################################  shopping cart  ################################*/
+.shopping-box .uc {
 	text-transform: uppercase;
 }
-.sidebar .notonsidebar {
+
+.shopping-box .bold {
+	font-weight: bold;
+}
+
+.shopping-box .hidden,.shopping-cart-box .hidden {
 	display: none;
 }
 
-.shop-cart {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-.sidebar .shop-cart-hd-txt {
-	display: none;
-}
-.post-content .shop-cart-hd-txt {
-	text-transform: none;
+.shopping-box .button {
+	text-transform: uppercase;
+	background-color: #bfbfbf;
+	font-weight: bold;
+	cursor: pointer;
+	padding: 3px 5px 3px 5px;
 	font-size: 12px;
+	font-weight: bold;
 }
 
-.post-content .shop-cart-entry .update {
-	color: #303030;
-	background-color: #808080;;
-}
-
-.button:hover {
+.shopping-box .button:hover {
 	text-decoration: underline;
 	background-color: #d0d0d0;
 	color: #f0f0f0;
 }
 
-.button {
-	background-color: #bfbfbf;
+.shopping-box .shop-cart .col {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+#content .shopping-box { /* align with sidebar */
+	margin-top: 4px;
+}
+
+#content .shop-cart-box-header .col {
+	display: inline-block;
+	color: white;
 	font-weight: bold;
-	cursor: pointer;
-	padding: 3px 5px 3px 5px;
+	margin: 0px;
+}
+#content .shop-cart-box-header .shop-cart-hd-remove {
+	width: 70px;
+}
+#content .shop-cart-box-header .shop-cart-hd-products {
+	width: 420px;
+}
+
+.shopping-box .shop-cart-footer {
+	margin: 4px 5px 4px 5px;
+	padding: 5px;
+	clear: both; /* buttons float above */
+}
+
+.shopping-box .shop-cart-footer .debug {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	background: #ff8080;
+	font-size: 18px;
+	font-family: Verdana, sans-serif;
 	font-weight: bold;
 }
 
-.shop-cart-continue {
-	background-color: #080;
+.shopping-box .shop-cart-checkout { /* the right float has to be first in the div to avoid a line break */
+	float: right;
+}
+
+.shopping-box .shop-cart-total {
+	margin: 4px 5px 10px 5px;
+}
+
+.shopping-box .shop-cart-entry span.product-id {
+	display: none;
+	color: #080;
+	opacity: 50%;
+}
+/*################################ content & shop-cart-entries ################################
+<div class="shop-cart-entry format-standard">
+	  <span class="products-price cart-entry col col5 bold">${products_price_gross}€</span>
+	  <span class="cart-entry-delete cart-entry button col col1"></span>
+	  <span class="products-thumb cart-entry col col2"><img src="${parents_thumb}"/></span>
+	  <span class="products-name cart-entry col col3">${parents_name}</span>
+	  <span class="products-model cart-entry ext">${products_model}</span>
+	  <span class="products-format cart-entry ext">${products_format}</span>
+	  <span class="products-qty cart-entry col">${products_qty}</span>
+	  <span class="products-price-tax cart-entry hidden">${products_price_tax}</span>
+	  <span class="cart-index cart-entry hidden">${index}</span>
+	  <span class="products-id cart-entry hidden">${products_id}</span>
+</div><!-- end cart-entry-template -->
+*/
+#content .shop-cart-box .shop-cart-entry .ext,#content .shop-cart-box .shop-cart-entry .col {
+	display: inline-block;
+/* 	max-width: 300px; */
+	vertical-align: top;
+	overflow: hidden;
+	border-width: 1px;
+	border-color: #eaeaea;
+}
+#content .shop-cart-box .shop-cart-entry .col1 {
+	width: 80px;
+}
+#content .shop-cart-box .col2 {
+	width: 250px;
+}
+#content .shop-cart-box .col3 {
+	width: 150px;
+}
+#content .shop-cart-box .col4 {
+	width: 100px;
+}
+#content .shop-cart-box .right {
+	float: right;
+	text-align: right;
+}
+#content .shop-cart-hd-txt {
+	text-transform: none;
+	font-size: 12px;
+	font-weight: lighter;
+	color: #888;
+	padding-left: 10px;
+}
+
+#content .shop-cart-box-header {
+	background: #bdbdbd;
+	margin: 4px 5px 4px 5px;
+	padding: 4px 5px 4px 5px;
+}
+#content .shop-cart .shop-cart-header h3 {
+	padding-left: 19px;
+}
+
+
+#content .shop-cart-box-header {
+}
+
+#content .shop-cart-entry {
+	margin: 4px 5px 4px 5px;
+}
+/* do padding on children so image is bigger */
+#content .shop-cart-entry .cart-entry {
+	padding: 4px 5px 4px 5px;
+}
+#content .shop-cart-entry .cart-entry-delete {
+	background-image: url('../images/deleteRed.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-color: transparent;
+	background-position: center;
+	padding: 12px 2px 2px 2px;
+	height: 12px;
+	width: 12px;
+	vertical-align: middle;
+}
+
+#content .shop-cart-entry .cart-entry-delete:hover {
+	background-color: black; /* TODO get another image */
+}
+
+#content .shop-cart-entry .products-thumb {
+	margin: 0;
+	padding: 0;
+	vertical-align: top;
+}
+
+#content .shop-cart-entry .products-thumb img {
+	height: 60px;
+	width: 60px;
+}
+
+#content .shop-cart-entry .products-model {
+	position: relative;
+	width: 10px; /* remove box from normal flow */
+	top: 16px;
+	left: -260px;
+	width: 0px;
+	overflow:visible;
+}
+
+
+#content .shop-cart-entry .products-qty {
+	width: 16px;
+	margin-right: 2px;
+	background-color: #bfbfbf;
+	text-align: right;
+}
+
+#content .shop-cart-entry .products-format:before {
+	content: "Format: ";
+}
+
+#content .shop-cart-total .order-items {
+	display: none;
+}
+
+#content .shop-cart-total .order-total {
+	font-weight: bolder;
+}
+
+#content .shop-cart-total .order-total:before {
+	content: "Sub-";
+}
+
+#content .order-text:after {
+	content: "A minimum order amount of 2.98€ is required in order to checkout!";
+	color: #ababab;
+}
+/* adjust button text to context */
+#content .shop-cart-update:before {
+	content: "update ";
+}
+
+#content .shop-cart-footer {
+	background-color: #bdbdbd;
+}
+
+#content .shop-cart-footer .button {
+	background-color: white;
+}
+/*################################  up down ################################*/
+/*
+<div class="updown updown_up">up</div>
+<span class="products-qty car col col4">3</span>
+<div class="updown updown_down">down</div>
+*/
+#content .shopping-box .updown {
+	display: inline-block;
+	width: 16px;
+	padding: 0px;
+	background-color: transparent;
+	vertical-align: top;
+}
+
+#content .updown:hover {
+	background-color: black;
+}
+
+#content .updown_up {
+	position: relative;
+	top: -5px;
+	left: -16px;
+	background-image: url('../images/upArrow.png');
+}
+
+#content .updown_down {
+	position: relative;
+	top: 5px;
+	background-image: url('../images/downArrow.png');
+}
+
+/*################################  side bar  ################################*/
+.sidebar .notonsidebar {
+	display: none;
+}
+
+.sidebar .shop-cart-hd-txt {
+	display: none;
 }
 
 .sidebar .shop-cart-update {
 	float: left;
 }
-.sidebar .shop-cart-checkout {
-	float: right;
-}
-
-.shop-cart-entry span.product-id {
-	display: inline;
-}
 
 .sidebar .order-text {
 	display: none;
-}
-.post-content .order-text:after {
-	content: "A minimum order amount of 2.98€ is required in order to checkout!";
-}
-.post-content .shop-cart-update:before {
-	content: "update ";
 }
 
 .sidebar .shop-cart-update:before {
@@ -462,22 +679,22 @@ div#encoding {
 	font-size: 12px;
 	padding: 10px;
 }
-.shop-cart-total {
-	margin: 4px 5px 10px 5px;
-}
+
 .sidebar .order-total {
 	float: right;
 }
-.sidebar .order-total, .sidebar .order-item-count {
+
+.sidebar .order-total,.sidebar .order-item-count {
 	font-weight: bold;
 }
-.shop-cart-footer {
-	margin: 4px 5px 4px 5px ;
+/** ############################################################## **/
+/******************************* sidebar ****************************/
+.sidebar .widget {
+	margin-bottom: 20px;
 }
 /** ############################################################## **/
 /******************************* artist grid ************************/
 /******************************* artist grid ************************/
-
 div.product-info {
 	float: left;
 	overflow: hidden;
@@ -537,7 +754,8 @@ div.product-image-wide {
 .post-content img.prod-image-wide {
 	width: 100%;
 	max-width: inherit;
-	margin-bottom: 0px;
+	margin: 0;
+	padding: 0;
 }
 
 span.recordCount {

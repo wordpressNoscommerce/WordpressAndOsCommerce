@@ -344,8 +344,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 			$now = date(DATE_RFC822);
 			$msg ="No Records found for prod_query_result ($now): $this->sql";
 			fb($msg);
-			if (!$this->json)	echo "<h3>$msg</h3>";
-			else 				echo $msg;
+			echo ($this->json)?$msg:"<h3>$msg</h3>";
 		} else {
 			$this->osc_fix_product_list_json();    // add extra fields to list items
 			if ($this->json) {

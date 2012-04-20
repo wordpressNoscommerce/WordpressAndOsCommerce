@@ -86,6 +86,7 @@ function osc_init()
     wp_enqueue_script('java_script', OSCOMMERCEJSURL.'/java_script.js');
     else {
         wp_enqueue_script('jquery.tmpl', OSCOMMERCEJSURL.'/jquery.tmpl.js', array('jquery'));
+        wp_enqueue_script('jquery.updown', OSCOMMERCEJSURL.'/jquery.updown.js', array('jquery'));
         // inject jplayer
         wp_enqueue_script('jplayer', OSCOMMERCEJPLAYERURL.'/jquery.jplayer.js', array('jquery','jquery.tmpl'));
         wp_enqueue_script('jplayer.playlist', OSCOMMERCEJPLAYERURL.'/add-on/jplayer.playlist.js', array('jquery','jquery.tmpl','jplayer'));
