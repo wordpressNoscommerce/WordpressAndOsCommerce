@@ -834,7 +834,7 @@ jQuery.noConflict();
 			var index = $(e.currentTarget).prev('a.jp-playlist-item').attr('tabindex');
 			console.assert(index >= 0);
 			// console.log('buy click on index %d for mp3 %o', index, curMP3list[index]);
-			addProductsToCart([ curMP3list[index].products_id ]); // make array of prod id
+			oscCartHandler('add_product',[ curMP3list[index].products_id ]); // make array of prod id
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// called by click on buy button in format line
@@ -846,7 +846,7 @@ jQuery.noConflict();
 				prodlist[i] = $(e).attr('value');
 			});
 			// console.log('buy %d products %o', prodlist.length, prodlist);
-			addProductsToCart(prodlist);
+			oscCartHandler('add_product',prodlist);
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// diff
@@ -875,34 +875,6 @@ jQuery.noConflict();
 					oscCartHandler(action,products,target);
 				else {
 					scrollTo('div.shopping-box',true);
-				}
-			});
-		}
-		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
-		// take the first element of list and add to cart
-		function addProductsToCart(prodlist) {
-			var productId = prodlist.shift();
-			var data = {
-				'products_id' : productId,
-				'osCsid' : osCsid,
-				'action' : 'add_product'
-			};
-			// cartId is new each time when not logged in (cart in session, basket in DB)
-			$.post(shoppingCartUrl, data, function(data, textStatus, jqXHR) {
-				if (jqXHR.status != 200) {
-					console.error('problem with shopping cart post %o', jqXHR);
-					throw 'problem with shopping cart post';
-				}
-				var result = eval('(' + data + ')'); // eval json data
-				osCsid = result.osCsid; // keep osCsid everywhere
-				location.hash = addHashParm(location.hash, 'osCsid', osCsid);
-
-				renderShoppingBox(result.cart, '.sidebar');
-				if (prodlist.length) // daisy chain adding the products
-					addProductsToCart(prodlist);
-				else {
-					scrollTo('div.shopping-box',true);
-					// $('#artist-detail').addClass('ui-tabs-hide');
 				}
 			});
 		}
