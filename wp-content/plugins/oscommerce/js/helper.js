@@ -161,6 +161,14 @@ function countProperties(obj) {
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 function hasProperties(obj) {
 	for ( var p in obj)
-		return true;
+		return p == p;
 	return false;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function scrollTo(selector,top) {
+	if (typeof selector == 'string')
+		selector = jQuery(selector);
+	var elem = selector.get(0);
+	if (elem)
+		elem.scrollIntoView(top);
 }

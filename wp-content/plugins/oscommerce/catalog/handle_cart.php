@@ -60,16 +60,9 @@ if (isset($action)) {
     break;
   	// customer wants to remove a product from their shopping cart
     case 'remove_product' :
-    	for ($i=0, $n=sizeof($products_id); $i<$n; $i++) {
-   		fb('update product * '.sizeof($products_id));
-			if (in_array($products_id[$i], (is_array($HTTP_POST_VARS['cart_delete']) ? $HTTP_POST_VARS['cart_delete'] : array()))) {
-		        $cart->remove($products_id[$i]);
-		    } else {
-		    	$attributes = ($HTTP_POST_VARS['id'][$products_id[$i]]) ? $HTTP_POST_VARS['id'][$products_id[$i]] : '';
-      		}
-      		$cart->add_cart($products_id[$i], $HTTP_POST_VARS['cart_quantity'][$i], $attributes, false, $HTTP_POST_VARS['salesbundle'][$i]);
-    	}
-    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+   		fb('remove_product '.$products_id);
+   		$cart->remove($products_id[$i]);
+//    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
     // customer wants to update the product quantity in their shopping cart
     case 'update_product' :
@@ -179,6 +172,7 @@ if (isset($action)) {
   */
   // collect things in result
   $result['osCsid']=tep_session_id();
+	$cart->calculate();
   $result['cart']=$cart;
   // and return them
   echo json_encode($result);

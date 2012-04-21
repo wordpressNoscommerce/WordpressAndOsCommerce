@@ -13,13 +13,13 @@ jQuery.fn.updown = function (min, max, initial, valueChangedCallback) {
 			: valueChangedCallback);	// Use the given callback.
 
 		target
-			.after("<div class=\"updown updown_up button\">&nbsp;</div>")		// Insert the markup for the up button.
+			.after("<div class=\"updown updown_up button\">up</div>")		// Insert the markup for the up button.
 			.next()													// Select the newly created up button.
 			.data("target", target)									// Tell the button which element it is associated with.
 			.click(increment);										// Attach behaviour.
 
 		target
-			.after("<div class=\"updown updown_down button\">&nbsp;</div>")	// Same as for the up button, see above.
+			.after("<div class=\"updown updown_down button\">down</div>")	// Same as for the up button, see above.
 			.next()
 			.data("target", target)
 			.click(decrement);
@@ -30,7 +30,7 @@ jQuery.fn.updown = function (min, max, initial, valueChangedCallback) {
 
 	function increment() {
 		target = jQuery(this).data("target");
-		value = target.data("value") + 1;
+		value = parseInt(target.data("value")) + 1;
 
 		if (value > target.data("max"))
 			value = target.data("min");
@@ -41,7 +41,7 @@ jQuery.fn.updown = function (min, max, initial, valueChangedCallback) {
 
 	function decrement() {
 		target = jQuery(this).data("target");
-		value = target.data("value") - 1;
+		value = parseInt(target.data("value")) - 1;
 
 		if (value < target.data("min"))
 			value = target.data("max");

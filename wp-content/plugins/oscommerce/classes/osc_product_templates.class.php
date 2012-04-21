@@ -328,9 +328,9 @@ class osc_product_templates
 		</div>
 		<div class="shop-cart-body notonsidebar clear"></div>
 		<div class="shop-cart-total">
-			<span class="order-items">You have <span class="order-item-count">${total}</span> item(s) in your box.</span>
+			<span class="order-items"><span class="order-items-count">${totalItems}</span></span>
 			<span class="order-text notonsidebar"></span>
-			<span class="order-total right bold">Total: <span class="order-total-amount">${totalPrice}</span>€</span>
+			<span class="order-total right bold col">Total: <span class="order-total-amount">${total}</span>€</span>
 		</div>
 		<div class="shop-cart-footer clear">
 			<span class="shop-cart-checkout button right">check out</span>
@@ -362,10 +362,12 @@ class osc_product_templates
     	?>
 <div class="shop-cart-entry format-standard">
 	  <span class="products-price cart-entry col right bold">${products_price_gross}€</span>
-	  <span class="cart-entry-delete cart-entry button col "></span>
-	  <span class="products-thumb cart-entry col ext"><img src="${parents_thumb}"/></span>
-	  <span class="products-name cart-entry col col2">${parents_name}</span>
-	  <span class="products-model cart-entry ext">${products_model}</span>
+	  <span class="cart-entry-delete cart-entry button col ">delete</span>
+	  <span class="products-thumb cart-entry col"><img src="${parents_thumb}"/></span>
+	  <span class="products-desc cart-entry col col2">
+		  <span class="products-name cart-entry col float">${parents_name}</span>
+		  <span class="products-model cart-entry col float">${products_model}</span>
+	  </span>
 	  <span class="products-format cart-entry col col3">${products_format}</span>
 	  <span class="products-qty cart-entry col col4">${products_qty}</span>
 	  <span class="products-price-tax cart-entry hidden">${products_price_tax}</span>
