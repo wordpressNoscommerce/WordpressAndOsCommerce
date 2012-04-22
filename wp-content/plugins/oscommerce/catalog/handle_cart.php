@@ -9,7 +9,7 @@ foreach($_GET as $key => $value) { fb('$_GET['.$key.']='.$value); }
 require('includes/setupFramework.php');
 fb('id: '. $HTTP_POST_VARS['id']);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 // setup Products_id & action
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // be flexible about where our vars come from
@@ -58,24 +58,11 @@ if (isset($action)) {
     }
 //    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
-  	// customer wants to remove a product from their shopping cart
+  	// customer wants to remove a product from their shopping cart (only single ones
     case 'remove_product' :
    		fb('remove_product '.$products_id);
-   		$cart->remove($products_id[$i]);
+   		$cart->remove($products_id);
 //    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
-    break;
-    // customer wants to update the product quantity in their shopping cart
-    case 'update_product' :
-    	for ($i=0, $n=sizeof($products_id); $i<$n; $i++) {
-    		fb('update product * '.sizeof($products_id));
-			if (in_array($products_id[$i], (is_array($HTTP_POST_VARS['cart_delete']) ? $HTTP_POST_VARS['cart_delete'] : array()))) {
-		        $cart->remove($products_id[$i]);
-		    } else {
-		    	$attributes = ($HTTP_POST_VARS['id'][$products_id[$i]]) ? $HTTP_POST_VARS['id'][$products_id[$i]] : '';
-      		}
-      		$cart->add_cart($products_id[$i], $HTTP_POST_VARS['cart_quantity'][$i], $attributes, false, $HTTP_POST_VARS['salesbundle'][$i]);
-    	}
-    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
     // performed by the 'buy now' button in product listings and review page
     case 'buy_now' :        if (isset($products_id)) {

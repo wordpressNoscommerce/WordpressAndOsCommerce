@@ -834,7 +834,7 @@ jQuery.noConflict();
 			var index = $(e.currentTarget).prev('a.jp-playlist-item').attr('tabindex');
 			console.assert(index >= 0);
 			// console.log('buy click on index %d for mp3 %o', index, curMP3list[index]);
-			oscCartHandler('add_product',[ curMP3list[index].products_id ]); // make array of prod id
+			oscCartHandler('add_product',[ curMP3list[index].products_id ],'.sidebar'); // make array of prod id
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// called by click on buy button in format line
@@ -846,12 +846,12 @@ jQuery.noConflict();
 				prodlist[i] = $(e).attr('value');
 			});
 			// console.log('buy %d products %o', prodlist.length, prodlist);
-			oscCartHandler('add_product',prodlist);
+			oscCartHandler('add_product',prodlist,'.sidebar');
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// diff
 		function oscCartHandler(action,products,target) {
-			var productId = (typeof prodlist == 'array')?products.shift():products;
+			var productId = (products instanceof Array)?products.shift():products;
 			var data = {
 				'products_id' : productId,
 				'osCsid' : osCsid,
@@ -869,9 +869,9 @@ jQuery.noConflict();
 					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 					renderShoppingBox(result.cart, target);
 				} catch (e) {
-					console.log(e);
+					console.log('caught exception %s when receiving %s', e, data);
 				}
-				if (typeof prodlist == 'array' && products.length) // daisy chain to handle the product list
+				if (products instanceof Array && products.length) // daisy chain to handle the product list
 					oscCartHandler(action,products,target);
 				else {
 					scrollTo('div.shopping-box',true);
@@ -881,19 +881,22 @@ jQuery.noConflict();
 		// ###############################################################################
 		function shopBoxClickHandler(e) {
 			var button = $(e.currentTarget);
+			var prodId = button.parents('.shop-cart-entry').find('.products-id').html();
 			console.log('shopBoxClickHandler on %s', button.html());
 			var context = button.parents('.sidebar').first().attr('class');
 			switch (button.html()) {
 			// cart-entry actions
 			case "up":	// what we put into the buttons
-				console.log('increase count %o', button.html());
+				console.log('increase count %o for %d', button.html(), prodId);
+				oscCartHandler('add_product',prodId,'#content');	// robust version
 				break;
 			case "down":	// what we put into the buttons
-				console.log('decrease count %o', button.html());
+				console.log('decrease count %o for %d', button.html(), prodId);
+				oscCartHandler('remove_product',prodId,'#content');	// robust version
 				break;
 			case "delete":
-				console.log('delete button on %o', button.html());
-				oscCartHandler('remove_product', button.parent().find('.products-id').html(), '#content');	// robust version
+				console.log('delete button on %o for %d', button.html(), prodId);
+				oscCartHandler('remove_product',prodId,'#content');	// robust version
 				break;
 				// footer button actions
 			case "box":
@@ -1014,13 +1017,13 @@ jQuery.noConflict();
 					var cartEntry = new Object(); // add properties
 					cartEntry.index = i;
 					cartEntry.products_id = key;
-					cartEntry.products_qty = e.qty;
+					cartEntry.products_qty = e.qty;		// new one from osc cart
 					// copy the product fields
+					cartEntry.products_parent = prod.products_parent;
 					cartEntry.products_thumb = prod.products_image_url;
 					cartEntry.products_tax_class_id = prod.products_tax_class_id;
 					cartEntry.products_name = prod.products_name;
 					cartEntry.products_model = prod.products_model;
-					// cartEntry.products_qty = prod.products_qty;
 					cartEntry.products_format = prod.products_format;
 					cartEntry.products_price_tax = prod.products_price_tax;
 					cartEntry.products_price = prod.products_price;
@@ -1052,7 +1055,7 @@ jQuery.noConflict();
 			});
 			newcart.totalPrice = parseFloat(newcart.totalPrice).toFixed(2);
 			console.log('fixed %d cart entries: total items %d OurSum %s oscsum %s', 
-					newcart.entries.length, newcart.totalitems, newcart.totalPrice, newcart.total);
+					newcart.entries.length, newcart.totalItems, newcart.totalPrice, newcart.total);
 			console.dir(newcart.entries);
 			return newcart;
 		}
@@ -1166,7 +1169,7 @@ jQuery.noConflict();
 		function addHashParm(hash, name, value) {
 			var newNameValue = name + '=' + encodeURI(value);
 			if (hash.indexOf(name) >= 0) { 			// replace in place if found
-				console.log('replace %s : %s in hash %s', name, value, hash);
+//				console.log('replace %s : %s in hash %s', name, value, hash);
 //				var oldval = (RegExp('(&|#)' + name + '=' + '(.+?)(&|$)').exec(hash))[2];
 //				console.log('found previous value: %s', oldval);
 				var match = (RegExp('(&|#)(' + name + '=' + '(.+?))(&|$)').exec(hash));

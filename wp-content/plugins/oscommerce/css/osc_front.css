@@ -448,7 +448,7 @@ div#encoding {
 	width: 420px;
 }
 
-.shopping-box .shop-cart-footer {
+.shopping-box .shop-cart-footer, .sidebar .shop-cart-total {
 	margin: 4px 5px 4px 5px;
 	padding: 5px;
 	clear: both; /* buttons float above */
@@ -505,14 +505,12 @@ div#encoding {
 	width: 80px;
 }
 #content .shop-cart-box .col2 {
-	width: 250px;
+	width: 380px;
 }
 #content .shop-cart-box .col3 {
-	width: 140px;
+	width: 80px;			/* last item before float so never mind */
 }
-#content .shop-cart-box .col4 {
-	width: 100px;
-}
+#content .shop-cart-box .col4 { width: 100px; }
 #content .shop-cart-box .right {
 	float: right;
 	text-align: right;
@@ -537,10 +535,11 @@ div#encoding {
 }
 #content .shop-cart-entry {
 	margin: 4px 5px 4px 5px;
+	border-bottom: 1px  solid #bfbfbf;
 }
 /* do padding on children so image is bigger */
 #content .shop-cart-entry .cart-entry {
-	padding: 4px 5px 4px 5px;
+	padding: 2px 3px 2px 3px;
 }
 #content .shop-cart-box .shop-cart-entry .cart-entry-delete {
 	background-image: url('../images/deleteRed.png');

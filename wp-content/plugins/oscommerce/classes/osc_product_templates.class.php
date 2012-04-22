@@ -366,10 +366,10 @@ class osc_product_templates
 	  <span class="products-thumb cart-entry col"><img src="${parents_thumb}"/></span>
 	  <span class="products-desc cart-entry col col2">
 		  <span class="products-name cart-entry col float">${parents_name}</span>
-		  <span class="products-model cart-entry col float">${products_model}</span>
-	  </span>
-	  <span class="products-format cart-entry col col3">${products_format}</span>
-	  <span class="products-qty cart-entry col col4">${products_qty}</span>
+		  <span class="products-model cart-entry col float">${parents_model}</span>
+	  	<span class="products-format cart-entry col float">${products_format}</span>
+		</span>
+	  <span class="products-qty cart-entry col col3">${products_qty}</span>
 	  <span class="products-price-tax cart-entry hidden">${products_price_tax}</span>
 	  <span class="cart-index cart-entry hidden">${index}</span>
 	  <span class="products-id cart-entry hidden">${products_id}</span>
