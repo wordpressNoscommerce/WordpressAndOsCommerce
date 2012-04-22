@@ -16,6 +16,7 @@ var artistPage = '/artists';
 var releasePage = '/releases';
 var osCsid = 0;
 var cart = 0;
+var shoppingBoxCtx = 0;
 
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
@@ -896,7 +897,7 @@ jQuery.noConflict();
 				break;
 			case "delete":
 				console.log('delete button on %o for %d', button.html(), prodId);
-				oscCartHandler('remove_product',prodId,'#content');	// robust version
+				oscCartHandler('delete_product',prodId,'#content');	// robust version
 				break;
 				// footer button actions
 			case "box":
@@ -912,6 +913,8 @@ jQuery.noConflict();
 			case "continue shopping":
 			default:
 				$('#content .shopping-box').fadeOut(500);
+				$('.sidebar .shopping-box').remove();
+				$('#content .shopping-box').prependTo('.sidebar');
 				$('.sidebar .shopping-box').show(1200);
 				$('#content .page').fadeIn(1000);
 				console.log('action for other button "%s"', button.html());
@@ -945,7 +948,7 @@ jQuery.noConflict();
 		// ###############################################################################
 		/** render shopping box / cart showing the body is controlled via CSS sidebar/post-content * */
 		function renderShoppingBox(newcart, context) {
-
+			shoppingBoxCtx = context;
 			var shopboxSelector = context + ' .shopping-box';
 			var shopbox = $(shopboxSelector);
 			if (shopbox.length == 0) { // place shopping box div in the top of sidebar when missing
@@ -1032,6 +1035,7 @@ jQuery.noConflict();
 						cartEntry.products_price_gross = Math.ceil(prod.products_price * 119) / 100;
 						cartEntry.products_price_tax = Math.ceil(prod.products_price * 19) / 100;
 					}
+					cartEntry.products_price_total = Math.ceil(cartEntry.products_price_gross * e.qty * 100)/100;
 					if (!parent) {
 						console.log("no parent for %s of product %d",prod.products_id,prod.products_parent);
 					} else {
@@ -1046,7 +1050,7 @@ jQuery.noConflict();
 					// add up items
 					newcart.totalItems += (+e.qty); // force int
 					// messy float operations watch the rounding
-					newcart.totalPrice = newcart.totalPrice + ((+e.qty) * parseFloat(cartEntry.products_price_gross));
+					newcart.totalPrice = newcart.totalPrice + parseFloat(cartEntry.products_price_total);
 					newcart.entries[i] = cartEntry;
 					i++;
 				} else {
@@ -1428,19 +1432,45 @@ jQuery.noConflict();
 			var action = getHashParm('action');
 			console.log('found action=', action);
 			switch (action) {
+			case "login":
+				loginUser(e);
+				break;
 			case "show":
 				location.hash = addHashParm(location.hash, 'action', action);
 				location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 				showMainShoppingBox();
+				break;
 			case "register":
 			case "checkout":
-			case "login":
 			default:
 			}
 			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// the trigger to scroll when hitting bottom of page
+		function loginUser() {
+			var loginform=$('#login-form'); 
+			if (loginform.length == 0) {			
+				var templateName = "#login-form-template";
+				var template = $(templateName);
+				console.assert(template.length); // make sure its found				
+				template.tmpl({}).appendTo('sidebar');
+				loginform=$('#login-form');	// reload 				
+			}
+			loginform.dialog({
+				title: 'Shopkatapult Login',
+				height: 300,
+				width: 300,
+				modal: true,
+				open: function() {
+					$(this).load(oscPrefix + 'login.php');
+				},
+				buttons: { 'Login': function() {
+					console.log('pressed login button');					
+				}}
+			});
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// SCROLL TRIGGER to load more items when hitting bottom of page
 		var cnt = 0;
 		$(window).scroll(function() {
 			if (!loadingPage)

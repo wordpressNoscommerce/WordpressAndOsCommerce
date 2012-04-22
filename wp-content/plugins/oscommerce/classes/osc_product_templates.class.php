@@ -36,6 +36,7 @@ class osc_product_templates
         $this->osc_inject_pagination_template();
         $this->osc_inject_shopcart_template();
         $this->osc_inject_shopcart_entry_template();
+        $this->osc_inject_login_form_template();
     }
 
     /** jquery template for PRODUCT BOX in grid **/
@@ -361,7 +362,7 @@ class osc_product_templates
 ';
     	?>
 <div class="shop-cart-entry format-standard">
-	  <span class="products-price cart-entry col right bold">${products_price_gross}€</span>
+	  <span class="products-price cart-entry col right bold">${products_price_total}€</span>
 	  <span class="cart-entry-delete cart-entry button col ">delete</span>
 	  <span class="products-thumb cart-entry col"><img src="${parents_thumb}"/></span>
 	  <span class="products-desc cart-entry col col2">
@@ -372,11 +373,30 @@ class osc_product_templates
 	  <span class="products-qty cart-entry col col3">${products_qty}</span>
 	  <span class="products-price-tax cart-entry hidden">${products_price_tax}</span>
 	  <span class="cart-index cart-entry hidden">${index}</span>
-	  <span class="products-id cart-entry hidden">${products_id}</span>
-</div><!-- end cart-entry-template -->
+	  <span class="products-id cart-entry hidden">${products_id}</span>	 
+</div><!-- end shop-cart-entry -->
 <?php   echo '</script>
 ';
-        }
-} // EOC osc_product_templates
+     }
+    ///////////////////////////////////////////////////////////////////////////
+    /** login window with jquery */
+    function osc_inject_login_form_template() {
+     	echo '<script id="login-form-template" type="text/x-jquery-tmpl">     	
+     	';
+     	?>
+<div id="login-form">
+<form>
+	<fieldset>
+		<label for="email">Email</label>
+		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
+		<label for="password">Password</label>
+		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+	</fieldset>
+</form>
+</div><!-- end login-form -->
+<?php   echo '</script>
+';
+     }
+    } // EOC osc_product_templates
 
 ?>

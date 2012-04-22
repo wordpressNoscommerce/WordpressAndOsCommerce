@@ -44,7 +44,8 @@ if (isset($action)) {
     }
   }
   switch ($action) {
-    // customer adds a product from the products page
+
+  	// customer adds a product from the products page
     case 'add_product' :
       if (isset($products_id) && is_numeric($products_id)) {
    		fb('add  product ' . $products_id);
@@ -56,14 +57,21 @@ if (isset($action)) {
       //end small salesbundlehack
       $cart->add_cart($products_id, $cart->get_quantity(tep_get_uprid($products_id, $HTTP_POST_VARS['id']))+1, $HTTP_POST_VARS['id'],true,$salesbundle);
     }
-//    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
-  	// customer wants to remove a product from their shopping cart (only single ones
+
+    // customer wants to decrement quantity for product in the shopping cart
     case 'remove_product' :
    		fb('remove_product '.$products_id);
-   		$cart->remove($products_id);
-//    	tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+   		$qty = $cart->get_quantity($products_id);
+   		$cart->update_quantity($products_id, $qty - 1);
     break;
+
+    // customer wants to remove a product completely from their shopping cart
+    case 'delete_product' :
+   		fb('delete_product '.$products_id);
+   		$cart->remove($products_id);
+    break;
+
     // performed by the 'buy now' button in product listings and review page
     case 'buy_now' :        if (isset($products_id)) {
     	// check if product selection is incomplete (i.e. product needs more attributes)
@@ -74,7 +82,7 @@ if (isset($action)) {
         $cart->add_cart($products_id, $cart->get_quantity($products_id)+1);
       }
     }
-    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+//    tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
     break;
     case 'notify' :
       if (tep_session_is_registered('customer_id')) {
