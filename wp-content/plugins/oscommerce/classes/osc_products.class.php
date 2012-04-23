@@ -110,6 +110,7 @@ class osc_products extends osc_product_templates
 		?>
 
 <script type="text/javascript">// initial JSON injection including count, next ones get loaded by AJAX
+	var oscShopUrl = "<?php echo $this->shop_url ?>";  
   var productsCount = <?php echo $this->product_count ?>;
   var productsPageSize = <?php echo $this->records_per_page ?>;
   var productsReleaseFormats = <?php echo $this->release_formats ?>;
@@ -449,14 +450,11 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		//	echo '<h4 style="color: blue;">Found Entry: '.$res_arr[0]->vchUrl .' DB:'.$res_arr[0]->vchUsername .':'.$res_arr[0]->vchPassword .'@'.$res_arr[0]->vchHost .'#'.$res_arr[0]->vchDbName .'</h4>';
 		$shop_url = $res_arr[0]->vchUrl;
 		if (preg_match('/http:/', $shop_url))
-		$this->shop_url = $res_arr[0]->vchUrl;
+			$this->shop_url = $res_arr[0]->vchUrl;
 		else
-		$this->shop_url = 'http://'.$res_arr[0]->vchUrl;
-
+			$this->shop_url = 'http://'.$res_arr[0]->vchUrl;
 		$this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
-
 		$this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
-
 		$this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
 
 		// show connection data

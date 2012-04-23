@@ -82,8 +82,8 @@ jQuery.noConflict();
 				delete json[tab]; // remove container after loading page
 			}
 		}
-		if (location.hash.indexOf('action') > 0) {
-					showMainShoppingBox();
+		if (location.hash.indexOf('action') > 0) {	// we have an action
+			handleAction();
 		}
 		// ##########################################################################
 		// ##########################################################################
@@ -1171,6 +1171,7 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// TODO URI encoding????
 		function addHashParm(hash, name, value) {
+			if (!value) return;
 			var newNameValue = name + '=' + encodeURI(value);
 			if (hash.indexOf(name) >= 0) { 			// replace in place if found
 //				console.log('replace %s : %s in hash %s', name, value, hash);
@@ -1428,45 +1429,112 @@ jQuery.noConflict();
 			e.stopPropagation();
 			// $(this).addClass('loading');
 			$(this).find('.pagination').text('LOADING...');
-			initPage(href); // open page for href parms... dont reload
+			initPage(href); // open page for href parms... dont necessarily reload
+			handleAction();
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// deal with the action parameter
+		function handleAction() {
 			var action = getHashParm('action');
 			console.log('found action=', action);
 			switch (action) {
 			case "login":
-				loginUser(e);
+				loginUser();
+				break;
+			case "register":
+				registerUser();
 				break;
 			case "show":
 				location.hash = addHashParm(location.hash, 'action', action);
 				location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 				showMainShoppingBox();
 				break;
-			case "register":
 			case "checkout":
 			default:
 			}
 			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// show login form and try to login user
 		function loginUser() {
-			var loginform=$('#login-form'); 
-			if (loginform.length == 0) {			
-				var templateName = "#login-form-template";
-				var template = $(templateName);
-				console.assert(template.length); // make sure its found				
-				template.tmpl({}).appendTo('sidebar');
-				loginform=$('#login-form');	// reload 				
-			}
-			loginform.dialog({
+			var loginUrl = oscPrefix + '/login.php?action=process';
+			$('<div id="login-form"><div class="validateTips"></div><form><fieldset><label for="email">Email:</label> <input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" /> <label for="password">Password:</label> <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></fieldset></form></div>')
+			.dialog({
 				title: 'Shopkatapult Login',
-				height: 300,
-				width: 300,
+//				height: 300,
+				width: 400,
 				modal: true,
+//				open: function() {
+//					$(this).load(oscPrefix + '/login.php');
+//				},
+				close: function() {
+					$('#login-form input').val( "" ).removeClass( "ui-state-error" );
+				},				
+				buttons: {
+					'Cancel': function() {
+						$(this).dialog("close");
+					},
+					'Login' : function() {
+						var bValid = true;
+						var email = $("#email");
+						var password = $("#password");
+						var tips = $("#login-form .validateTips");
+						
+						$('#login-form input').removeClass("ui-state-error");						
+						bValid = bValid && checkLength(tips, email, "email", 6, 80);
+						bValid = bValid && checkLength(tips, password, "password", 5, 16);
+						bValid = bValid && checkRegexp(tips, email,
+										/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,
+										"eg. ui@jquery.com");
+						if (bValid) {
+							console.log('now we can try to login');
+							var data = {
+									'email_address' : email.html(),
+									'password' :  password.html(),
+									'osCsid' : osCsid,
+								};
+								// cartId is new each time when not logged in (cart in session, basket in DB)
+								$.post(loginUrl, data, function(answer, textStatus, jqXHR) {
+									if (jqXHR.status != 200) {
+										console.error('problem with login in %o', jqXHR);
+										throw 'problem with login in ';
+									}
+									try {
+										var result = eval('(' + answer + ')'); // eval json data
+										console.log('Result from login: %o', result);
+									} catch (e) {
+										console.log('caught exception %s when receiving %s', e, data);
+									};
+								});
+						} // bValid
+					} // Login
+				}	// buttons
+			});
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// show login form and try to login user
+		function registerUser() {
+			var createAccountUrl = oscPrefix + '/catalog/create_account.php'; 
+			$('<div></div>').dialog({
+				title: 'My Account Information',
+				position: ['center', 'top'],
+				height: 'auto',
+				width: 600,
+				modal: true,
+				show: 'slide',
+//				resizable: true,			// not working without additional scripts
+//				draggable: true,				
 				open: function() {
-					$(this).load(oscPrefix + 'login.php');
+					$(this).load(createAccountUrl);
 				},
-				buttons: { 'Login': function() {
-					console.log('pressed login button');					
-				}}
+				close: function() {
+					console.log('register close has been called!');
+				}
+//				,				
+//				buttons: {
+//					'Cancel': function() { $(this).dialog("close"); },
+//					'Register': function() { console.log('now we register'); }
+//				}
 			});
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

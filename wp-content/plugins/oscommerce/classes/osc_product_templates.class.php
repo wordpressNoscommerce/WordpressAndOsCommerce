@@ -36,7 +36,8 @@ class osc_product_templates
         $this->osc_inject_pagination_template();
         $this->osc_inject_shopcart_template();
         $this->osc_inject_shopcart_entry_template();
-        $this->osc_inject_login_form_template();
+//         $this->osc_inject_login_form_template();
+//         $this->osc_inject_register_form_template();
     }
 
     /** jquery template for PRODUCT BOX in grid **/
@@ -387,9 +388,9 @@ class osc_product_templates
 <div id="login-form">
 <form>
 	<fieldset>
-		<label for="email">Email</label>
+		<label for="email">Email:</label>
 		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
-		<label for="password">Password</label>
+		<label for="password">Password:</label>
 		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
 	</fieldset>
 </form>
@@ -397,6 +398,25 @@ class osc_product_templates
 <?php   echo '</script>
 ';
      }
-    } // EOC osc_product_templates
+    ///////////////////////////////////////////////////////////////////////////
+    /** register window with jquery */
+    function osc_inject_register_form_template() {
+     	echo '<script id="register-form-template" type="text/x-jquery-tmpl">     	
+     	';
+     	?>
+<div id="register-form">
+<form>
+	<fieldset>
+		<label for="email">Email:</label>
+		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
+		<label for="password">Password:</label>
+		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+	</fieldset>
+</form>
+</div><!-- end register-form -->
+<?php   echo '</script>
+';
+     }
+} // EOC osc_product_templates
 
 ?>

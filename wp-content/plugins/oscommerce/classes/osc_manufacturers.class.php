@@ -115,6 +115,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
 
 <script type="text/javascript">// initial JSON injection, next ones get loaded by AJAX
 //  var products = {}; // for robustness as
+	var oscShopUrl = "<?php echo $this->shop_url ?>";  
   var manufacturersCount = <?php echo $this->artist_count ?>;
   var manufacturersPageSize = <?php echo $this->records_per_page ?>;
   var manufacturersSets = <?php echo $this->artist_sets ?>;

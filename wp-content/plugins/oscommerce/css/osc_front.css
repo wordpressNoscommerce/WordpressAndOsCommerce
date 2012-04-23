@@ -413,7 +413,7 @@ div#encoding {
 	display: none;
 }
 
-.shopping-box .button {
+.shopping-box .button, .ui-button-text {
 	text-transform: uppercase;
 	background-color: #bfbfbf;
 	font-weight: bold;
@@ -421,6 +421,7 @@ div#encoding {
 	padding: 3px 5px 3px 5px;
 	font-size: 12px;
 	font-weight: bold;
+	border-radius: 0px;
 }
 
 .shopping-box .button:hover {
@@ -528,7 +529,7 @@ div#encoding {
 	margin: 4px 5px 4px 5px;
 	padding: 4px 5px 4px 5px;
 }
-#content .shop-cart .shop-cart-header h3 {
+#content .shopping-box h3.shop-cart-header  {
 	padding-left: 19px;
 }
 #content .shop-cart-box-header {
@@ -878,4 +879,53 @@ div#artist-name-detail {
 /* TODO fix font display */
 .wpui-light .ui-tabs-panel {
 	text-shadow: none;
+}
+/**************************************************************************************/
+/* login form css */
+/* this is a modal jquery-ui dialog. dimensions need to be specified during dialog init
+<div id="login-form">
+<form>
+	<fieldset>
+		<label for="email">Email</label>
+		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
+		<label for="password">Password</label>
+		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+	</fieldset>
+</form>
+</div><!-- end login-form -->
+*/
+#login-form input {
+	float: right;
+	width: 250px;
+	font-size: 14px;
+	line-height: 18px;
+	background-color: #eaeaea;
+	padding: 4px;
+	border-width: 0px;
+}
+#login-form label , .validateTips {
+	float: left;
+	clear: both;
+	padding: 4px;
+}
+/**************************************************************************************/
+/* registration form */
+div#scrollTextContent h1 {
+	display: none;
+}
+
+div#scrollTextContent h2 {
+	padding: 5px;
+/* 	margin: 5px; */
+	background: #eaeaea;
+}
+
+html body div.ui-dialog.ui-widget div.ui-dialog-titlebar, .inputRequirement  {
+	background-image: none;
+	background-color: #eaeaea !important;
+}
+.ui-dialog .ui-dialog-titlebar .ui-dialog-title{
+	background-color: #eaeaea;
+	font-size: 16px;
+	text-transform: uppercase;	
 }
