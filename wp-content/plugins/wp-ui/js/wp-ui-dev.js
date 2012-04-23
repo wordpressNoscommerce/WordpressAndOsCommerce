@@ -124,7 +124,7 @@ jQuery.fn.wptabs = function( options ) {
 			linkS = '<a href="#' + parID + '">' + imgLink + jQuery( this ).text() + '</a>';
 
 			} else {
-			linkS = '<a href="#' + parID + '">' + jQuery( this ).text() + '</a>';
+			linkS = '<h3><a href="#' + parID + '">' + jQuery( this ).text() + '</a></h3>';
 			}
 
 
