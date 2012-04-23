@@ -1,16 +1,12 @@
 <?php
-/*
-  $Id: create_account.php,v 1.65 2003/06/09 23:03:54 hpdl Exp $
+require_once ('debug.php');
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+foreach($_POST as $key => $value) { fb('$_POST['.$key.']='.$value); }
+foreach($_GET as $key => $value) { fb('$_GET['.$key.']='.$value); }
+$HTTP_POST_VARS = $_POST;
+//fb('id: '. $HTTP_POST_VARS['id']);
 
-  Copyright (c) 2003 osCommerce
-
-  Released under the GNU General Public License
-*/
-
-  require('includes/setupFramework.php');
+require('includes/setupFramework.php');
 
 // needs to be included earlier to set the success message in the messageStack
   require(DIR_WS_LANGUAGES . $language . '/' . FILENAME_CREATE_ACCOUNT);
@@ -291,7 +287,7 @@ if ($newsletter) {
 <title><?php echo TITLE; ?></title>
 <!--  <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER : HTTP_SERVER) . DIR_WS_CATALOG; ?>"> -->
 <!-- <link rel="stylesheet" type="text/css" href="stylesheet.css"> -->
-<script src="includes/general.js" type="text/javascript"></script>
+<script src="/<?php echo OSCOMMERCE_WPPLUGIN_PATH; ?>includes/general.js" type="text/javascript"></script>
 <?php require('includes/form_check.js.php'); ?>
 </head>
 <body marginwidth="0" marginheight="0" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0">
@@ -318,10 +314,10 @@ if ($newsletter) {
         <div id="scrollTextContent">
         
     	<h1><?php echo HEADING_TITLE; ?></h1>
-    	<?php echo tep_draw_form('create_account', tep_href_link(FILENAME_CREATE_ACCOUNT, '', 'SSL'), 'post', 'onSubmit="return check_form(create_account);"') . tep_draw_hidden_field('action', 'process'); ?>
+    	<?php echo tep_draw_form('create_account', tep_href_link(OSCOMMERCE_WPPLUGIN_PATH.FILENAME_CREATE_ACCOUNT, '', 'SSL'), 'post', 'onSubmit="return check_form(create_account);"') . tep_draw_hidden_field('action', 'process'); ?>
     	<table border="0" width="100%" cellspacing="0" cellpadding="0">
       <tr>
-        <td class="smallText"><br><?php echo sprintf(TEXT_ORIGIN_LOGIN, tep_href_link(FILENAME_LOGIN, tep_get_all_get_params(), 'SSL')); ?></td>
+        <td class="smallText"><br><?php echo sprintf(TEXT_ORIGIN_LOGIN, '#action=login' /* tep_href_link(WPLINK_LOGIN, tep_get_all_get_params(), 'SSL') */); ?></td>
       </tr>
       <tr>
         <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
@@ -342,7 +338,7 @@ if ($newsletter) {
         <td><table border="0" width="100%" cellspacing="0" cellpadding="2">
           <tr>
             <td><h2><?php echo CATEGORY_PERSONAL; ?></h2></td>
-           <td class="inputRequirement" align="right"><?php echo FORM_REQUIRED_INFORMATION; ?></td>
+           <td align="right"><span class="inputRequirement"><h2><?php echo FORM_REQUIRED_INFORMATION; ?></h2></span></td>
           </tr>
         </table></td>
       </tr>
@@ -390,7 +386,7 @@ if ($newsletter) {
   if (ACCOUNT_COMPANY == 'true') {
 ?>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td><h2><?php echo CATEGORY_COMPANY; ?></h2></td>
@@ -411,7 +407,7 @@ if ($newsletter) {
   }
 ?>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td><h2><?php echo CATEGORY_ADDRESS; ?></h2></td>
@@ -480,7 +476,7 @@ if ($newsletter) {
         </table></td>
       </tr>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td><h2><?php echo CATEGORY_CONTACT; ?></h2></td>
@@ -502,7 +498,7 @@ if ($newsletter) {
         </table></td>
       </tr>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td><h2><?php echo CATEGORY_OPTIONS; ?></h2></td>
@@ -520,7 +516,7 @@ if ($newsletter) {
         </table></td>
       </tr>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td><h2><?php echo CATEGORY_PASSWORD; ?></h2></td>
@@ -543,13 +539,13 @@ if ($newsletter) {
         </table></td>
       </tr>
       <tr>
-        <td><?php echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
+        <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
       </tr>
       <tr>
         <td>
         	<table border="0" width="100%" cellspacing="1" cellpadding="2">
           <tr>
-            <td align="right"><?php echo tep_image_submit('button_continue.gif', IMAGE_BUTTON_CONTINUE); ?></td>
+            <td align="right"><button type="submit" class="button">Register</button> <?php // echo tep_image_submit('button_continue.gif', IMAGE_BUTTON_CONTINUE); ?></td>
           </tr>
         </table></td>
       </tr>

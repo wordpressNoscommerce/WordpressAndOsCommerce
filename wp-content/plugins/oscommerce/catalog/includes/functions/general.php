@@ -58,7 +58,7 @@ function tep_output_string_protected($string) {
 }
 
 function tep_sanitize_string($string) {
-    $string = ereg_replace(' +', ' ', trim($string));
+    $string = preg_replace('/ +/', ' ', trim($string));
 
     return preg_replace("/[<>]/", '_', $string);
 }
@@ -140,7 +140,7 @@ function tep_get_products_description($products_id, $language = '') {
 }
 
 ////
-// Return a product's label (hack für diesen Shop
+// Return a product's label (hack fï¿½r diesen Shop
 // TABLES: products
 function tep_get_products_label($product_id) {
     $product_query = tep_db_query("select categories_name from " . TABLE_CATEGORIES_DESCRIPTION. " cd left join " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc on cd.categories_id = ptc.categories_id where products_id = '" . (int)$product_id . "'");
@@ -216,7 +216,7 @@ function tep_get_products_format_pi($products_label,$product_model) {
         }
 
         $depreis = round($product['products_price']+(($product['products_price']/100)*$steuer), 2);
-        //Hack für Sales-Produkte
+        //Hack fï¿½r Sales-Produkte
         $sales = false;
         $depa = strtolower ($product['products_parent']);
         if(strpos($depa, 'sales')!== false){
@@ -1503,7 +1503,7 @@ function tep_array_values_to_string($array, $separator = ',') {
     return $get_string;
 }
 
-//Funktion für Newsletter-Anmeldungen mit erforderlicher Bestätigung
+//Funktion fï¿½r Newsletter-Anmeldungen mit erforderlicher Bestï¿½tigung
 function users_queue($email_address, $firstname, $lastname, $groups_array, $custom_data = array(), $queue_type = "adm-subscribe") {
     if(@count($groups_array) > 0) {
         $hash	= md5(uniqid(rand(), 1));

@@ -32,6 +32,9 @@ require('includes/configure.php');
 
 // define the project version
 define('PROJECT_VERSION', 'osCommerce Online Merchant v2.2 RC1');
+define('OSCOMMERCE_WPPLUGIN_PATH', 'wp-content/plugins/oscommerce/catalog/');
+// the ajax login page
+define('WPLINK_LOGIN', '#action=login');
 
 // some code to solve compatibility issues
 require(DIR_WS_FUNCTIONS . 'compatibility.php');
@@ -263,6 +266,12 @@ require(DIR_WS_LANGUAGES . $language . '.php');
 // currency
 define('DEFAULT_CURRENCY','EUR');
 $currency = DEFAULT_CURRENCY;
+
+// include the password crypto functions
+require(DIR_WS_FUNCTIONS . 'password_funcs.php');
+
+// include validation functions (right now only email address)
+require(DIR_WS_FUNCTIONS . 'validations.php');
 
 // infobox
   require(DIR_WS_CLASSES . 'boxes.php');

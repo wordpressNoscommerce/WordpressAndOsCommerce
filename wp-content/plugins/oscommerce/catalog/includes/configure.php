@@ -1,6 +1,6 @@
 <?php
-  define('HTTP_SERVER', 'http://shopkatapult.com:8080');
-  define('HTTPS_SERVER', 'http://shopkatapult.com:8080');
+  define('HTTP_SERVER', 'http://mywebsite:8080');
+  define('HTTPS_SERVER', 'https://mywebsite:8080');
   define('ENABLE_SSL', false);
   define('HTTP_COOKIE_DOMAIN', 'www.shopkatapult.com');
   define('HTTPS_COOKIE_DOMAIN', 'www.shopkatapult.com');
