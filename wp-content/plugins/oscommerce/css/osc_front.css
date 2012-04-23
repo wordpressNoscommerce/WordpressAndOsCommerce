@@ -898,29 +898,44 @@ div#artist-name-detail {
 	float: right;
 	width: 250px;
 	font-size: 14px;
-	line-height: 18px;
+	line-height: 24px;
 	background-color: #eaeaea;
 	padding: 4px;
-	border-width: 0px;
+	margin: 8px;
+	border: 1px inset #bfbfbf;
 }
-#login-form label , .validateTips {
+#login-form form {
+	clear: both;
+} 
+#login-form label{
 	float: left;
 	clear: both;
 	padding: 4px;
+}
+
+#login-form .validateTips {
+	width: 100%;
+}
+.ui-widget-header .ui-icon {
+	background-image: url("/wp-content/uploads/wp-ui/shit-theme/images/ui-icons_333333_256x240.png") !important;
+}
+/* .shit-theme .ui-widget-content .ui-icon { background-color: white; } */
+/* .shit-theme .ui-widget-content .ui-icon:after { content: "X"; } */
+
+.messageStackError {
+	background-color: red;
 }
 /**************************************************************************************/
 /* registration form */
 div#scrollTextContent h1 {
 	display: none;
 }
-
 div#scrollTextContent h2 {
 	padding: 5px;
-/* 	margin: 5px; */
+	margin: 8px 0 3px 0;
 	background: #eaeaea;
 }
-
-html body div.ui-dialog.ui-widget div.ui-dialog-titlebar, .inputRequirement  {
+html body div.ui-dialog.ui-widget div.ui-dialog-titlebar,.inputRequirement {
 	background-image: none;
 	background-color: #eaeaea !important;
 }
@@ -928,4 +943,7 @@ html body div.ui-dialog.ui-widget div.ui-dialog-titlebar, .inputRequirement  {
 	background-color: #eaeaea;
 	font-size: 16px;
 	text-transform: uppercase;	
+}
+div#scrollTextContent form table tbody tr td img {
+	display: none;
 }

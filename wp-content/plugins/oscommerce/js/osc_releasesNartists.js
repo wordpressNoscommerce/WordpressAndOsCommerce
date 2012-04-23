@@ -1457,12 +1457,13 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show login form and try to login user
 		function loginUser() {
-			var loginUrl = oscPrefix + '/login.php?action=process';
+			var loginUrl = oscPrefix + '/catalog/login.php?action=process';
 			$('<div id="login-form"><div class="validateTips"></div><form><fieldset><label for="email">Email:</label> <input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" /> <label for="password">Password:</label> <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></fieldset></form></div>')
 			.dialog({
 				title: 'Shopkatapult Login',
 //				height: 300,
 				width: 400,
+				dialogClass: 'shit-theme',
 				modal: true,
 //				open: function() {
 //					$(this).load(oscPrefix + '/login.php');
@@ -1487,24 +1488,20 @@ jQuery.noConflict();
 										/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,
 										"eg. ui@jquery.com");
 						if (bValid) {
-							console.log('now we can try to login');
+							console.log('now we can try to login with: %s/%s', email.val(),password.val());
 							var data = {
-									'email_address' : email.html(),
-									'password' :  password.html(),
+									'email_address' : email.val(),
+									'password' :  password.val(),
 									'osCsid' : osCsid,
 								};
 								// cartId is new each time when not logged in (cart in session, basket in DB)
 								$.post(loginUrl, data, function(answer, textStatus, jqXHR) {
+									$("#login-form").dialog("option", "buttons", null);	// remove buttons after post									
 									if (jqXHR.status != 200) {
 										console.error('problem with login in %o', jqXHR);
 										throw 'problem with login in ';
 									}
-									try {
-										var result = eval('(' + answer + ')'); // eval json data
-										console.log('Result from login: %o', result);
-									} catch (e) {
-										console.log('caught exception %s when receiving %s', e, data);
-									};
+									$('#login-form').empty().append(answer);
 								});
 						} // bValid
 					} // Login
@@ -1515,7 +1512,7 @@ jQuery.noConflict();
 		// show login form and try to login user
 		function registerUser() {
 			var createAccountUrl = oscPrefix + '/catalog/create_account.php'; 
-			$('<div></div>').dialog({
+			$('<div id="register"></div>').dialog({
 				title: 'My Account Information',
 				position: ['center', 'top'],
 				height: 'auto',
@@ -1525,7 +1522,14 @@ jQuery.noConflict();
 //				resizable: true,			// not working without additional scripts
 //				draggable: true,				
 				open: function() {
-					$(this).load(createAccountUrl);
+					$(this).load(createAccountUrl, undefined, function (responseText, textStatus, XMLHttpRequest) {
+						$(this).html(responseText);
+						$('#login').click(function (e) {	// close registration and open login
+							$('#register').dialog('close');
+							loginUser();
+						});						
+					});
+					// attach handler to login link
 				},
 				close: function() {
 					console.log('register close has been called!');
