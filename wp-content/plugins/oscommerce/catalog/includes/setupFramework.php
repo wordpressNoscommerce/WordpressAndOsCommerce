@@ -263,4 +263,16 @@ require(DIR_WS_LANGUAGES . $language . '.php');
 // currency
 define('DEFAULT_CURRENCY','EUR');
 $currency = DEFAULT_CURRENCY;
+
+// infobox
+  require(DIR_WS_CLASSES . 'boxes.php');
+  // START STS 4.5
+  require (DIR_WS_CLASSES.'sts.php');
+  $sts= new sts();
+  $sts->start_capture();
+  // END STS
+// initialize the message stack for output messages
+require(DIR_WS_CLASSES . 'message_stack.php');
+$messageStack = new messageStack;
+
 ?>
