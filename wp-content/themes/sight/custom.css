@@ -141,6 +141,7 @@ div.product-detail  {
 }
 
 /* to align with the menu and tab headers */
+div#product-format-tabs div.ui-tabs div.ui-tabs-panel div.wp-tab-content,
 div#artist-set-tabs .grid {
 padding: 0 0 0 0px;
 }
