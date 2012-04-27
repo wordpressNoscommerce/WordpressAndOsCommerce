@@ -1,11 +1,5 @@
 <?php
 require_once ('debug.php');
-
-foreach($_POST as $key => $value) { fb('$_POST['.$key.']='.$value); }
-foreach($_GET as $key => $value) { fb('$_GET['.$key.']='.$value); }
-$HTTP_POST_VARS = $_POST;
-//fb('id: '. $HTTP_POST_VARS['id']);
-
 require('includes/setupFramework.php');
 
 // redirect the customer to a friendly cookie-must-be-enabled page if cookies are disabled (or the session has not started)
@@ -60,13 +54,23 @@ require('includes/setupFramework.php');
 // restore cart contents
         $cart->restore_contents();
 
-        if (sizeof($navigation->snapshot) > 0) {
-          $origin_href = tep_href_link($navigation->snapshot['page'], tep_array_to_string($navigation->snapshot['get'], array(tep_session_name())), $navigation->snapshot['mode']);
-          $navigation->clear_snapshot();
-          tep_redirect($origin_href);
-        } else {
-          tep_redirect(tep_href_link(FILENAME_DEFAULT));
-        }
+//         if (sizeof($navigation->snapshot) > 0) {
+//           $origin_href = tep_href_link($navigation->snapshot['page'], tep_array_to_string($navigation->snapshot['get'], array(tep_session_name())), $navigation->snapshot['mode']);
+//           $navigation->clear_snapshot();
+//           tep_redirect($origin_href);
+//         } else {
+//           tep_redirect(tep_href_link(FILENAME_DEFAULT));
+//         }
+// WE ARE LOGGED IN NOW
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Content-type: application/json');
+        $result = new StdClass();
+        $result->osCsid = tep_session_id();
+        $result->customer_id = $customer_id;        
+        $result->customer_firstname = $customer_first_name;        
+        $json = json_encode($result);
+				echo $json;
+				return;
       }
     }
 
@@ -159,11 +163,11 @@ function session_win() {
                   </tr>
                   <tr>
                     <td class="main"><b><?php echo ENTRY_EMAIL_ADDRESS; ?></b></td>
-                    <td class="main"><?php echo tep_draw_input_field('email_address'); ?></td>
+                    <td class="main"><?php echo tep_draw_input_field('email_address', null, ' id="email"'); ?></td>
                   </tr>
                   <tr>
                     <td class="main"><b><?php echo ENTRY_PASSWORD; ?></b></td>
-                    <td class="main"><?php echo tep_draw_password_field('password'); ?></td>
+                    <td class="main"><?php echo tep_draw_password_field('password', null, ' id="password"'); ?></td>
                   </tr>
                   <tr>
                     <td colspan="2"><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
@@ -176,7 +180,7 @@ function session_win() {
                   </tr>
                   <tr>
                     <td colspan="2" align="right">
-                    <?php echo tep_image_submit('button_login.gif', IMAGE_BUTTON_LOGIN); ?>
+                    <?php echo '<button id="login-button">Login</button>'; ?>
                     </td>
                   </tr>
                 </table>
@@ -199,7 +203,9 @@ function session_win() {
                     <td><?php // echo tep_draw_separator('pixel_trans.gif', '100%', '10'); ?></td>
                   </tr>
                   <tr>
-                    <td align="right"><?php echo '<a href="' . tep_href_link(FILENAME_CREATE_ACCOUNT, '', 'SSL') . '">' . tep_image_button('button_create_account.gif', IMAGE_BUTTON_CREATE_ACCOUNT) . '</a>'; ?></td>
+                    <td align="right">
+                    <?php echo '<button id="create_account-button">Create Account</button>'; ?>
+                    </td>
                   </tr>
                 </table>
         
