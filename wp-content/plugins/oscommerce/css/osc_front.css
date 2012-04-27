@@ -13,42 +13,13 @@ body {
 	margin-bottom: 0px;
 }
 /**************************************************************************************/
-/** PRODUCT formatting **/
-/* div.post-content div#loop.grid div.product-box { */
-/*   padding: 0px 0px 0px 0px; */
-/* } */
-
-/* limit depth to ui tabs only */
-/* div#product-format-tabs.wp-tabs .ui-tabs>ul { */
-/*   border-bottom: 1px solid #D9D9D9; */
-/* } */
-
-/* TODO dont override the jplayer lists */
-div#product-detail-tabs.wp-tabs ul.ui-tabs-nav li {
-	border-bottom: 0px;
-}
-
-/* no shadow after prodimage */
-div#product-detail-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav {
-	box-shadow: 0 0px 0 #FFFFFF inset;
-}
-/* no rounded corners  */
-.wp-tabs .wpui-styles .ui-corner-top a {
-	border-radius: 0 0 0 0;
-}
-
-.wp-tabs .wpui-light ul.ui-tabs-nav {
-	box-shadow: 0 1px 0 #FFFFFF inset;
-	padding-left: 10px;
-	padding-top: 10px;
-}
-
 div#product-format-tabs.wp-tabs li.ui-state-default a {
 	padding-top: 0px;
 	/*     border-bottom: 0px; */
 }
 
-div#product-format-tabs.wp-tabs li.ui-state-default h3,div#artist-set-tabs.wp-tabs li.ui-state-default h3 {
+div#product-format-tabs.wp-tabs li.ui-state-default h3,
+div#artist-set-tabs.wp-tabs li.ui-state-default h3 {
 	padding-top: 0px;
 	padding-bottom: 0px;
 	margin-top: 0px;
@@ -73,13 +44,8 @@ div#container.clear div#content div.entry {
 	background: #eaeaea url(../images/rightArrow.png) center left no-repeat;
 }
 
-/* div.player-block { } */
-div.wp-tabs div.ui-tabs div.wp-tab-content {
-
-}
-
 /* ############################################################## */
-/* jplayer */
+/* ###################  JPLAYER ################################# */
 div.wp-tabs div.jp-audio {
 	width: auto;
 	border-width: 0px;
@@ -630,7 +596,7 @@ div#encoding {
 	background-image: url('../images/downArrow.png');
 }
 
-/*################################  side bar  ################################*/
+/*################################  SIDEBAR ################################*/
 .sidebar .notonsidebar {
 	display: none;
 }
@@ -671,14 +637,11 @@ div#encoding {
 	float: right;
 	font-weight: bold;
 }
-/** ############################################################## **/
-/******************************* sidebar ****************************/
 .sidebar .widget {
 	margin-bottom: 20px;
 }
 /** ############################################################## **/
-/******************************* artist grid ************************/
-/******************************* artist grid ************************/
+/******************************* ARTIST GRID ************************/
 div.product-info {
 	float: left;
 	overflow: hidden;
@@ -719,13 +682,6 @@ span.product-model {
 	padding-bottom: 20px;
 }
 
-div#product-detail-tabs {
-	font-size: small;
-}
-
-div#product-detail-tabs .ui-tabs {
-	padding: 0;
-}
 
 div.product-image-wide {
 	height: 200px;
@@ -747,6 +703,11 @@ span.recordCount {
 	font-size: 50%;
 }
 
+/**************************************************************************************/
+/* PRODUCT DETAIL TABS CSS */
+/* fix layout on release page */
+/* format tab links under the product details */
+/* TODO dont override the jplayer lists */
 /* try to limit size of infotext */
 div#product-detail-tabs.wp-tabs div[id ^=infotext] div.wp-tab-content {
 	padding-top: 10px;
@@ -756,16 +717,30 @@ div#product-detail-tabs.wp-tabs div[id ^=infotext] div.wp-tab-content {
 	font-size: 12px;
 }
 
-/**************************************************************************************/
-/* release tab css */
-/* fix layout on release page */
-/* format tab links under the product details */
+div#product-detail-tabs {
+	font-size: small;
+}
+
+div#product-detail-tabs .ui-tabs {
+	padding: 0;
+}
+
+div#product-detail-tabs.wp-tabs ul.ui-tabs-nav li {
+	border-bottom: 0px;
+	background-image: none;
+	background-color: transparent;	
+}
+
+/* no shadow after prodimage */
+div#product-detail-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav {
+	box-shadow: 0 0px 0 #FFFFFF;
+}
 div#product-detail-tabs.wp-tabs div.ui-tabs  ul.ui-tabs-nav {
 	background-color: #333333;
 	/* 	vertical-align: top; */
 }
 
-/* set the background for the tabmenu under the product image */
+/* set the background for the tabmenu DIRECTLY under the product image */
 div#product-detail-tabs.wp-tabs>ul {
 	background-color: #333333;
 	vertical-align: top;
@@ -778,14 +753,15 @@ div.post-content #product-detail-tabs .ui-tabs-panel {
 div#product-detail-tabs.wp-tabs li.ui-state-active a {
 	color: #bbbbbb;
 	background: #333333 url(../images/downArrow.png) center left no-repeat;
+	padding-left: 20px;
 }
 
-/* make sure we only get he wanted ones */
-div#product-detail-tabs.wp-tabs>div>ul>li>a {
+/* make sure we only get the wanted ones and use direct CSS paths */
+div#product-detail-tabs.wp-tabs>div>ul>li>h3>a {
 	text-transform: uppercase;
 	padding-left: 20px; /* make space for image */
 	background: #333333 url(../images/rightArrow.png) center left no-repeat;
-	text-shadow: none;
+/* 	text-shadow: none; */
 }
 
 div.ui-tabs-panel>h3 {
@@ -883,7 +859,7 @@ div#artist-name-detail {
 /**************************************************************************************/
 /* login form css */
 /* this is a modal jquery-ui dialog. dimensions need to be specified during dialog init
-<div id="login-form">
+<div id="login-div">
 <form>
 	<fieldset>
 		<label for="email">Email</label>
@@ -892,9 +868,9 @@ div#artist-name-detail {
 		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
 	</fieldset>
 </form>
-</div><!-- end login-form -->
+</div><!-- end login-div -->
 */
-#login-form input {
+#login-div input {
 	float: right;
 	width: 250px;
 	font-size: 14px;
@@ -904,16 +880,16 @@ div#artist-name-detail {
 	margin: 8px;
 	border: 1px inset #bfbfbf;
 }
-#login-form form {
+#login-div form {
 	clear: both;
 } 
-#login-form label{
+#login-div label{
 	float: left;
 	clear: both;
 	padding: 4px;
 }
 
-#login-form .validateTips {
+#login-div .validateTips {
 	width: 100%;
 }
 .ui-widget-header .ui-icon {
@@ -946,4 +922,7 @@ html body div.ui-dialog.ui-widget div.ui-dialog-titlebar,.inputRequirement {
 }
 div#scrollTextContent form table tbody tr td img {
 	display: none;
+}
+td.main {
+	width: 180px;
 }

@@ -361,6 +361,17 @@ div.post-content .ui-tabs-panel {
 	cursor: default;
 }
 
+/* no rounded corners  */
+.wp-tabs .wpui-styles .ui-corner-top a {
+	border-radius: 0 0 0 0;
+}
+
+.wp-tabs .wpui-light ul.ui-tabs-nav {
+	box-shadow: 0 1px 0 #FFFFFF inset;
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
 /******************************************************************/
 /* label page */
 div.post-content div.wp-tabs div.ui-tabs ul.ui-tabs-nav li.ui-state-default h3 {
