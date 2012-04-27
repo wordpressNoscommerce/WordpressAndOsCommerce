@@ -21,6 +21,7 @@ var customer_id = 0; // osc customer
 var customer_firstname = 0; // osc customer
 var cart = 0;
 var shoppingBoxCtx = 0;
+var ajaxPending = false;
 
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
@@ -31,6 +32,7 @@ jQuery.noConflict();
 		// config values for jquery and player
 		var fadeintime = 500; // animation parameter
 		var loadingPage = false;
+		var isPageLoad = true;
 		var playerId = 'jquery_jplayer_1';
 		var playerShown = false;
 		var playerSelector = '#' + playerId;
@@ -39,7 +41,10 @@ jQuery.noConflict();
 		// var mp3Prefix = oscPrefix + '/jplayer/';
 		var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
 		var oscPrefix = '/wp-content/plugins/oscommerce';
-		var shoppingCartUrl = oscPrefix + '/catalog/handle_cart.php';
+		var shoppingCartUrl = oscPrefix + '/catalog/wp-handle_cart.php';
+		var loginUrl = oscPrefix + '/catalog/wp-login.php?action=process'
+		+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+		var createAccountUrl = oscPrefix + '/catalog/wp-create_account.php';
 
 		// our local database where we keep everything
 		var prodmap = {};
@@ -81,7 +86,7 @@ jQuery.noConflict();
 		var curTabCtx = getTabCtx(location.href, true); // we must load artist before artist releases!
 		if (renderJsonData(curTabCtx)) { // returns false if wrong context
 			fixWpTabHeader(curTabCtx); // modify formating of tabs
-			initPage(location.href, true);
+			initPage(location.href,true);
 			var json = getJsonData();
 			for ( var tab in json) {
 				delete json[tab]; // remove container after loading page
@@ -144,14 +149,18 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// called to rebuild the page also from click handlers - extra parm to distinguish
-		function initPage(href, isPageLoad) {
+		function initPage(href, isPageLoading) {
+			isPageLoad = isPageLoading;
 			console.log('initPage(%o)', href);
 			if (location.href != href) // if we set this to same value the page reloads forever!!!
 				location.href = href; // maintain state of javascript app in location.hash
 			var curTabCtx = getTabCtx(href, isPageLoad);
+			// use eval to return varnames from independent js context in helper.js
 			var curTab = eval(getTabParm(href, isPageLoad));
 			var curLoader = eval(getTabLoaderFun(href, isPageLoad));
-			curLoader(curTabCtx, curTab, paged); // try to load the requested page
+			var pageno = eval(getPageVarForCtx(curTabCtx));
+			curLoader(curTabCtx, curTab, pageno); // try to load the requested page
+			isPageLoad = false; /// reset flag
 		}
 		// ###############################################################################
 		// ###############################################################################
@@ -243,16 +252,16 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// called to fetch releases for artists, parms have to adhere to function prototype
 		function loadProductsForArtist(artistId) { // use closure to supply the extra artistId
-			return function(curTabCtx, tabName, rpage) {
+			return function(curTabCtx, tabName, pageno) {
 				if (relemap[artistId] == undefined)
 					relemap[artistId] = []; // init empty release ARRAY before loading
 				// load new data if empty or next page (as this is an object now count the props instead of length)
-				if (relemap[artistId] == undefined || countProperties(relemap[artistId]) == 0 || rpage > 1) {
+				if (relemap[artistId] == undefined || countProperties(relemap[artistId]) == 0 || pageno > 1) {
 					var fetchurl = oscPrefix + "/get_product_page.php?json=1&artistId=" + artistId;
 					fetchurl += "&format=All"; // TODO read all formats for now
 					fetchurl += "&pagesize=3"; // only 3 at a time
-					if (rpage != undefined)
-						fetchurl += "&paged=" + rpage; // append extra param
+					if (pageno != undefined)
+						fetchurl += "&paged=" + pageno; // append extra param
 					// DATA = array($this->records_per_page,$this->product_count, $this->max_page,
 					// $this->result,$this->release_formats);
 					getTabLnk(curTabCtx, tabName).addClass('loading');
@@ -267,9 +276,9 @@ jQuery.noConflict();
 							} else {
 								var result = eval('(' + data + ')'); // eval json array
 								addToCache(result[3], artistId); // this is the product list and artist relation
-								renderItemsInTab(curTabCtx, result[3], tabName, rpage, '#release-box-template'); // use rpage nos
+								renderItemsInTab(curTabCtx, result[3], tabName, pageno, '#release-box-template'); // use pageno nos
 								// function renderPagination(curTabCtx, pageSize, totalRecCount, newItems, paged)
-								renderPagination(getTabDiv(curTabCtx, tabName), result[0], result[1], result[3], rpage);
+								renderPagination(getTabDiv(curTabCtx, tabName), result[0], result[1], result[3], pageno);
 								selectTab(curTabCtx, tabName, loadProductsForArtist(artistId), releaseClickHandler);
 								// scroll box to bottom
 								scrollTo(curTabCtx, false);
@@ -514,8 +523,9 @@ jQuery.noConflict();
 				}
 				return;
 			} else {
-				// reset page numbers
-				rpage = 1;
+				// reset page numbers when not loading
+				if (!isPageLoad)
+					rpage = 1;
 				console.info('destroyed jplayer for %d', lastProductId);
 				$(playerSelector).jPlayer("destroy"); // remove jplayer first TODO check when necessary
 				$(seltor).empty(); // clear if new prod after removing player
@@ -589,6 +599,9 @@ jQuery.noConflict();
 			var seltor = $(seltorName);
 			if (lastProductId == prodId) {
 				seltor.toggle(); // toggle if same
+				if (seltorName.indexOf('#release-detail')>= 0) {
+					$('#artist-detail').toggle(); 	// show artist detail if hiding release detail
+				}
 				// remove artist tab title for releases
 				$('div#release-format-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible')
 				.find('h3').hide(); //css( 'display', 'none');
@@ -728,8 +741,8 @@ jQuery.noConflict();
 						if (result.xsell != undefined)
 							renderPlaylistPlayer(target, prod, result.xsell);
 						renderProductFormats(target, result.formats);
-						$('#artist-header-detail').toggle();
-						// scrollTo('#content .post-content', true);
+						$('#artist-header-detail').hide();
+						scrollTo('#content .post-content', true);
 					}
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
@@ -939,7 +952,7 @@ jQuery.noConflict();
 					oscCartHandler('add_product', 0, '#content'); // this is calling us again but with a cart
 				} else {
 					console.error('nothing found %o for %s', cart, osCsid);
-					// alert('you dont have a shopping cart!');
+					alert('your shopping cart is still empty!');
 					return; // nothing to do
 				}
 			// add action parm
@@ -1013,7 +1026,7 @@ jQuery.noConflict();
 			if (newcart.totalItems == undefined)
 				newcart.totalItems = 0;
 			newcart.osCsid = osCsid; // keep global oscsid in cart also for rendering
-			newcart.osCsid = customer_id; // keep global customer_id in cart also for rendering
+			newcart.customer_id = customer_id; // keep global customer_id in cart also for rendering
 			console.dir(newcart.entries);
 			console.dir(newcart.contents);
 			var i = 0;
@@ -1126,8 +1139,12 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// get product for cart (different from master!!)
 		function getProductForCart(prod_id) {
-			var prod = prodmap[prod_id];
-			console.assert(prod);
+			var cnt = 0;
+			var prod = undefined;
+			while (!(prod = prodmap[prod_id]) && cnt++ < 5) {
+				console.log('lost race for product %s',prod_id);
+				$.delay(500);						
+			}
 			return prod;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1458,8 +1475,9 @@ jQuery.noConflict();
 				registerUser();
 				break;
 			case "show":
-				location.hash = addHashParm(location.hash, 'action', action);
-				location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+				// location.hash = addHashParm(location.hash, 'action', action); // redundant
+				if (osCsid)
+					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 				showMainShoppingBox();
 				break;
 			case "checkout":
@@ -1509,8 +1527,6 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// do the actual loging with OSC
 		function doLogin(e) {
-			var loginUrl = oscPrefix + '/catalog/login.php?action=process'
-			+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 			var bValid = true;
 			var email = $("#email");
 			var password = $("#password");
@@ -1569,7 +1585,6 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show login form and try to login user
 		function registerUser() {
-			var createAccountUrl = oscPrefix + '/catalog/create_account.php';
 			var debug = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP','KEY':'123456789012345'} ;
 			$('<div id="register-div"></div>').dialog({
 				title : 'My Account Information',
@@ -1632,7 +1647,7 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show contact form
 		function contactUs() {
-			var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
+			var contactFormUrl = oscPrefix + '/catalog/wp-contact_us.php';
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page
@@ -1643,6 +1658,8 @@ jQuery.noConflict();
 					// find the only visible pager at the bottom of the page
 					var pager = $(getTabCtx() + ' div.pagination a:visible').last();
 					if (pager.length) {
+						if (location.hash.indexOf('listenbuy')>0)
+							return;		/// skip autoload if we are showing the player
 						var page = getLastPageOfTab(pager.parent());
 						console.log('%d.trigger pageload for page %d', cnt++, page);
 						loadingPage = page;

@@ -9,6 +9,13 @@ function fixTabName(tabName) {
 	return tabName.toLowerCase().replace(/ /g, '_');
 }
 
+function getPageVarForCtx(curTabCtx) {
+	if (curTabCtx == '#release-format-tabs')
+		return 'rpage';
+	else
+		return 'paged';
+}
+
 function getUrlParm(name, url) {
 	return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(url) || [ , null ])[1]);
 }
