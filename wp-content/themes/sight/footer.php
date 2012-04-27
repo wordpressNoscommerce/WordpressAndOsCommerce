@@ -22,10 +22,10 @@
 </div><!-- footer -->
 <div
 	class="shr-bookmarks shr-bookmarks-expand shr-bookmarks-center shr-bookmarks-bg-knowledge"
-	style="margin-left: 3.5px; height: 32px; display: block; overflow: hidden;">
+	style="margin-left: 3.5px; height: 32px; display: none; overflow: hidden;">
 	<ul class="socials">
 		<li class="shr-facebook"><a
-			onclick="window.open(this.href,'sharer','toolbar=0,status=0,width=626,height=436'); return false;"
+			onclick="window.open(this.href,'sharer','toolbar=0,status=0,width=626,height=436');"
 			title="Share this on Facebook" class="external" rel="nofollow"
 			href="http://www.facebook.com/share.php?v=4&amp;src=bm&amp;u=<?php bloginfo('home') ?>&amp;t=<?php urlencode(bloginfo('description')) ?>"
 			target="_blank">&nbsp;</a>
