@@ -24,7 +24,7 @@ if ( is_singular() ) wp_enqueue_script( 'comment-reply' );
 wp_enqueue_script('script', get_template_directory_uri() . '/js/script.js', 'jquery', false);
 
 function is_news() {
-	fb($_SERVER['REQUEST_URI']);
+// 	fb($_SERVER['REQUEST_URI']);
 	return strpos($_SERVER['REQUEST_URI'],'/category/news') !== false;
 }
 ?>
