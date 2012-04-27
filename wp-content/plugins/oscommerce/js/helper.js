@@ -9,6 +9,10 @@ function fixTabName(tabName) {
 	return tabName.toLowerCase().replace(/ /g, '_');
 }
 
+function getUrlParm(name, url) {
+	return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(url) || [ , null ])[1]);
+}
+
 function getTabDiv(curTabCtx, tabName) {
 	var divsel = 'div[id^=' + fixTabName(tabName) + ']';
 	if (typeof curTabCtx == 'string')

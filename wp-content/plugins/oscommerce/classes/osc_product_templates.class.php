@@ -338,7 +338,10 @@ class osc_product_templates
 			<span class="shop-cart-checkout button right">check out</span>
 			<span class="shop-cart-update button col1">box</span>
 			<span class="shop-cart-continue button col3 notonsidebar">continue shopping</span>
-			<div class="debug clear"> <span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> </div>
+			<div class="debug clear">
+				<span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> 
+				<span class="customer_id"><?php echo $customer_id; ?>${customer_id}</span>
+			</div>
 		</div>
 	</div><!-- shop-cart-box -->
 </div>

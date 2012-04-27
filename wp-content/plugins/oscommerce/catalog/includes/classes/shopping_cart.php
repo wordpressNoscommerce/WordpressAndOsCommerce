@@ -238,6 +238,7 @@
         tep_db_query("delete from " . TABLE_CUSTOMERS_BASKET . " where customers_id = '" . (int)$customer_id . "' and products_id = '" . tep_db_input($products_id) . "'");
         tep_db_query("delete from " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " where customers_id = '" . (int)$customer_id . "' and products_id = '" . tep_db_input($products_id) . "'");
       }
+
 // assign a temporary unique ID to the order contents to prevent hack attempts during the checkout procedure
       $this->cartID = $this->generate_cart_id();
     }
