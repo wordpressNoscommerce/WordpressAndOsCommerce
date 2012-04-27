@@ -749,7 +749,6 @@ div#product-detail-tabs.wp-tabs>ul {
 div.post-content #product-detail-tabs .ui-tabs-panel {
 	margin: 0;
 }
-
 div#product-detail-tabs.wp-tabs li.ui-state-active a {
 	color: #bbbbbb;
 	background: #333333 url(../images/downArrow.png) center left no-repeat;
@@ -758,6 +757,7 @@ div#product-detail-tabs.wp-tabs li.ui-state-active a {
 
 /* make sure we only get the wanted ones and use direct CSS paths */
 div#product-detail-tabs.wp-tabs>div>ul>li>h3>a {
+  font-size: 12px;
 	text-transform: uppercase;
 	padding-left: 20px; /* make space for image */
 	background: #333333 url(../images/rightArrow.png) center left no-repeat;
