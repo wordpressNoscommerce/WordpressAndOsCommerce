@@ -23,12 +23,12 @@
 	overflow: visible;
 }
 
-.logo a img {
-	opacity: 0.9;
-	/*     width:50px; */
-	/*     height:30px; */
-	background: transparent url(./images/shitkatapult.png) 2px 2px no-repeat;
-}
+/* .logo a img { */
+/* 	opacity: 0.9; */
+/*     width:50px; */
+/*     height:30px; */
+/* 	background: transparent url(./images/shitkatapult.png) 2px 2px no-repeat; */
+/* } */
 
 .header {
 	height: 100px;
@@ -48,7 +48,7 @@
 	height: 40px;
 }
 ul.dd li.menu-item {
-	width: 110px;
+/* 	min-width: 110px; */
 }
 
 .nav ul.dd li ul li {
@@ -319,19 +319,6 @@ div.post-content .ui-tabs-panel {
  	padding: 0px;
 }
 
-/* override css from themes/sight/style.css */
-/* .pagination {padding: 20px 0 0 30px; color: #aaa9a9; font-size: 12px; clear: both; position: relative;} */
-/* .pagination a {color: #000; text-decoration: none;} */
-/* .pagination a:hover {text-decoration: underline;} */
-/* .pagination .nextpostslink {position: absolute; right: 0; top: 17px; line-height: 21px; text-transform: uppercase; background: url("images/nextpostslink.png") 100% 0 no-repeat; padding-right: 36px;} */
-/* .pagination .previouspostslink {position: absolute; left: 30px; top: 17px; line-height: 21px; text-transform: uppercase; background: url("images/previouspostslink.png") 0 0 no-repeat; padding-left: 36px;} */
-
-/* #pagination {padding: 20px 0 0 30px;} */
-/* #pagination .nextpostslink {color: #000; text-decoration: none; display: block; padding: 9px 0; text-align: center; font-size: 14px;} */
-/* #pagination .nextpostslink:hover {background-color: #FFEA97; text-decoration: none; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;} */
-/* #pagination .loading {background: url("images/loading.gif") 240px 9px no-repeat; color: #555;} */
-/* #pagination .loading:hover {background-color: transparent !important; cursor: default;} */
-
 /* we need to specify pagination to override the image */
 .loading, .post-content .pagination .loading {background: url("images/loading.gif")  100% 0 no-repeat ; }
 
@@ -415,6 +402,15 @@ div.post-content div.wp-tabs div.ui-tabs ul.ui-tabs-nav li.ui-state-default h3 {
 	left: 32px;
     width: 145px;
 }
+
+/******************************************************************/
+/* GIGPRESS CUSTOMIZATION */
+.gigpress-cal:hover {
+}
+.gigpress-cal:after {
+	content: "Click to add to your calendar!";
+	font-size: 8px;
+}
 /******************************************************************/
 /* debug div */
 #debugDiv {
@@ -449,9 +445,7 @@ img#uv {
 
 /* ######################################################################## */
 /* ######################################################################## */
-/* ######################################################################## */
 /* SHARE BOOKMARKS */
-/* ######################################################################## */
 /* ######################################################################## */
 /* ######################################################################## */
 div.shr-bookmarks {
