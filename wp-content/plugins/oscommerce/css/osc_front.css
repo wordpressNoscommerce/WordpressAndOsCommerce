@@ -428,10 +428,12 @@ div#encoding {
 	position: fixed;
 	top: 0px;
 	left: 0px;
-	background: #ff8080;
+}
+.shopping-box .shop-cart-footer .debug .span {
 	font-size: 18px;
 	font-family: Verdana, sans-serif;
 	font-weight: bold;
+	background: #ff8080;
 }
 
 .shopping-box .shop-cart-checkout { /* the right float has to be first in the div to avoid a line break */

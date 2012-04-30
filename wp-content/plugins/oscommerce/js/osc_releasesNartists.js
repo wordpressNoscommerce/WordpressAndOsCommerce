@@ -41,10 +41,13 @@ jQuery.noConflict();
 		// var mp3Prefix = oscPrefix + '/jplayer/';
 		var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
 		var oscPrefix = '/wp-content/plugins/oscommerce';
-		var shoppingCartUrl = oscPrefix + '/catalog/wp-handle_cart.php';
-		var loginUrl = oscPrefix + '/catalog/wp-login.php?action=process'
+		var shoppingCartUrl = oscPrefix + '/osclink/wp-handle_cart.php';
+		var checkoutUrl = oscPrefix + '/catalog/checkout_payment.php'
+		+ '?XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+//		var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
+		var loginUrl = oscPrefix + '/osclink/wp-login.php?action=process'
 		+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
-		var createAccountUrl = oscPrefix + '/catalog/wp-create_account.php';
+		var createAccountUrl = oscPrefix + '/osclink/wp-create_account.php';
 
 		// our local database where we keep everything
 		var prodmap = {};
@@ -827,7 +830,7 @@ jQuery.noConflict();
 				return false;
 			}
 			// render the box
-			target.append('<div id="buyline"><div id="format-buy-box"/><form id="format-buy-form"></form></div>');
+			target.append('<div id="buyline"><div id="format-buy-box"/></div>');
 			target.append('<div id="encoding">All MP3 Downloads encoded at 320kbps unless otherwise specified.</div>');
 			template.tmpl(formatList).appendTo($('#format-buy-box'));
 			$('#format-buy-box').append('<span id="buy-format-btn">BUY</span>');
@@ -887,13 +890,20 @@ jQuery.noConflict();
 					console.error('problem with shopping cart post %o', jqXHR);
 					throw 'problem with shopping cart post';
 				}
-				try {
-					var result = eval('(' + data + ')'); // eval json data
-					osCsid = result.osCsid; // keep osCsid everywhere
+				if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
+					// json data is already interpreted
+					osCsid = data.osCsid; // keep osCsid everywhere
 					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
-					renderShoppingBox(result.cart, target);
-				} catch (e) {
-					console.log('caught exception %s when receiving %s', e, data);
+					renderShoppingBox(data.cart, target);					
+				} else  {	
+					console.log('Problem with OSC cart. Response %s', data);
+					$('<div id="errMsg">ErrorMessage</div>').dialog({
+						position : [ 'center', 'top' ],
+						width : '100%',
+						autoOpen : false
+					});
+					$('#errMsg').html(data);
+					$('#errMsg').dialog('open');
 				}
 				if (products instanceof Array && products.length) // daisy chain to handle the product list
 					oscCartHandler(action, products, target);
@@ -931,6 +941,8 @@ jQuery.noConflict();
 			case "check out":
 				if (context == 'sidebar') {
 					showMainShoppingBox();
+				} else {
+					window.open(checkoutUrl); // use cookies!!!! + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid);
 				}
 				break;
 			case "continue shopping":
@@ -979,7 +991,8 @@ jQuery.noConflict();
 				shopbox = $(shopboxSelector); // reload
 			}
 			if (newcart == undefined || newcart == 0) {
-				shopbox.html('<h3>Your ShoppingBox is totally empty</h3>');
+				shopbox.html('<h3>Your ShoppingBox is totally empty</h3><button class="button">Continue Shopping</button>');
+				shopbox.find('.button').click(shopBoxClickHandler);
 				return;
 			}
 			cart = prepareCart(newcart); // global reference to cart
@@ -988,7 +1001,7 @@ jQuery.noConflict();
 			// shopbox.hide(); // hide at first NOT WORKING
 			cart_tmpl.tmpl(cart).appendTo(shopbox.first());
 			// its an object not an array & we skip body on sidebar
-			if (countProperties(cart.contents) && context.indexOf('sidebar') < 0) {
+			if (countProperties(cart.contents) && context != '.sidebar') {
 				var cart_entry_tmpl = $('#shopcart-entry-template');
 				console.assert(cart_entry_tmpl.length);
 				var shopbody = shopbox.find('.shop-cart-body');
@@ -1002,12 +1015,23 @@ jQuery.noConflict();
 					});
 				});
 			}
+			if (cart.total > 2.98) {
+				shopbox.find('.order-text').hide();
+				shopbox.find('.shop-cart-checkout').show();
+			} else {
+				shopbox.find('.order-text').show();
+				shopbox.find('.shop-cart-checkout').hide();				
+			}
 			shopbox.show(fadeintime);
 			// keep session in hash now
 			location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 			// location.hash = addHashParm(location.hash, 'cartId', cart.cartId);
 			// attach click handlers to the buttons in our NEW rendered box
 			shopbox.find('.button').click(shopBoxClickHandler);
+			// set cookie
+			if (osCsid) {
+				document.cookie='osCsid='+osCsid+';path=/;domain=shopkatapult.com';				
+			}
 		}
 		// ###############################################################################
 		/*******************************************************************************************************************
@@ -1138,14 +1162,16 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// get product for cart (different from master!!)
+		var cnt = 0;
 		function getProductForCart(prod_id) {
-			var cnt = 0;
 			var prod = undefined;
-			while (!(prod = prodmap[prod_id]) && cnt++ < 5) {
+			if (!(prod = prodmap[prod_id]) && cnt++ < 5) {
 				console.log('lost race for product %s',prod_id);
-				$.delay(500);						
+				window.setTimeout(function() { prod = getProductForCart(prod_id);}, 500);
 			}
+			cnt = 0;
 			return prod;
+			
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// add new products to artist,release cache,product cache depending on data
@@ -1221,7 +1247,7 @@ jQuery.noConflict();
 			if (value == "null" || value == undefined) {
 				// if the hash is a single token (alphnumeric and _) we use it for the respective parameter
 				if ((isReleasePage(hash) && name == 'format')
-						|| (isArtistPage(hash) && (name == 'artistSet' || name == 'artRelTab')))
+						|| (isArtistPage(hash) && ((name == 'artistSet' && !products_id) || name == 'artRelTab')))
 					value = decodeURI((RegExp('[^#]*#([a-z0-9_]+)(&|$)').exec(hash ? hash : location.hash) || [ , null ])[1]);
 			}
 			return value;
@@ -1451,15 +1477,15 @@ jQuery.noConflict();
 			var href = $(e.currentTarget).attr('href');
 			if (href.indexOf('#') == 0)
 				href = location.pathname + href; // include pathname of current page in context
-			if (!isCurCtx(href))
-				return true; // reload page if we are wron
-			// we are in the right context carry on
-			getStateFromUrl(href);
-			e.preventDefault();
-			e.stopPropagation();
-			// $(this).addClass('loading');
-			$(this).find('.pagination').text('LOADING...');
-			initPage(href); // open page for href parms... dont necessarily reload
+			if (isCurCtx(href)) {
+				// we are in the right context carry on
+				getStateFromUrl(href);
+				e.preventDefault();
+				e.stopPropagation();
+				// $(this).addClass('loading');
+				$(this).find('.pagination').text('LOADING...');
+				initPage(href); // open page for href parms... dont necessarily reload
+			}
 			handleAction();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1647,7 +1673,6 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show contact form
 		function contactUs() {
-			var contactFormUrl = oscPrefix + '/catalog/wp-contact_us.php';
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page

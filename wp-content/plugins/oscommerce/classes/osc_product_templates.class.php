@@ -309,13 +309,13 @@ class osc_product_templates
      function osc_inject_shopcart_template() {
      	echo '<script id="shopcart-template" type="text/x-jquery-tmpl">
 ';
-     	$this->osc_show_shopcart('');
+     	$this->osc_show_shopcart('','');
      	echo '</script>
 ';
      }
 			// 	draw our shopping cart, this is called from oscommerce.php
 			// since we have two version of this cart on ein sidebar one in content-body we need to use classes only
-		function osc_show_shopcart($osCsid){
+		function osc_show_shopcart($osCsid,$customer_id){
 		?>
 <div class="shop-cart" class="box cart widget">
 	<h3 class="shop-cart-header">Your Shopping Box
@@ -339,8 +339,8 @@ class osc_product_templates
 			<span class="shop-cart-update button col1">box</span>
 			<span class="shop-cart-continue button col3 notonsidebar">continue shopping</span>
 			<div class="debug clear">
-				<span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> 
-				<span class="customer_id"><?php echo $customer_id; ?>${customer_id}</span>
+				osCsid:<span class="oscSid"><?php echo $osCsid; ?>${osCsid}</span> 
+				customer_id:<span class="customer_id"><?php echo $customer_id; ?>${customer_id}</span>
 			</div>
 		</div>
 	</div><!-- shop-cart-box -->
