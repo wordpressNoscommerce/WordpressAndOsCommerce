@@ -415,9 +415,7 @@ div#encoding {
 	width: 420px;
 }
 /* disable update box button - not needed */
-#content .shopping-box .shop-cart-footer .shop-cart-update {
-	display: none;
-} 
+/* #content .shopping-box .shop-cart-footer .shop-cart-update { display: none; } */
 .shopping-box .shop-cart-footer, .sidebar .shop-cart-total {
 	margin: 4px 5px 4px 5px;
 	padding: 5px;

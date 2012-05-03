@@ -63,6 +63,7 @@ require('wp-setupFramework.php');
 // WE ARE LOGGED IN NOW
         header('Cache-Control: no-cache, must-revalidate');
         header('Content-type: application/json');
+//				header('Set-Cookie: osCsid='+tep_session_id().';path=/;domain=shopkatapult.com',true);
         $result = new StdClass();
         $result->osCsid = tep_session_id();
         $result->customer_id = $customer_id;        

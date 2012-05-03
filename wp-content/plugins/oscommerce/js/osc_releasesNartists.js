@@ -8,6 +8,9 @@
  **********************************************************************************************************************/
 
 // lets pollute some global namespace :)
+var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
+var oscPrefix = '/wp-content/plugins/oscommerce';
+var shopPrefix = 'http://shopkatapult.com:8080';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -39,15 +42,14 @@ jQuery.noConflict();
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#' + playerContent;
 		// var mp3Prefix = oscPrefix + '/jplayer/';
-		var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
-		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var shoppingCartUrl = oscPrefix + '/osclink/wp-handle_cart.php';
-		var checkoutUrl = oscPrefix + '/catalog/checkout_payment.php'
-		+ '?XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
-//		var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
 		var loginUrl = oscPrefix + '/osclink/wp-login.php?action=process'
-		+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+//		+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345'
+		;
 		var createAccountUrl = oscPrefix + '/osclink/wp-create_account.php';
+		var checkoutUrl = shopPrefix + '/checkout_payment.php';
+		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
+//		var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
 
 		// our local database where we keep everything
 		var prodmap = {};
@@ -893,7 +895,7 @@ jQuery.noConflict();
 				if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 					// json data is already interpreted
 					osCsid = data.osCsid; // keep osCsid everywhere
-					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+//					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 					renderShoppingBox(data.cart, target);					
 				} else  {	
 					console.log('Problem with OSC cart. Response %s', data);
@@ -936,14 +938,15 @@ jQuery.noConflict();
 			case "box":
 				if (context == 'sidebar') {
 					showMainShoppingBox();
+				} else {
+					oscCartHandler('return_cart', undefined, '#content');					
 				}
 				break;
-			case "check out":
+			case "check out":	// we have to post the session Id to cross domains
 				if (context == 'sidebar') {
 					showMainShoppingBox();
-				} else {
-					window.open(checkoutUrl); // use cookies!!!! + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid);
-				}
+				} else 
+					checkout();
 				break;
 			case "continue shopping":
 			default:
@@ -1030,7 +1033,7 @@ jQuery.noConflict();
 			shopbox.find('.button').click(shopBoxClickHandler);
 			// set cookie
 			if (osCsid) {
-				document.cookie='osCsid='+osCsid+';path=/;domain=shopkatapult.com';				
+				$.cookie('osCsid', osCsid);				
 			}
 		}
 		// ###############################################################################
@@ -1050,10 +1053,12 @@ jQuery.noConflict();
 			if (newcart.totalItems == undefined)
 				newcart.totalItems = 0;
 			newcart.osCsid = osCsid; // keep global oscsid in cart also for rendering
+			$('.site-description p').html(osCsid);
 			newcart.customer_id = customer_id; // keep global customer_id in cart also for rendering
 			console.dir(newcart.entries);
 			console.dir(newcart.contents);
 			var i = 0;
+			var VAT = 0.; // 19.;
 			$.each(newcart.contents, function(key, e) { // loop over properties (returned from handle_cart.php)
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.dir(e);
@@ -1080,17 +1085,17 @@ jQuery.noConflict();
 					cartEntry.products_price = prod.products_price;
 					cartEntry.products_price_gross = prod.products_price;
 					if (prod.products_tax_class_id == 2) { // vat depending on tax class: 2 => 19%
-						cartEntry.products_price_gross = Math.ceil(prod.products_price * 119) / 100;
-						cartEntry.products_price_tax = Math.ceil(prod.products_price * 19) / 100;
+						cartEntry.products_price_gross = Math.ceil(prod.products_price * (100.+VAT)) / 100;
+						cartEntry.products_price_tax = Math.ceil(prod.products_price * VAT) / 100;
 					}
-					cartEntry.products_price_total = Math.ceil(cartEntry.products_price_gross * e.qty * 100) / 100;
+					cartEntry.products_price_total = Math.ceil(cartEntry.products_price_gross * e.qty * 100.) / 100;
 					if (!parent) {
 						console.log("no parent for %s of product %d", prod.products_id, prod.products_parent);
 					} else {
 						cartEntry.parents_thumb = parent.products_image_url;
-						cartEntry.parents_model = prod.products_model;
-						cartEntry.parents_name = prod.products_name;
-						cartEntry.parents_description = prod.products_description;
+						cartEntry.parents_model = parent.products_model;
+						cartEntry.parents_name = parent.products_name;
+						cartEntry.parents_description = parent.products_description;
 					}
 					if (!cartEntry.products_format) {
 						cartEntry.products_format = "MP3-Single";
@@ -1162,14 +1167,12 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// get product for cart (different from master!!)
-		var cnt = 0;
-		function getProductForCart(prod_id) {
+		function getProductForCart(prod_id, cnt) {
 			var prod = undefined;
-			if (!(prod = prodmap[prod_id]) && cnt++ < 5) {
+			if (!(prod = prodmap[prod_id]) && cnt < 5) { // terminate recursion
 				console.log('lost race for product %s',prod_id);
-				window.setTimeout(function() { prod = getProductForCart(prod_id);}, 500);
+				window.setTimeout(function() { prod = getProductForCart(prod_id, (cnt == undefined)?0:cnt++);}, 500);
 			}
-			cnt = 0;
 			return prod;
 			
 		}
@@ -1501,12 +1504,14 @@ jQuery.noConflict();
 				registerUser();
 				break;
 			case "show":
-				// location.hash = addHashParm(location.hash, 'action', action); // redundant
-				if (osCsid)
-					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
-				showMainShoppingBox();
+				if (osCsid) // if we have a session
+					oscCartHandler('return_cart', undefined, '#content');
+				else
+					showMainShoppingBox();
 				break;
 			case "checkout":
+					checkout();
+				break;
 			default:
 			}
 			return false;
@@ -1578,7 +1583,9 @@ jQuery.noConflict();
 						osCsid = result.osCsid;
 						customer_id = result.customer_id;
 						customer_firstname = result.customer_firstname;
-						location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+						$.cookie('osCsid', osCsid); // store the osCsid in cookie
+						$('.debug span.osCsid').html(osCsid);	// show us during development
+//						location.hash = addHashParm(location.hash, 'osCsid', osCsid);		// NOT IN THE HASH
 						$('.site-description').html('<h3>Hello '+customer_firstname+'!</h3>');
 						$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
 						loginDiv.dialog('close'); // SUCCESS						
@@ -1654,7 +1661,7 @@ jQuery.noConflict();
 										alert('session not created');
 									else {
 										osCsid = newOsCsid;
-										location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+//										location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 									}
 									regDiv.dialog('close'); // DONE
 								}); // end click handler
@@ -1671,8 +1678,31 @@ jQuery.noConflict();
 			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// show contact form
-		function contactUs() {
+		// call checkout on shopkatapult
+		function checkout () {
+			var form = document.createElement("form");
+			form.setAttribute("method", "post");
+			form.setAttribute("action", checkoutUrl);
+
+			// setting form target to a window named 'formresult'	
+			form.setAttribute("target", "checkout");
+
+			var hiddenField = document.createElement("input");              
+			hiddenField.setAttribute("name", "osCsid");
+			hiddenField.setAttribute("value", osCsid);
+			form.appendChild(hiddenField);
+			document.body.appendChild(form);
+			// creating the 'formresult' window with custom features prior to submitting the form
+			window.open('', 'formresult', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
+			form.submit();			
+
+//			var data = { 'osCsid' : osCsid };
+//			for (prop in XDEBUG) { data[prop] = XDEBUG[prop];}
+//			$.post(checkoutUrl, data , function (returned) {
+//				$('<div id="checkout"></div>').dialog("option", "position", [ 'center', 'center' ]);
+//				$('#checkout').html(returned);
+//			});
+//			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page
