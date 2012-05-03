@@ -42,6 +42,7 @@ define('MIN_RECORDS', 10);
 define('OSC_ARTIST_TAG','[oscArtistListing]');
 define('OSC_RELEASE_TAG','[oscReleaseListing]');
 define('OSC_SHOPPINGCART_TAG','[oscShoppingCart]');
+define('OSC_SHOP_TAG','[oscShop]');
 
 //$TAGLIST = array(OSC_ARTIST_TAG,OSC_RELEASE_TAG);
 // TODO improve shopkatapult OSC location config
@@ -203,7 +204,7 @@ function filterOscReleaseListing($content)
 }
 
 /** replace artist tag with funky tabbed UI **/
-function filterosCommerceArtistListing($content)
+function filterOscArtistListing($content)
 {
 //    fbDebugBacktrace(); // debug only when doing something
     if(preg_match(OSC_ARTIST_TAG, $content))
@@ -228,8 +229,34 @@ function filterosCommerceArtistListing($content)
     return $content;
 }
 
+/** replace artist tag with funky tabbed UI **/
+function filterOscShopListing($content)
+{
+	//    fbDebugBacktrace(); // debug only when doing something
+	if(preg_match(OSC_SHOP_TAG, $content))
+	{
+		$osc_match_filter = '['.OSC_SHOP_TAG.']';
+		$osc_manufacturers = new osc_manufacturers();
+
+		// the text before the tag
+		$before_shop_listing = osc_strstr($content, $osc_match_filter, false);
+		// is simply echoed
+		echo $before_shop_listing;
+		// as is our tabbed interface
+		$osc_manufacturers->osc_show_tabbed_manufacturers_page();
+
+		$content = osc_strstr($content, $osc_match_filter, true);
+
+		// TODO does this disconnect db session?
+		unset($osc_manufacturers->osc_db);
+		unset($osc_manufacturers);
+	}
+
+	return $content;
+}
+
 /** inject shopping cart for tag **/
-function filterosCommerceShoppingCart($content)
+function filterOscShoppingCart($content)
 {
     if(preg_match(OSC_SHOPPINGCART_TAG, $content))
     {
@@ -267,7 +294,8 @@ add_action('admin_menu', 'osc_management_init');
 add_action('wp_head', 'osCommerceHeaderScript');
 add_action('admin_head', 'osCommerceAdminHeaderScript');
 add_filter('the_content', 'filterOscReleaseListing');
-add_filter('the_content', 'filterosCommerceArtistListing');
-add_filter('the_content', 'filterosCommerceShoppingCart');
+add_filter('the_content', 'filterOscArtistListing');
+add_filter('the_content', 'filterOscShopListing');
+add_filter('the_content', 'filterOscShoppingCart');
 add_filter('the_content', 'filterAddGuidToPost');
 ?>

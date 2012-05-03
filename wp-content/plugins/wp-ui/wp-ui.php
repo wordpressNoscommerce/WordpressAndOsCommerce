@@ -224,16 +224,13 @@ class wpUI {
 
 			// // Load from Google CDN.
 			// wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js', false, '1.6.1');
-			// wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', false, '1.4.2');
 
 			// Let's use Wordpress bundled jQuery.
 			// wp_enqueue_script( 'jquery' );
 
 			// Will be gradually moved to wordpress bundled UI ( >= 3.3)
 			wp_deregister_script( 'jquery-ui' );
-			// wp_register_script('jquery-ui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js', array( 'jquery' ) );
-			wp_register_script('jquery-ui', $plugin_url . '/js/jquery-ui.min.js', array( 'jquery'), '1.8.18' );
-
+			wp_register_script('jquery-ui', $plugin_url . '/js/jquery-ui.min.js', array( 'jquery'), '1.8.20' );
 			wp_register_script('jquery-easing', $plugin_url . '/js/jquery.easing.1.3.js', array( 'jquery', 'jquery-ui') );
 
 		}

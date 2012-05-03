@@ -26,17 +26,27 @@ error_reporting(E_ALL & ~E_NOTICE);
 if (file_exists('includes/local/configure.php')) include('includes/local/configure.php');
 
 // include server parameters
-define('OSCOMMERCE_WPPLUGIN_PATH', '/wp-content/plugins/oscommerce/catalog/');
-define('DIR_FS_CATALOG', dirname(__FILE__).'/../catalog/');
+define ('FILENAME_WP_CREATE_ACCOUNT_SUCCESS', 'wp-create_account_success.php');
+define ('FILENAME_WP_CREATE_ACCOUNT', 'wp-create_account.php');
+define('OSCOMMERCE_OSCLINK_PATH', 'wp-content/plugins/oscommerce/osclink/');
+define('DIR_FS_CATALOG', 'E:/Devel/shopkatapult/');
+define('DIR_FS_INCLUDES', DIR_FS_CATALOG. 'includes/');
+define('DIR_WS_INCLUDES', DIR_FS_CATALOG. 'includes/');
+define('DIR_FS_FUNCTIONS', DIR_FS_INCLUDES. 'functions/');
+define('DIR_FS_CLASSES', DIR_FS_INCLUDES. 'classes/');
+define('DIR_FS_LANGUAGES', DIR_FS_INCLUDES. 'languages/');
 define('HTTP_SERVER', 'http://mywebsite:8080');
 define('HTTPS_SERVER', 'https://mywebsite:8080');
 define('HTTP_COOKIE_DOMAIN', 'mywebsite');
 define('HTTPS_COOKIE_DOMAIN', 'mywebsite');
 // define('HTTP_COOKIE_PATH', '/');
 // define('HTTPS_COOKIE_PATH', '/');
-define('DIR_WS_IMAGES', DIR_FS_CATALOG. 'images/');
-define('DIR_WS_INCLUDES', DIR_FS_CATALOG. 'includes/');
-require(DIR_WS_INCLUDES.'configure.php');
+// define('DIR_WS_HTTP_CATALOG', '/');
+// define('DIR_WS_HTTPS_CATALOG', '/');
+// define('DIR_WS_IMAGES', DIR_FS_CATALOG. 'images/');
+// define('DIR_WS_INCLUDES', DIR_FS_CATALOG. 'includes/');
+
+require(DIR_FS_INCLUDES.'configure.php');
 
 // define the project version
 define('PROJECT_VERSION', 'osCommerce Wordpress Integration 0.99');
@@ -44,7 +54,7 @@ define('PROJECT_VERSION', 'osCommerce Wordpress Integration 0.99');
 define('WPLINK_LOGIN', '#action=login');
 
 // some code to solve compatibility issues
-require(DIR_WS_FUNCTIONS . 'compatibility.php');
+require(DIR_FS_FUNCTIONS . 'compatibility.php');
 
 // set the type of request (secure or not)
 $request_type = (getenv('HTTPS') == 'on') ? 'SSL' : 'NONSSL';
@@ -59,16 +69,16 @@ if ($request_type == 'NONSSL') {
 }
 
 // include the list of project filenames
-require(DIR_WS_INCLUDES . 'filenames.php');
+require(DIR_FS_INCLUDES . 'filenames.php');
 
 // include the list of project database tables
-require(DIR_WS_INCLUDES . 'database_tables.php');
+require(DIR_FS_INCLUDES . 'database_tables.php');
 
 // customization for the design layout
 define('BOX_WIDTH', 125); // how wide the boxes should be in pixels (default: 125)
 
 // include the database functions
-require(DIR_WS_FUNCTIONS . 'database.php');
+require(DIR_FS_FUNCTIONS. 'database.php');
 
 // make a connection to the database... now
 tep_db_connect() or die('Unable to connect to database server!');
@@ -111,8 +121,8 @@ if (SEARCH_ENGINE_FRIENDLY_URLS == 'true') {
 }
 
 // define general functions used application-wide
-require(DIR_WS_FUNCTIONS . 'general.php');
-require(DIR_WS_FUNCTIONS . 'html_output.php');
+require(DIR_FS_FUNCTIONS . 'general.php');
+require(DIR_FS_FUNCTIONS . 'html_output.php');
 
 // set the cookie domain
 $cookie_domain = (($request_type == 'NONSSL') ? HTTP_COOKIE_DOMAIN : HTTPS_COOKIE_DOMAIN);
@@ -122,10 +132,10 @@ $cookie_path = (($request_type == 'NONSSL') ? HTTP_COOKIE_PATH : HTTPS_COOKIE_PA
 if (USE_CACHE == 'true') include(DIR_WS_FUNCTIONS . 'cache.php');
 
 // include shopping cart class
-require(DIR_WS_CLASSES . 'shopping_cart.php');
+require(DIR_FS_CLASSES . 'shopping_cart.php');
 
 // define how the session functions will be used
-require(DIR_WS_FUNCTIONS . 'sessions.php');
+require(DIR_FS_FUNCTIONS . 'sessions.php');
 
 // set the session name and save path
 tep_session_name('osCsid');
@@ -161,7 +171,7 @@ if (SESSION_FORCE_COOKIE_USE == 'True') {
   $spider_flag = false;
 
   if (tep_not_null($user_agent)) {
-    $spiders = file(DIR_WS_INCLUDES . 'spiders.txt');
+    $spiders = file(DIR_FS_INCLUDES . 'spiders.txt');
 
     for ($i=0, $n=sizeof($spiders); $i<$n; $i++) {
       if (tep_not_null($spiders[$i])) {
@@ -239,12 +249,12 @@ if (tep_session_is_registered('cart') && is_object($cart)) {
 }
 
 // include currencies class and create an instance
-require(DIR_WS_CLASSES . 'currencies.php');
+require(DIR_FS_CLASSES . 'currencies.php');
 $currencies = new currencies();
 
 // include the mail classes
-require(DIR_WS_CLASSES . 'mime.php');
-require(DIR_WS_CLASSES . 'email.php');
+require(DIR_FS_CLASSES . 'mime.php');
+require(DIR_FS_CLASSES . 'email.php');
 
 // set the language
 if (!tep_session_is_registered('language') || isset($HTTP_GET_VARS['language'])) {
@@ -253,7 +263,7 @@ if (!tep_session_is_registered('language') || isset($HTTP_GET_VARS['language']))
     tep_session_register('languages_id');
   }
 
-  include(DIR_WS_CLASSES . 'language.php');
+  include(DIR_FS_CLASSES . 'language.php');
   $lng = new language();
 
   if (isset($HTTP_GET_VARS['language']) && tep_not_null($HTTP_GET_VARS['language'])) {
@@ -267,27 +277,27 @@ if (!tep_session_is_registered('language') || isset($HTTP_GET_VARS['language']))
 }
 
 // include the language translations
-require(DIR_WS_LANGUAGES . $language . '.php');
+require(DIR_FS_LANGUAGES . $language . '.php');
 
 // currency
 define('DEFAULT_CURRENCY','EUR');
 $currency = DEFAULT_CURRENCY;
 
 // include the password crypto functions
-require(DIR_WS_FUNCTIONS . 'password_funcs.php');
+require(DIR_FS_FUNCTIONS . 'password_funcs.php');
 
 // include validation functions (right now only email address)
-require(DIR_WS_FUNCTIONS . 'validations.php');
+require(DIR_FS_FUNCTIONS . 'validations.php');
 
 // infobox
-  require(DIR_WS_CLASSES . 'boxes.php');
+  require(DIR_FS_CLASSES . 'boxes.php');
   // START STS 4.5
-  require (DIR_WS_CLASSES.'sts.php');
+  require (DIR_FS_CLASSES.'sts.php');
   $sts= new sts();
   $sts->start_capture();
   // END STS
 // initialize the message stack for output messages
-require(DIR_WS_CLASSES . 'message_stack.php');
+require(DIR_FS_CLASSES . 'message_stack.php');
 $messageStack = new messageStack;
 
 ?>

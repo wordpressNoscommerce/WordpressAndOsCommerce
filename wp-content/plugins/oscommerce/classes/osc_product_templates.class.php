@@ -418,8 +418,8 @@ class osc_product_templates
 </form>
 </div><!-- end register-form -->
 <?php   echo '</script>
-';
-     }
-} // EOC osc_product_templates
+';	
+     	}
+    } // EOC osc_product_templates
 
-?>
+    ?>

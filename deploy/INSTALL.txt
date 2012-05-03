@@ -35,3 +35,4 @@ transferNews.sql
 
 10. check item IDs used to apply specific styles in wp-content/themes/sight/custom.css
 
+11. replace print with error_log in sts.php#156

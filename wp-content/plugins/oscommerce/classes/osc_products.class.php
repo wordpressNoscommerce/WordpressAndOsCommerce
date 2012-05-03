@@ -67,12 +67,10 @@ class osc_products extends osc_product_templates
 		$select = 'SELECT COUNT(p.products_id) AS cnt ';
 		$sql = $select . $from;
 		$this->product_count = $this->shop_db->get_var($sql);
-		if (empty($this->product_count)) {
-			fb("prodCountFrom($sql): IS EMPTY!!!!!!!!!!!");
-			//			    fb(json_encode($this->shop_db));
-			//			    fb(json_encode($this->wp_db));
-		} else
-		fb("prodCountFrom($sql):".$this->product_count);
+//		if (empty($this->product_count)) {
+//			fb("prodCountFrom($sql): IS EMPTY!!!!!!!!!!!");
+//		} else
+//			fb("prodCountFrom($sql):".$this->product_count);
 	}
 
 	/** list products according to parms set in oscProducts object **/
@@ -111,7 +109,8 @@ class osc_products extends osc_product_templates
 
 <script type="text/javascript">// initial JSON injection including count, next ones get loaded by AJAX
 	var oscShopUrl = "<?php echo $this->shop_url ?>";  
-  var productsCount = <?php echo $this->product_count ?>;
+	var osCsidJson = "<?php echo $this->osc_sid ?>";  
+	var productsCount = <?php echo $this->product_count ?>;
   var productsPageSize = <?php echo $this->records_per_page ?>;
   var productsReleaseFormats = <?php echo $this->release_formats ?>;
   var products = {};
@@ -207,7 +206,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		/** CALCULATE PAGING **/
 		// GET TOTAL AMOUNT OF PRODUCTS TODO try to story this value somehow
 		$this->osc_count_products_from($from.$where);
-		fb('counted '.$this->product_count.' products');
+//		fb('counted '.$this->product_count.' products');
 		if($this->product_count > 0)
 		{
 			$this->max_page = ceil($this->product_count/$this->records_per_page);
@@ -221,8 +220,8 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		}
 		/////////////// QUERY
 		$prod_query_results = $this->shop_db->get_results($sql); // returns array of objects
-		fb('SQL:'.$sql.' found Records:'.$this->product_count);
-		fb("osc_query_products(shop_db, $this->shop_id, $this->cat_id):". $this->shop_db->num_rows);
+//		fb('SQL:'.$sql.' found Records:'.$this->product_count);
+//		fb("osc_query_products(shop_db, $this->shop_id, $this->cat_id):". $this->shop_db->num_rows);
 		$this->sql = $sql;
 		$this->result = $prod_query_results;
 		return $prod_query_results;
@@ -349,6 +348,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		} else {
 			$this->osc_fix_product_list_json();    // add extra fields to list items
 			if ($this->json) {
+				header('Content-type: application/json');				
 				$retval = array($this->records_per_page,$this->product_count, $this->max_page, $this->result,$this->release_formats);
 				// encode tuple of pagesize, count and result
 				echo json_encode($retval);
@@ -382,11 +382,8 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		$this->osc_get_shop_db ();    // get handle for shop database
 
 		$prod_xsell_query_results = $this->shop_db->get_results($sql); // returns array of objects
-		fb('SQL:'.$sql.' found XSell Records:'.count($prod_xsell_query_results));
+//		fb('SQL:'.$sql.' found XSell Records:'.count($prod_xsell_query_results));
 
-		if ($this->json)
-		echo json_encode($prod_xsell_query_results);
-		else
 		return $prod_xsell_query_results;
 	}
 
@@ -412,7 +409,8 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		$this->osc_get_shop_db ();    // get handle for shop database
 
 		$prod_format_query_results = $this->shop_db->get_results($sql); // returns array of objects
-		fb('SQL:'.$sql.' found Format Records:'. count($prod_format_query_results));
+//		fb('SQL:'.$sql.' found Format Records:'. count($prod_format_query_results));
+
 		foreach ($prod_format_query_results as $prod_format) {
 			if ($prod_format->products_tax_class_id == 2) {
 				$prod_format->products_price_taxed = + round($prod->products_price + ($prod->products_price * 19)/100, 2);
@@ -420,15 +418,75 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 			else if ($prod_format->products_tax_class_id == 1) {
 				$prod_format->products_price_taxed = round($prod->products_price  + ($prod->products_price * 7)/100, 2);
 			} else
-			$prod_format->products_price_taxed = $prod->products_price;
+				$prod_format->products_price_taxed = $prod->products_price;
 
 		}
-		if ($this->json)
-		echo json_encode($prod_format_query_results);
-		else
 		return $prod_format_query_results;
 	}
+	/** 
+	 * this is to reload data when we are missing a product in client cache 
+	 **/
+	function osc_get_product_and_parent($pid) {
+		$sql = '
+			SELECT	p.products_id,
+				p.products_image,
+				p.products_image_lrg,
+				pd.products_name,
+				p.products_model,
+				p.products_weight,
+				p.products_quantity,
+				p.products_price,
+				p.manufacturers_id,
+				m.manufacturers_name,
+				m.manufacturers_image,
+				p.products_tax_class_id,
+				IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
+				IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
+				pd.products_description,
+				pd.products_format,
+				pd.products_viewed,
+				pd.products_head_keywords_tag,
+				p.products_upc,
+				p.products_isrc
+			FROM products p
+			LEFT JOIN products_description pd ON pd.products_id = p.products_id
+			LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
+			LEFT JOIN specials s ON p.products_id = s.products_id
+			WHERE p.products_id = '.$pid.'
+			UNION
+			SELECT	parent.products_id,
+				parent.products_image,
+				parent.products_image_lrg,
+				pd.products_name,
+				parent.products_model,
+				parent.products_weight,
+				parent.products_quantity,
+				parent.products_price,
+				parent.manufacturers_id,
+				m.manufacturers_name,
+				m.manufacturers_image,
+				parent.products_tax_class_id,
+				IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
+				IF(s.status, s.specials_new_products_price, parent.products_price) AS final_price,
+				pd.products_description,
+				pd.products_format,
+				pd.products_viewed,
+				pd.products_head_keywords_tag,
+				parent.products_upc
+			FROM products p
+		  LEFT JOIN products parent on parent.products_model = p.products_parent
+			LEFT JOIN products_description pd ON pd.products_id = parent.products_id
+			LEFT JOIN manufacturers m ON m.manufacturers_id = parent.manufacturers_id
+			LEFT JOIN specials s ON parent.products_id = s.products_id
+			WHERE p.products_id = '.$pid;				
+		$this->osc_get_shop_db ();    // get handle for shop database
 
+		$prod_query_results = $this->shop_db->get_results($sql); // returns array of objects
+		$this->sql = $sql;
+		$this->result = $prod_query_results;		
+		return $prod_query_results;
+		
+	}
 	/** get handle to shop DB using data from wordpress DB,
 	 * $osc_db is member and has been injected from caller to avoid dependency **/
 	function osc_get_shop_db () {
@@ -443,7 +501,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		if (!is_array($res_arr)|| count($res_arr) == 0) {
 			$now = date('d.m. H:M',time());
 			$msg = "No entry found for shop ID:($this->shop_id) ($now)";
-			fb($msg);
+//			fb($msg);
 			throw new Exception($msg);
 		}
 		//  	echo '<h4 style="color: gray;">'.$db->dbuser.'@'.$db->dbname.' table '.$db->table_name ;
@@ -454,7 +512,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		else
 			$this->shop_url = 'http://'.$res_arr[0]->vchUrl;
 		$this->img_url = rtrim($this->shop_url, '/ ') ."/images/";
-		$this->cart_url = OSCOMMERCEURL.'/catalog/handle_cart.php';
+		$this->cart_url = OSCOMMERCEURL.'/catalog/wp-handle_cart.php';
 		$this->osc_sid = 0;    // this will be set after we had a shopping cart or login action
 
 		// show connection data
@@ -465,7 +523,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		if (empty($this->shop_db) || !$this->shop_db->ready) {
 			$now = date('d.m. H:M',time());
 			$msg = "Connection Failed to shopDB:".$this->shop_db->ready.json_encode($res_arr[0]);
-			fb($msg);
+//			fb($msg);
 			throw new Exception($msg);
 		}
 		return $this->shop_db;

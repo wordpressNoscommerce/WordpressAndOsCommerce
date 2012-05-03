@@ -16,6 +16,6 @@ wp_enqueue_script( 'my-ajax-request', plugin_dir_url( __FILE__ ) . 'js/ajax.js',
  */
 // prepare product query
 $osc_products = new osc_products();
-fb("osc_get_products_page:".gettype($osc_products));
+//fb("osc_get_products_page:".gettype($osc_products));
 $osc_products->osc_get_products_page();
 ?>

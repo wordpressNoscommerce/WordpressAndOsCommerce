@@ -267,8 +267,7 @@ if (isset($HTTP_POST_VARS['action']) && ($HTTP_POST_VARS['action'] == 'process')
 
 		tep_mail($name, $email_address, EMAIL_SUBJECT, $email_text, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
 
-		$target = tep_href_link(OSCOMMERCE_WPPLUGIN_PATH.FILENAME_CREATE_ACCOUNT_SUCCESS, '', 'SSL');
-		fb('redirect to: '. $target);
+		$target = tep_href_link(OSCOMMERCE_OSCLINK_PATH.FILENAME_WP_CREATE_ACCOUNT_SUCCESS, '', 'SSL');
 		tep_redirect($target);
 	}
 }
@@ -280,8 +279,7 @@ if (isset($HTTP_POST_VARS['action']) && ($HTTP_POST_VARS['action'] == 'process')
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo CHARSET; ?>">
 <title><?php echo TITLE; ?></title>
-<!--  <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER : HTTP_SERVER) . DIR_WS_CATALOG; ?>"> -->
-<script src="/<?php echo OSCOMMERCE_WPPLUGIN_PATH; ?>includes/general.js" type="text/javascript"></script>
+<?php require(DIR_FS_CATALOG . 'includes/general.js.php'); ?>
 <?php require(DIR_FS_CATALOG . 'includes/form_check.js.php'); ?>
 </head>
 <body marginwidth="0" marginheight="0" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0">
@@ -294,7 +292,7 @@ if (isset($HTTP_POST_VARS['action']) && ($HTTP_POST_VARS['action'] == 'process')
 		<h1>
 			<?php echo HEADING_TITLE; ?>
 		</h1>
-		<?php echo tep_draw_form('create_account', tep_href_link(OSCOMMERCE_WPPLUGIN_PATH.FILENAME_CREATE_ACCOUNT, '', 'SSL'), 'post', 'onSubmit="return check_form(create_account);" id="create_account"') . tep_draw_hidden_field('action', 'process'); ?>
+		<?php echo tep_draw_form('create_account', tep_href_link(OSCOMMERCE_OSCLINK_PATH.FILENAME_WP_CREATE_ACCOUNT, '', 'SSL'), 'post', 'onSubmit="return check_form(create_account);" id="create_account"') . tep_draw_hidden_field('action', 'process'); ?>
 		<table border="0" width="100%" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="smallText"><br> <?php echo sprintf(TEXT_ORIGIN_LOGIN, '#action=login' /* tep_href_link(WPLINK_LOGIN, tep_get_all_get_params(), 'SSL') */); ?>

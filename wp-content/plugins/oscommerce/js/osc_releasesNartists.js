@@ -9,10 +9,6 @@
 
 // lets pollute some global namespace :)
 var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
-var oscPrefix = '/wp-content/plugins/oscommerce';
-//var shopPrefix = 'http://shopkatapult.com:8080';
-//var shopPrefix = oscPrefix + '/catalog';
-var shopPrefix = 'http://dev2.shitkatapult.com';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -43,14 +39,22 @@ jQuery.noConflict();
 		var playerSelector = '#' + playerId;
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#' + playerContent;
-		// var mp3Prefix = oscPrefix + '/jplayer/';
-		var shoppingCartUrl = oscPrefix + '/osclink/wp-handle_cart.php';
-		var loginUrl = oscPrefix + '/osclink/wp-login.php?action=process'
-//		+ '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345'
+
+//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
+		var XDEBUGparms = ''; //'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+
+		var oscPrefix = '/wp-content/plugins/oscommerce/';
+		var oscLinkPrefix = oscPrefix+'osclink/';
+		//var shopPrefix = oscShopUrl; // 'http://dev2.shitkatapult.com';
+		var shopPrefix = 'http://dev2.shitkatapult.com:8080';
+	//var shopPrefix = 'http://shopkatapult.com:8080';
+		var shoppingCartUrl = oscLinkPrefix + 'wp-handle_cart.php';
+		var loginUrl = oscLinkPrefix + 'wp-login.php?action=process'
+//		+ XDEBUGparms
 		;
-		var createAccountUrl = oscPrefix + '/osclink/wp-create_account.php';
+		var logoffUrl = oscLinkPrefix + 'wp-logoff.php';
+		var createAccountUrl = oscLinkPrefix + 'wp-create_account.php';
 		var checkoutUrl = shopPrefix + '/checkout_payment.php';
-		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
 //		var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
 
 		// our local database where we keep everything
@@ -183,19 +187,18 @@ jQuery.noConflict();
 				$.ajax({
 					type : 'GET',
 					url : fetchurl,
-					success : function(data, textStatus, jqXHR) {
+					success : function(result, textStatus, jqXHR) {
 						getTabLnk(curTabCtx, tabName).removeClass('loading');
-						if (data.indexOf('No Records found') >= 0) {
-							console.error(data);
-							$('#product-detail').html(data).addClass('error');
-						} else {
-							var result = eval('(' + data + ')'); // eval json array
+						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
 							addToCache(result[3]); // this is the product list
 							renderItemsInTab(curTabCtx, result[3], tabName, pageno, '#product-box-template');
 							renderPagination(getTabDiv(curTabCtx, tabName), result[0], result[1], result[3], pageno);
 							selectTab(curTabCtx, tabName, loadProductsForTab, productClickHandler);
 							// scroll box to bottom
 							scrollTo(curTabCtx, false);
+						} else {
+							console.error(result);
+							$('#product-detail').html(result).addClass('error');
 						}
 					},
 					error : function(jqXHR, textStatus, errorThrown) {
@@ -275,13 +278,9 @@ jQuery.noConflict();
 					$.ajax({
 						type : 'GET',
 						url : fetchurl,
-						success : function(data, textStatus, jqXHR) {
+						success : function(result, textStatus, jqXHR) {
 							getTabLnk(curTabCtx, tabName).removeClass('loading');
-							if (data.indexOf('No Records found') >= 0) {
-								console.error(data);
-								getTabDiv(curTabCtx, tabName).html('<h3 class="error">' + data + '</h3>').addClass('error');
-							} else {
-								var result = eval('(' + data + ')'); // eval json array
+							if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
 								addToCache(result[3], artistId); // this is the product list and artist relation
 								renderItemsInTab(curTabCtx, result[3], tabName, pageno, '#release-box-template'); // use pageno nos
 								// function renderPagination(curTabCtx, pageSize, totalRecCount, newItems, paged)
@@ -289,6 +288,9 @@ jQuery.noConflict();
 								selectTab(curTabCtx, tabName, loadProductsForArtist(artistId), releaseClickHandler);
 								// scroll box to bottom
 								scrollTo(curTabCtx, false);
+							}else {
+								console.error(result);
+								getTabDiv(curTabCtx, tabName).html('<h3 class="error">' + result + '</h3>').addClass('error');
 							}
 						},
 						error : function(jqXHR, textStatus, errorThrown) {
@@ -733,12 +735,8 @@ jQuery.noConflict();
 			$.ajax({
 				type : 'GET',
 				url : fetchurl,
-				success : function(data, textStatus, jqXHR) {
-					if (data.indexOf('No Records found') >= 0) {
-						console.error(data);
-						lstbuytab.html(data).addClass('error');
-					} else { // stop loading image
-						var result = eval('(' + data + ')'); // eval json data
+				success : function(result, textStatus, jqXHR) {
+						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
 						// merge named members to local database
 						addToCache(result.formats, prod.products_id);
 						addToCache(result.xsell, prod.products_id);
@@ -750,7 +748,10 @@ jQuery.noConflict();
 						renderProductFormats(target, result.formats);
 						$('#artist-header-detail').hide();
 						scrollTo('#content .post-content', true);
-					}
+					} else {
+							console.error(result);
+							lstbuytab.html(result).addClass('error');
+						}
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
 					console.error('request(%s) error(%o)', fetchurl, jqXHR);
@@ -897,7 +898,9 @@ jQuery.noConflict();
 				if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 					// json data is already interpreted
 					osCsid = data.osCsid; // keep osCsid everywhere
-//					location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+					cart.customer_id = data.customer_id;
+					cart.customer_firstname = data.customer_firstname;
+					setGreeting (data.customer_firstname, osCsid);
 					renderShoppingBox(data.cart, target);					
 				} else  {	
 					console.log('Problem with OSC cart. Response %s', data);
@@ -966,7 +969,7 @@ jQuery.noConflict();
 			if (!cart)
 				if (osCsid) {
 					console.error('found %s - CAN LOAD CART', osCsid);
-					oscCartHandler('add_product', 0, '#content'); // this is calling us again but with a cart
+					oscCartHandler('return_cart', undefined, '#content');
 				} else {
 					console.error('nothing found %o for %s', cart, osCsid);
 					alert('your shopping cart is still empty!');
@@ -986,6 +989,12 @@ jQuery.noConflict();
 				renderShoppingBox(cart, '#content');
 		}
 		// ###############################################################################
+		function renderShoppingBoxCallback(newcart, context) {
+			return function () {
+				renderShoppingBox(newcart, context);
+			};
+		}
+		// ###############################################################################
 		/** render shopping box / cart showing the body is controlled via CSS sidebar/post-content * */
 		function renderShoppingBox(newcart, context) {
 			shoppingBoxCtx = context;
@@ -1000,7 +1009,7 @@ jQuery.noConflict();
 				shopbox.find('.button').click(shopBoxClickHandler);
 				return;
 			}
-			cart = prepareCart(newcart); // global reference to cart
+			cart = prepareCart(newcart,context); // global reference to cart
 			var cart_tmpl = $('#shopcart-template');
 			shopbox.empty(); // clean up previous one
 			// shopbox.hide(); // hide at first NOT WORKING
@@ -1045,7 +1054,7 @@ jQuery.noConflict();
 		 * @see osc_jquery_templates.class.php c.index c.products_id, c.products_image, c.products_tax_class_id,
 		 *      c.products_name, c.products_model, c.products_qty, c.products_format, c.products_price, c.products_price_tax
 		 ******************************************************************************************************************/
-		function prepareCart(newcart) {
+		function prepareCart(newcart,context) {
 			// read contents and create the entries list for display in the shopcart
 			// console.assert(newcart.entries == undefined);
 			if (newcart.entries == undefined)
@@ -1065,10 +1074,9 @@ jQuery.noConflict();
 				console.log('addCart #' + i + ' ' + key + ':');
 				console.dir(e);
 				if (newcart.entries[i] == undefined) { // TODO check if we actually can have something here
-					var prod = getProductForCart(key); // access product data
+					var prod = getProductForCart(key, renderShoppingBoxCallback(newcart,context));
 					if (prod == undefined) {
-						newcart.contents[key];
-						return; // skip unloaded products
+						throw "missing product - wait for reload"; // skip the rest and wait for callback
 					}
 					console.dir(prod);
 					var parent = getProductForCart(prod.products_parent);
@@ -1169,15 +1177,35 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// get product for cart (different from master!!)
-		function getProductForCart(prod_id, cnt) {
-			var prod = undefined;
-			if (!(prod = prodmap[prod_id]) && cnt < 5) { // terminate recursion
-				console.log('lost race for product %s',prod_id);
-				window.setTimeout(function() { prod = getProductForCart(prod_id, (cnt == undefined)?0:cnt++);}, 500);
+		function getProductForCart(prod_id,callback) {
+			var prod = prodmap[prod_id];
+			if (!prod) {
+				console.log('missing product %s',prod_id);				
+				getProductFromDb(prod_id,callback);
 			}
-			return prod;
-			
+			return prod;			
 		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		/** ************************************************************************** */
+		/** load missing product data from DB */
+		function getProductFromDb(prodId,callback) {
+			var fetchurl = oscPrefix + "/get_product_data.php?json=1&pid=" + prodId + XDEBUGparms;
+			$.ajax({
+				type : 'GET',
+				url : fetchurl,
+				success : function(result, textStatus, jqXHR) {
+					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+						addToCache(result.complete);
+						if (callback != undefined)
+							callback();	// closure
+					} else 
+						console.error(data);
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					console.error('request(%s) error(%o)', fetchurl, jqXHR);
+					}
+			});
+		}		
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// add new products to artist,release cache,product cache depending on data
 		// due to disjoint key sets we merge master-detail from product and artists in same map!!!
@@ -1193,7 +1221,8 @@ jQuery.noConflict();
 			}
 			for ( var i = 0; i < newData.length; i++) {
 				var o = newData[i];
-				o.products_parent = parentId;
+				if (parentId)
+					o.products_parent = parentId;
 				if (o.products_id != undefined)
 					prodmap[o.products_id] = o;
 				if (o.manufacturers_id != undefined)
@@ -1502,14 +1531,18 @@ jQuery.noConflict();
 			case "login":
 				loginUser();
 				break;
+			case "logoff":
+				logoffUser();
+				break;
 			case "register":
 				registerUser();
 				break;
 			case "show":
-				if (osCsid) // if we have a session
+//				if (osCsid) // if we have a session
+					// try to read the cart
 					oscCartHandler('return_cart', undefined, '#content');
-				else
-					showMainShoppingBox();
+//				else
+//					showMainShoppingBox();
 				break;
 			case "checkout":
 					checkout();
@@ -1521,15 +1554,12 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show login form and try to login user
 		function loginUser() {
-			$(
-					'<div id="login-div"><div class="validateTips"></div><form><fieldset><label for="email">Email:</label> <input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" /> <label for="password">Password:</label> <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></fieldset></form></div>')
+			$('<div id="login-div"><div class="validateTips"></div><form><fieldset><label for="login">Email:</label> <input type="text" name="login" id="email" value="" class="text ui-widget-content ui-corner-all" /> <label for="password">Password:</label> <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" /></fieldset></form></div>')
 					.dialog({
 						title : 'Shopkatapult Login',
-						// height: 300,
-						width : 400,
 						dialogClass : 'shit-theme',
 						closeOnEscape : true,
-						resizable : true, // not working without additional scripts
+						resizable : true, // requires draggable and resible jqui extensions to be loaded
 						draggable : true,
 						show : 'slide',
 						hide : 'slide',
@@ -1574,28 +1604,26 @@ jQuery.noConflict();
 				console.log('now we can try to login with: %s/%s', email.val(), password.val());
 				var data = { 'email_address' : email.val(), 'password' : password.val(), 'osCsid' : osCsid, };
 				// cartId is new each time when not logged in (cart in session, basket in DB)
-				$.post(loginUrl, data, function(responseText, textStatus, jqXHR) {
+				$.post(loginUrl, data, function(result, textStatus, jqXHR) {
 					var loginDiv = $('#login-div');
 					if (jqXHR.status != 200) {
-						console.error('problem with login in %o: %s', jqXHR, responseText);
+						console.error('problem with login in %o: %s', jqXHR, result);
 						// throw 'problem with login ' + responseText;
 					}
-					if (jqXHR.getResponseHeader('Content-type') == 'application/json') { // TODO bad hack to determine outcome						
-						var result = responseText; // take it directly as its already json 
+					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
 						osCsid = result.osCsid;
 						customer_id = result.customer_id;
 						customer_firstname = result.customer_firstname;
 						$.cookie('osCsid', osCsid); // store the osCsid in cookie
 						$('.debug span.osCsid').html(osCsid);	// show us during development
 //						location.hash = addHashParm(location.hash, 'osCsid', osCsid);		// NOT IN THE HASH
-						$('.site-description').html('<h3>Hello '+customer_firstname+'!</h3>');
-						$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
+						setGreeting (customer_firstname, osCsid);
 						loginDiv.dialog('close'); // SUCCESS						
 					} else { // houston we have a problem - try again
 						loginDiv.dialog("option", "buttons", {});
 						// loginDiv.dialog("option", "position", [ 'center', 'center' ]);
 						// loginDiv.dialog("option", "height", 500);
-						loginDiv.html(responseText);
+						loginDiv.html(result);
 						loginDiv.find('#login-button').unbind('click').click(function(e) {
 							e.preventDefault();
 							e.stopPropagation();
@@ -1620,7 +1648,10 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show login form and try to login user
 		function registerUser() {
-			var debug = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP','KEY':'123456789012345'} ;
+			var debug = {
+				'XDEBUG_SESSION_START' : 'ECLIPSE_DBGP',
+				'KEY' : '123456789012345'
+			};
 			$('<div id="register-div"></div>').dialog({
 				title : 'My Account Information',
 				position : [ 'center', 'top' ],
@@ -1628,17 +1659,17 @@ jQuery.noConflict();
 				width : 600,
 				modal : true,
 				show : 'slide',
-				// resizable: true, // not working without additional scripts
-				// draggable: true,
+				resizable : true, // not working without additional scripts
+				draggable : true,
 				open : function() {
 					var regDiv = $('#register-div');
-					$.post(createAccountUrl, debug , function(responseText, textStatus, jqXHR) {
+					$.post(createAccountUrl, debug, function(responseText, textStatus, jqXHR) {
 						if (jqXHR.status != 200) {
 							console.error('problem with registration in %o: %s', jqXHR, responseText);
 							throw 'problem with registration ' + responseText;
 						}
 						var start = responseText.indexOf('<html');
-						regDiv.html((start >=0)?responseText.substr(start):responseText);
+						regDiv.html((start >= 0) ? responseText.substr(start) : responseText);
 						$('#login').click(function(e) { // handler login link
 							regDiv.dialog('close');
 							loginUser();
@@ -1650,7 +1681,7 @@ jQuery.noConflict();
 								if (jqXHR.status != 200) {
 									console.error('problem with registration in %o: %s', jqXHR, responseText);
 									regDiv.html(textStatus);
-//									throw 'problem with registration ' + responseText;
+									// throw 'problem with registration ' + responseText;
 									return false;
 								} else
 									regDiv.html(responseText);
@@ -1664,7 +1695,7 @@ jQuery.noConflict();
 										alert('session not created');
 									else {
 										osCsid = newOsCsid;
-//										location.hash = addHashParm(location.hash, 'osCsid', osCsid);
+										// location.hash = addHashParm(location.hash, 'osCsid', osCsid);
 									}
 									regDiv.dialog('close'); // DONE
 								}); // end click handler
@@ -1674,30 +1705,61 @@ jQuery.noConflict();
 					});
 					// attach handler to login link
 				}
-//				, close : function() {
-//					console.log('register close has been called!');
-//				}
+			// , close : function() {
+			// console.log('register close has been called!');
+			//				}
 			});
 			return false;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// call checkout on shopkatapult
-		function checkout () {
-			var form = document.createElement("form");
-			form.setAttribute("method", "post");
-			form.setAttribute("action", checkoutUrl);
-
-			// setting form target to a window named 'formresult'	
-			form.setAttribute("target", "checkout");
-
-			var hiddenField = document.createElement("input");              
-			hiddenField.setAttribute("name", "osCsid");
-			hiddenField.setAttribute("value", osCsid);
-			form.appendChild(hiddenField);
-			document.body.appendChild(form);
-			// creating the 'formresult' window with custom features prior to submitting the form
-			window.open('', 'formresult', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
-			form.submit();			
+		// show login form and try to login user
+		function logoffUser() {
+				if (confirm('Do you really want to log off?'))
+					$.post(logoffUrl, { osCsid: osCsid} , function(result, textStatus, jqXHR) {
+						if (jqXHR.status != 200) {
+							console.error('problem with logoff in %o: %s', jqXHR, result);
+						} else {
+							setGreeting();
+							cart = 0;
+							$('.shopping-box').remove();							
+						}
+					});
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// call checkout on shopkatapult, to keep the session we create a form and post into an iframe
+		function checkout() {
+			var form = $('<form>').attr({
+				id : 'checkoutform',
+				method : "post",
+				action : checkoutUrl,
+				// setting form target to a window named 'checkout'
+				target : "checkout"
+			}).appendTo('body');
+			$('<input>').attr({
+				type : 'hidden',
+				name : 'osCsid',
+				value : osCsid
+			}).appendTo(form);
+			var iFrame = $('#iframe');
+			if (iFrame.length == 0) {
+				$('<iframe name="checkout" id="iframe"></iframe>').appendTo('body');
+				iFrame = $('#iframe');
+			}
+			iFrame.dialog({
+				autoOpen : false,
+				position : [ 'center', 'center' ],
+				dialogClass : 'shit-theme',
+				closeOnEscape : true,
+				resizable : true, // requires draggable and resible jqui extensions to be loaded
+				draggable : true,
+				show : 'slide',
+				hide : 'slide',
+				modal : true
+			});
+// window.open('', 'checkout', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
+			form.submit();
+			$('#iframe').dialog('open');
+			$('#checkoutform').remove();
 
 //			var data = { 'osCsid' : osCsid };
 //			for (prop in XDEBUG) { data[prop] = XDEBUG[prop];}
@@ -1706,6 +1768,10 @@ jQuery.noConflict();
 //				$('#checkout').html(returned);
 //			});
 //			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
+		}
+		function setGreeting (customer_firstname) {
+			$('.site-description').html(customer_firstname?'<h3>Hello '+customer_firstname+'!</h3>':'');			
+			$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');			
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page
