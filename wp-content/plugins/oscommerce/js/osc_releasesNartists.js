@@ -12,7 +12,7 @@ var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
 var oscPrefix = '/wp-content/plugins/oscommerce';
 //var shopPrefix = 'http://shopkatapult.com:8080';
 //var shopPrefix = oscPrefix + '/catalog';
-var shopPrefix = 'http://dev2.shopkatapult.com';
+var shopPrefix = 'http://dev2.shitkatapult.com';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -1638,7 +1638,7 @@ jQuery.noConflict();
 							throw 'problem with registration ' + responseText;
 						}
 						var start = responseText.indexOf('<html');
-						regDiv.html(responseText.substr(start));
+						regDiv.html((start >=0)?responseText.substr(start):responseText);
 						$('#login').click(function(e) { // handler login link
 							regDiv.dialog('close');
 							loginUser();
