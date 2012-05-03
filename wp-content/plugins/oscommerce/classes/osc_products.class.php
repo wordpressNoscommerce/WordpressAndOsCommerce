@@ -472,7 +472,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 	}
 	// just redirect to the html in our template for now
 	function osc_show_shopping_cart($db, $shop_id, $oscSid){
-		$this->osc_show_shopcart($oscSid);
+		$this->osc_show_shopcart($oscSid,'');
 	}
 } // EOC class def
 endif;
