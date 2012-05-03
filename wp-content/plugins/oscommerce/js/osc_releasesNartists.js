@@ -10,7 +10,9 @@
 // lets pollute some global namespace :)
 var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
 var oscPrefix = '/wp-content/plugins/oscommerce';
-var shopPrefix = 'http://shopkatapult.com:8080';
+//var shopPrefix = 'http://shopkatapult.com:8080';
+//var shopPrefix = oscPrefix + '/catalog';
+var shopPrefix = 'http://dev2.shopkatapult.com';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -1635,7 +1637,8 @@ jQuery.noConflict();
 							console.error('problem with registration in %o: %s', jqXHR, responseText);
 							throw 'problem with registration ' + responseText;
 						}
-						regDiv.html(responseText);
+						var start = responseText.indexOf('<html');
+						regDiv.html(responseText.substr(start));
 						$('#login').click(function(e) { // handler login link
 							regDiv.dialog('close');
 							loginUser();

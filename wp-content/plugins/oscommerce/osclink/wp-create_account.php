@@ -282,7 +282,7 @@ if (isset($HTTP_POST_VARS['action']) && ($HTTP_POST_VARS['action'] == 'process')
 <title><?php echo TITLE; ?></title>
 <!--  <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER : HTTP_SERVER) . DIR_WS_CATALOG; ?>"> -->
 <script src="/<?php echo OSCOMMERCE_WPPLUGIN_PATH; ?>includes/general.js" type="text/javascript"></script>
-<?php require('includes/form_check.js.php'); ?>
+<?php require(DIR_FS_CATALOG . 'includes/form_check.js.php'); ?>
 </head>
 <body marginwidth="0" marginheight="0" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0">
 	<!-- header //-->
