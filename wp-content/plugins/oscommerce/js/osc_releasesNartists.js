@@ -23,6 +23,7 @@ var customer_firstname = 0; // osc customer
 var cart = 0;
 var shoppingBoxCtx = 0;
 var ajaxPending = false;
+var VAT = 19.; // 0.;
 
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
@@ -41,21 +42,17 @@ jQuery.noConflict();
 		var playerContentSelector = '#' + playerContent;
 
 //		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
-		var XDEBUGparms = ''; //'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+		var XDEBUGparms ='&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345'; // ''; //
 
-		var oscPrefix = '/wp-content/plugins/oscommerce/';
-		var oscLinkPrefix = oscPrefix+'osclink/';
-		//var shopPrefix = oscShopUrl; // 'http://dev2.shitkatapult.com';
+		var oscPrefix = '/wp-content/plugins/oscommerce';
+		var oscLinkPrefix = oscPrefix+'/osclink';
 		var shopPrefix = 'http://dev2.shitkatapult.com:8080';
-	//var shopPrefix = 'http://shopkatapult.com:8080';
-		var shoppingCartUrl = oscLinkPrefix + 'wp-handle_cart.php';
-		var loginUrl = oscLinkPrefix + 'wp-login.php?action=process'
-//		+ XDEBUGparms
-		;
-		var logoffUrl = oscLinkPrefix + 'wp-logoff.php';
-		var createAccountUrl = oscLinkPrefix + 'wp-create_account.php';
+
 		var checkoutUrl = shopPrefix + '/checkout_payment.php';
-//		var contactFormUrl = oscPrefix + '/catalog/contact_us.php';
+		var shoppingCartUrl = oscLinkPrefix + '/wp-handle_cart.php';
+		var loginUrl = oscLinkPrefix + '/wp-login.php?action=process' + XDEBUGparms;
+		var logoffUrl = oscLinkPrefix + '/wp-logoff.php' + XDEBUGparms;
+		var createAccountUrl = oscLinkPrefix + '/wp-create_account.php';
 
 		// our local database where we keep everything
 		var prodmap = {};
@@ -104,7 +101,7 @@ jQuery.noConflict();
 			}
 		}
 		if (location.hash.indexOf('action') > 0) { // we have an action
-			handleAction();
+			actionHandler();
 		}
 		// ##########################################################################
 		// ##########################################################################
@@ -743,7 +740,7 @@ jQuery.noConflict();
 						console.log(result);
 						var target = lstbuytab.find(' div.wp-tab-content'); // select the content div!!!
 						target.empty();
-						if (result.xsell != undefined)
+						if (result.xsell && result.xsell.length)
 							renderPlaylistPlayer(target, prod, result.xsell);
 						renderProductFormats(target, result.formats);
 						$('#artist-header-detail').hide();
@@ -824,7 +821,7 @@ jQuery.noConflict();
 		function renderProductFormats(target, formatList) {
 			$.each(formatList, function(i, e) {
 				console.log('price %s', e.products_price);
-				e.products_price = (Math.floor(e.products_price * 119) / 100).toFixed(2);
+				e.products_price_gross = Math.round(e.products_price * (100.+VAT)) / 100;
 			});
 			console.log('renderProductFormats(%o)', formatList);
 			var template = $('#product-format-template'); // new version
@@ -862,10 +859,11 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// player util functions
 		function playlistBuyClickHandler(e) {
-			var index = $(e.currentTarget).prev('a.jp-playlist-item').attr('tabindex');
+			var button = $(e.currentTarget);
+			var index = button.prev('a.jp-playlist-item').attr('tabindex');
 			console.assert(index >= 0);
 			// console.log('buy click on index %d for mp3 %o', index, curMP3list[index]);
-			oscCartHandler('add_product', [ curMP3list[index].products_id ], '.sidebar'); // make array of prod id
+			oscCartHandler(button,'add_product', [ curMP3list[index].products_id ], '.sidebar'); // make array of prod id
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// called by click on buy button in format line
@@ -873,15 +871,17 @@ jQuery.noConflict();
 			console.log($(this).parent());
 			// $().addClass('loading').text('LOADING...');
 			var prodlist = [];
-			$(e.currentTarget).parent().find('input.checkbox:checked').each(function(i, e) {
+			var button = $(e.currentTarget);
+			button.parent().find('input.checkbox:checked').each(function(i, e) {
 				prodlist[i] = $(e).attr('value');
 			});
 			// console.log('buy %d products %o', prodlist.length, prodlist);
-			oscCartHandler('add_product', prodlist, '.sidebar');
+			oscCartHandler(button,'add_product', prodlist, '.sidebar');
 		}
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// diff
-		function oscCartHandler(action, products, target) {
+		function oscCartHandler(button,action, products, target) {
+			button.addClass('loading');				
 			var productId = (products instanceof Array) ? products.shift() : products;
 			var data = {
 				'products_id' : productId,
@@ -891,6 +891,7 @@ jQuery.noConflict();
 			};
 			// cartId is new each time when not logged in (cart in session, basket in DB)
 			$.post(shoppingCartUrl, data, function(data, textStatus, jqXHR) {
+				button.removeClass('loading');
 				if (jqXHR.status != 200) {
 					console.error('problem with shopping cart post %o', jqXHR);
 					throw 'problem with shopping cart post';
@@ -913,7 +914,7 @@ jQuery.noConflict();
 					$('#errMsg').dialog('open');
 				}
 				if (products instanceof Array && products.length) // daisy chain to handle the product list
-					oscCartHandler(action, products, target);
+					oscCartHandler(button,action, products, target);
 				else {
 					scrollTo('div.shopping-box', true);
 				}
@@ -929,22 +930,22 @@ jQuery.noConflict();
 			// cart-entry actions
 			case "up": // what we put into the buttons
 				console.log('increase count %o for %d', button.html(), prodId);
-				oscCartHandler('add_product', prodId, '#content'); // robust version
+				oscCartHandler(button,'add_product', prodId, '#content'); // robust version
 				break;
 			case "down": // what we put into the buttons
 				console.log('decrease count %o for %d', button.html(), prodId);
-				oscCartHandler('remove_product', prodId, '#content'); // robust version
+				oscCartHandler(button,'remove_product', prodId, '#content'); // robust version
 				break;
 			case "delete":
 				console.log('delete button on %o for %d', button.html(), prodId);
-				oscCartHandler('delete_product', prodId, '#content'); // robust version
+				oscCartHandler(button,'delete_product', prodId, '#content'); // robust version
 				break;
 			// footer button actions
 			case "box":
 				if (context == 'sidebar') {
 					showMainShoppingBox();
 				} else {
-					oscCartHandler('return_cart', undefined, '#content');					
+					oscCartHandler(button,'return_cart', undefined, '#content');					
 				}
 				break;
 			case "check out":	// we have to post the session Id to cross domains
@@ -969,7 +970,7 @@ jQuery.noConflict();
 			if (!cart)
 				if (osCsid) {
 					console.error('found %s - CAN LOAD CART', osCsid);
-					oscCartHandler('return_cart', undefined, '#content');
+					oscCartHandler('.shopping-box','return_cart', undefined, '#content');
 				} else {
 					console.error('nothing found %o for %s', cart, osCsid);
 					alert('your shopping cart is still empty!');
@@ -989,10 +990,16 @@ jQuery.noConflict();
 				renderShoppingBox(cart, '#content');
 		}
 		// ###############################################################################
+		// closure to be called when reloading products from db
 		function renderShoppingBoxCallback(newcart, context) {
 			return function () {
 				renderShoppingBox(newcart, context);
 			};
+		}
+		// ###############################################################################
+		function reloadCart() {
+			var shopbox = $('.shopping-box:visible');
+			console.log(shopbox);
 		}
 		// ###############################################################################
 		/** render shopping box / cart showing the body is controlled via CSS sidebar/post-content * */
@@ -1009,7 +1016,12 @@ jQuery.noConflict();
 				shopbox.find('.button').click(shopBoxClickHandler);
 				return;
 			}
-			cart = prepareCart(newcart,context); // global reference to cart
+			try {
+				cart = prepareCart(newcart,context); // global reference to cart				
+			} catch (err){
+				console.log('caught %s', err);
+				return;	// skip this for now... the callback does it again
+			}
 			var cart_tmpl = $('#shopcart-template');
 			shopbox.empty(); // clean up previous one
 			// shopbox.hide(); // hide at first NOT WORKING
@@ -1069,21 +1081,18 @@ jQuery.noConflict();
 			console.dir(newcart.entries);
 			console.dir(newcart.contents);
 			var i = 0;
-			var VAT = 0.; // 19.;
-			$.each(newcart.contents, function(key, e) { // loop over properties (returned from handle_cart.php)
-				console.log('addCart #' + i + ' ' + key + ':');
-				console.dir(e);
+			$.each(newcart.contents, function(key, elem) { // loop over propelemrties (returned from handle_cart.php)
+				console.log('addCart #%d %s: %o', i, key, elem);
 				if (newcart.entries[i] == undefined) { // TODO check if we actually can have something here
 					var prod = getProductForCart(key, renderShoppingBoxCallback(newcart,context));
 					if (prod == undefined) {
 						throw "missing product - wait for reload"; // skip the rest and wait for callback
 					}
-					console.dir(prod);
-					var parent = getProductForCart(prod.products_parent);
+//					console.dir(prod);
 					var cartEntry = new Object(); // add properties
 					cartEntry.index = i;
 					cartEntry.products_id = key;
-					cartEntry.products_qty = e.qty; // new one from osc cart
+					cartEntry.products_qty = elem.qty; // new one from osc cart
 					// copy the product fields
 					cartEntry.products_parent = prod.products_parent;
 					cartEntry.products_thumb = prod.products_image_url;
@@ -1095,10 +1104,11 @@ jQuery.noConflict();
 					cartEntry.products_price = prod.products_price;
 					cartEntry.products_price_gross = prod.products_price;
 					if (prod.products_tax_class_id == 2) { // vat depending on tax class: 2 => 19%
-						cartEntry.products_price_gross = Math.ceil(prod.products_price * (100.+VAT)) / 100;
-						cartEntry.products_price_tax = Math.ceil(prod.products_price * VAT) / 100;
+						cartEntry.products_price_gross = Math.round(prod.products_price * (100.+VAT)) / 100;
+						cartEntry.products_price_tax = Math.round(prod.products_price * VAT) / 100;
 					}
-					cartEntry.products_price_total = Math.ceil(cartEntry.products_price_gross * e.qty * 100.) / 100;
+					cartEntry.products_price_total = Math.round(cartEntry.products_price_gross * elem.qty * 100.) / 100;
+					var parent = getProductForCart(prod.products_parent);
 					if (!parent) {
 						console.log("no parent for %s of product %d", prod.products_id, prod.products_parent);
 					} else {
@@ -1111,7 +1121,7 @@ jQuery.noConflict();
 						cartEntry.products_format = "MP3-Single";
 					}
 					// add up items
-					newcart.totalItems += (+e.qty); // force int
+					newcart.totalItems += (+elem.qty); // force int
 					// messy float operations watch the rounding
 					newcart.totalPrice = newcart.totalPrice + parseFloat(cartEntry.products_price_total);
 					newcart.entries[i] = cartEntry;
@@ -1180,8 +1190,9 @@ jQuery.noConflict();
 		function getProductForCart(prod_id,callback) {
 			var prod = prodmap[prod_id];
 			if (!prod) {
-				console.log('missing product %s',prod_id);				
-				getProductFromDb(prod_id,callback);
+				console.log('missing product %o in prodmap: %s ',prod_id, (callback?'callingback later':''));
+				if (callback)
+					getProductFromDb(prod_id,callback);
 			}
 			return prod;			
 		}
@@ -1195,9 +1206,11 @@ jQuery.noConflict();
 				url : fetchurl,
 				success : function(result, textStatus, jqXHR) {
 					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
-						addToCache(result.complete);
-						if (callback != undefined)
-							callback();	// closure
+						if (result.complete && result.complete.length) {
+							addToCache(result.complete);
+							callback();	// call 	closure
+						} else
+							console.error('getProductFromDb: no data for %s', prodId);
 					} else 
 						console.error(data);
 				},
@@ -1520,11 +1533,11 @@ jQuery.noConflict();
 				$(this).find('.pagination').text('LOADING...');
 				initPage(href); // open page for href parms... dont necessarily reload
 			}
-			handleAction();
+			actionHandler();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// deal with the action parameter
-		function handleAction() {
+		function actionHandler() {
 			var action = getHashParm('action');
 			console.log('found action=', action);
 			switch (action) {
@@ -1540,7 +1553,7 @@ jQuery.noConflict();
 			case "show":
 //				if (osCsid) // if we have a session
 					// try to read the cart
-					oscCartHandler('return_cart', undefined, '#content');
+					oscCartHandler('.shopping-box','return_cart', undefined, '#content');
 //				else
 //					showMainShoppingBox();
 				break;
@@ -1618,6 +1631,7 @@ jQuery.noConflict();
 						$('.debug span.osCsid').html(osCsid);	// show us during development
 //						location.hash = addHashParm(location.hash, 'osCsid', osCsid);		// NOT IN THE HASH
 						setGreeting (customer_firstname, osCsid);
+						reloadCart();
 						loginDiv.dialog('close'); // SUCCESS						
 					} else { // houston we have a problem - try again
 						loginDiv.dialog("option", "buttons", {});
@@ -1730,7 +1744,9 @@ jQuery.noConflict();
 		function checkout() {
 			var form = $('<form>').attr({
 				id : 'checkoutform',
+				name : 'checkoutform',
 				method : "post",
+				enctype : "multipart/form-data",
 				action : checkoutUrl,
 				// setting form target to a window named 'checkout'
 				target : "checkout"
@@ -1740,27 +1756,39 @@ jQuery.noConflict();
 				name : 'osCsid',
 				value : osCsid
 			}).appendTo(form);
-			var iFrame = $('#iframe');
-			if (iFrame.length == 0) {
-				$('<iframe name="checkout" id="iframe"></iframe>').appendTo('body');
-				iFrame = $('#iframe');
-			}
+			var iFrame = $('<iframe>').attr({
+				name : "checkout",
+				id: "iframe",
+				width:"900px",
+				sandbox: "allow-forms allow-scripts"
+			}).appendTo('body');
 			iFrame.dialog({
+				title : 'Shopkatapult Checkout',
 				autoOpen : false,
+        autoResize: true,
+//				width : 950,
+//			height : 650,
+				minWidth : 950,
+				minHeight : 630,
 				position : [ 'center', 'center' ],
-				dialogClass : 'shit-theme',
+//				dialogClass : 'shit-theme',
 				closeOnEscape : true,
 				resizable : true, // requires draggable and resible jqui extensions to be loaded
 				draggable : true,
 				show : 'slide',
 				hide : 'slide',
-				modal : true
+				modal : true,
+				open : function() {
+					form.submit();
+					form.remove();				
+				},
+				close : function () {
+					iFrame.remove();
+				}			
 			});
 // window.open('', 'checkout', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
-			form.submit();
-			$('#iframe').dialog('open');
-			$('#checkoutform').remove();
-
+			iFrame.dialog('open');
+	
 //			var data = { 'osCsid' : osCsid };
 //			for (prop in XDEBUG) { data[prop] = XDEBUG[prop];}
 //			$.post(checkoutUrl, data , function (returned) {
@@ -1770,8 +1798,11 @@ jQuery.noConflict();
 //			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
 		}
 		function setGreeting (customer_firstname) {
-			$('.site-description').html(customer_firstname?'<h3>Hello '+customer_firstname+'!</h3>':'');			
-			$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');			
+			if (customer_firstname) {
+				$('.site-description').html(customer_firstname?'<h3>Hello '+customer_firstname+'!</h3>':'');			
+				$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
+			} else
+				$('.site-description').empty();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page
@@ -1785,7 +1816,7 @@ jQuery.noConflict();
 						if (location.hash.indexOf('listenbuy')>0)
 							return;		/// skip autoload if we are showing the player
 						var page = getLastPageOfTab(pager.parent());
-						console.log('%d.trigger pageload for page %d', cnt++, page);
+						console.log('%d. trigger pageload for page %d', cnt++, page);
 						loadingPage = page;
 						pager.click();
 					}
