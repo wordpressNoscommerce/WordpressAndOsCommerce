@@ -1742,6 +1742,12 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// call checkout on shopkatapult, to keep the session we create a form and post into an iframe
 		function checkout() {
+			var iFrame = $('<iframe>').attr({
+				name : "checkout",
+				id: "iframe",
+//				width:"900px",
+				sandbox: "allow-forms allow-scripts"
+			});			
 			var form = $('<form>').attr({
 				id : 'checkoutform',
 				name : 'checkoutform',
@@ -1749,45 +1755,39 @@ jQuery.noConflict();
 				enctype : "multipart/form-data",
 				action : checkoutUrl,
 				// setting form target to a window named 'checkout'
-				target : "checkout"
+				target : "_blank"
+			//}).appendTo(iFrame);
 			}).appendTo('body');
 			$('<input>').attr({
 				type : 'hidden',
 				name : 'osCsid',
 				value : osCsid
 			}).appendTo(form);
-			var iFrame = $('<iframe>').attr({
-				name : "checkout",
-				id: "iframe",
-				width:"900px",
-				sandbox: "allow-forms allow-scripts"
-			}).appendTo('body');
-			iFrame.dialog({
-				title : 'Shopkatapult Checkout',
-				autoOpen : false,
-        autoResize: true,
-//				width : 950,
-//			height : 650,
-				minWidth : 950,
-				minHeight : 630,
-				position : [ 'center', 'center' ],
-//				dialogClass : 'shit-theme',
-				closeOnEscape : true,
-				resizable : true, // requires draggable and resible jqui extensions to be loaded
-				draggable : true,
-				show : 'slide',
-				hide : 'slide',
-				modal : true,
-				open : function() {
-					form.submit();
-					form.remove();				
-				},
-				close : function () {
-					iFrame.remove();
-				}			
-			});
+			form.submit();
+
+//			$('<div id="iframediv"/>').dialog({
+//				title : 'Shopkatapult Checkout',
+//        autoResize: true,
+//				minWidth : 950,
+//				minHeight : 630,
+//				position : [ 'center', 'center' ],
+//				closeOnEscape : true,
+//				resizable : true, // requires draggable and resible jqui extensions to be loaded
+//				draggable : true,
+//				show : 'slide',
+//				hide : 'slide',
+//				modal : true,
+//				open : function() {
+//					$(this).html(iFrame.html());
+//					form.submit();
+//					form.remove();				
+//				},
+//				close : function () {
+//					$(this).remove();
+//				}			
+//			});
 // window.open('', 'checkout', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
-			iFrame.dialog('open');
+//			iFrame.dialog('open');
 	
 //			var data = { 'osCsid' : osCsid };
 //			for (prop in XDEBUG) { data[prop] = XDEBUG[prop];}
