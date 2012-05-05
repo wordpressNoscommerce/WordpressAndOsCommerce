@@ -12,6 +12,13 @@ body {
 #content .entry {
 	margin-bottom: 0px;
 }
+
+#iframe {
+/* 	width: 900px; */
+/* 	height: 630 px; */
+	min-width: 950px;
+	min-height: 620px;
+}
 /**************************************************************************************/
 div#product-format-tabs.wp-tabs li.ui-state-default a {
 	padding-top: 0px;

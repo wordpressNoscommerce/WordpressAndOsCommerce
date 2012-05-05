@@ -20,6 +20,7 @@
 /* header formatting */
 .logo {
 	height: 80px;
+	padding: 30px 0 0 20px;
 	overflow: visible;
 }
 
@@ -593,7 +594,7 @@ li.shr-comfeed:hover {
 }
 
 /* minimal versioning tag */
-#filetime {
+.debug, #filetime {
 	position: absolute;
 	right: 0;
 	font-family: Verdana, sans-serif;

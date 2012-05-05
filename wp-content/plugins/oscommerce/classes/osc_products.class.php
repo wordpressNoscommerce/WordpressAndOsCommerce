@@ -176,7 +176,7 @@ LEFT JOIN products_description pd ON pd.products_id = p.products_id
 LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
 LEFT JOIN specials s ON p.products_id = s.products_id
 LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
-		// general conditions
+		// general conditions  TODO fix this query
 		$where = "
 WHERE p.products_status = '1' and p.products_parent = ''
 AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
@@ -189,7 +189,6 @@ AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
 			// show the products of a specified manufacturer
 			$where .= "
 AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
-
 		}
 		if ($this->label_id) {
 			// show the products in a given categorie
@@ -453,7 +452,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 			LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
 			LEFT JOIN specials s ON p.products_id = s.products_id
 			WHERE p.products_id = '.$pid.'
-			UNION
+UNION
 			SELECT	parent.products_id,
 				parent.products_image,
 				parent.products_image_lrg,
@@ -472,7 +471,8 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 				pd.products_format,
 				pd.products_viewed,
 				pd.products_head_keywords_tag,
-				parent.products_upc
+				parent.products_upc,
+				parent.products_isrc
 			FROM products p
 		  LEFT JOIN products parent on parent.products_model = p.products_parent
 			LEFT JOIN products_description pd ON pd.products_id = parent.products_id
