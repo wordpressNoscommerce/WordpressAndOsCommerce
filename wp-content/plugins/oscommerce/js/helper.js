@@ -179,6 +179,10 @@ function hasProperties(obj) {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 function scrollTo(selector,top) {
+	if (top) {
+		document.body.scrollIntoView(top);		/// override top scrolls
+		return;
+	}
 	if (typeof selector == 'string')
 		selector = jQuery(selector);
 	var elem = selector.get(0);
