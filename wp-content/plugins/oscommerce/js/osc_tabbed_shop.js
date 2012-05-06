@@ -103,6 +103,12 @@ jQuery.noConflict();
 		if (location.hash.indexOf('action') > 0) { // we have an action
 			actionHandler();
 		}
+		var ajaxError = $('<div id="ajaxError"></div>');
+		ajaxError.ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
+			ajaxError.dialog({ modal: true});
+			ajaxError.html('<p>calling '+ajaxSettings.url+':'+ thrownError+'</p>'+jqXHR.responseText);
+			
+		});
 		// ##########################################################################
 		// ##########################################################################
 		// render the injected JSON data from the backend
@@ -1530,7 +1536,7 @@ jQuery.noConflict();
 				e.preventDefault();
 				e.stopPropagation();
 				// $(this).addClass('loading');
-				$(this).find('.pagination').text('LOADING...');
+				$(this).parent().find('.pagination').text('LOADING...');
 				initPage(href); // open page for href parms... dont necessarily reload
 			}
 			actionHandler();
