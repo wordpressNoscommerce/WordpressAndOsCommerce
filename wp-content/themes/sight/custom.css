@@ -40,9 +40,10 @@
 /* 	display: none; */
 /* } */
 
-/* div.site-description { */
+div.site-description {
 /* 	 padding-top: 20px; */
-/* } */
+	display: none;
+}
 /**************************************************************************************/
 /**navigation formatting**/
 .dd {

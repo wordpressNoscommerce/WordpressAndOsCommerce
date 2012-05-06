@@ -105,7 +105,7 @@ function osc_init()
         // helper functions extracted
         wp_enqueue_script('helper', OSCOMMERCEJSURL.'/helper.js', array('jquery'));
         // our tabbed interface for products --  this has to depend on wpui-init for right inclusion order
-        wp_enqueue_script('osc_releasesNartists', OSCOMMERCEJSURL.'/osc_releasesNartists.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
+        wp_enqueue_script('osc_releasesNartists', OSCOMMERCEJSURL.'/osc_tabbed_shop.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
     }
 
     if(!$inadmin || ($inadmin && strstr($svr_uri, 'widget')))
