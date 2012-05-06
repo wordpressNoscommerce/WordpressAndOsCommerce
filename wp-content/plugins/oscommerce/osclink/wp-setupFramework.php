@@ -20,13 +20,12 @@ if (!isset($HTTP_SERVER_VARS)) {
 define('PAGE_PARSE_START_TIME', microtime());
 
 // set the level of error reporting
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL & ~E_NOTICE  & ~E_DEPRECATED);
 
 // Set the local configuration parameters - mainly for developers
 //if (file_exists('includes/local/configure.php')) include('includes/local/configure.php');
 
 // set_include_path('/var/www/vhosts/shopkatapult.com/httpdocs/'.PATH_SEPARATOR.get_include_path());
-error_log('MYINCPATH:'.get_include_path());
 // include server parameters
 define ('FILENAME_WP_CREATE_ACCOUNT', 'wp-create_account.php');
 define ('FILENAME_WP_CREATE_ACCOUNT_SUCCESS', 'wp-create_account_success.php');

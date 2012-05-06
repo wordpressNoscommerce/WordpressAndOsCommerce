@@ -43,7 +43,7 @@ jQuery.noConflict();
 		var playerContentSelector = '#' + playerContent;
 
 //		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
-		var XDEBUGparms ='&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345'; // ''; //
+		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 
 		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var oscLinkPrefix = oscPrefix+'/osclink';
