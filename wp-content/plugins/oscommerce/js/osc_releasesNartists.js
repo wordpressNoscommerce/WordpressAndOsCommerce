@@ -9,6 +9,7 @@
 
 // lets pollute some global namespace :)
 var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
+var shopPrefix = 'http://dev2.shitkatapult.com:8080';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -46,7 +47,6 @@ jQuery.noConflict();
 
 		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var oscLinkPrefix = oscPrefix+'/osclink';
-		var shopPrefix = 'http://dev2.shitkatapult.com:8080';
 
 		var checkoutUrl = shopPrefix + '/checkout_payment.php';
 		var shoppingCartUrl = oscLinkPrefix + '/wp-handle_cart.php';

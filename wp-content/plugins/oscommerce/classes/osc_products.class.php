@@ -122,21 +122,20 @@ class osc_products extends osc_product_templates
 		 fb('injected '.count($this->result).' products for '.$this->format.' using JSON: '. implode("-",$ids));
 		 */
 	}
-
+	function get_img_url($image) {
+		$url = EMPTY_IMAGE;
+		if ($image) {
+			$url = rtrim($this->shop_url, '/') ."/images/". $image;
+		}
+		return $url;
+	}
 	/** add missing fields to product list **/
 	function osc_fix_product_list_json() {
 		$i=0; // add missing fields to products array before jsoning it
 		foreach ($this->result as $product) {
 			$product->products_index = $i++;
-			if ($product->products_image) {
-				$product->products_image_url = rtrim($this->shop_url, '/') ."/images/". $product->products_image;
-			} else // empty image link
-			$product->products_image_url = "/wp-content/plugins/oscommerce/images/no_image.gif";
-
-			if ($product->products_image_lrg){
-				$product->products_image_lrg_url = rtrim($this->shop_url, '/') ."/images/". $product->products_image_lrg;
-			} else // empty image link
-			$product->products_image_lrg_url = "/wp-content/plugins/oscommerce/images/no_image.gif";
+			$product->products_image_url = $this->get_img_url($product->products_image);
+			$product->products_image_lrg_url = $this->get_img_url($product->products_image_lrg);
 		}
 	}
 

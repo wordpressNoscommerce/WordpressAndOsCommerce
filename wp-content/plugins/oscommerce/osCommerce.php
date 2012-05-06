@@ -39,6 +39,8 @@ define('OSCOMMERCEIMAGESURL', OSCOMMERCEURL. '/images');
 define('ABSWPINCLUDE', ABSPATH.WPINC);
 define('MIN_RECORDS', 10);
 
+define('EMPTY_IMAGE', OSCOMMERCEIMAGESURL."/no_image.gif");
+
 define('OSC_ARTIST_TAG','[oscArtistListing]');
 define('OSC_RELEASE_TAG','[oscReleaseListing]');
 define('OSC_SHOPPINGCART_TAG','[oscShoppingCart]');
