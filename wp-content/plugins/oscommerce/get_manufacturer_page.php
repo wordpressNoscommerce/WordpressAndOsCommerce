@@ -1,5 +1,5 @@
 <?php
-require_once ('debug.php');
+//require_once ('debug.php');
 require_once( "../../../wp-config.php" );
 require_once (ABSPATH."/wp-content/plugins/oscommerce/osCommerce.php");
 
@@ -16,6 +16,6 @@ wp_enqueue_script( 'my-ajax-request', plugin_dir_url( __FILE__ ) . 'js/ajax.js',
  */
 // prepare manufacturer query
 $osc_manufacturers = new osc_manufacturers();
-fb("osc_get_manufacturers_page:".gettype($osc_manufacturers));
+//fb("osc_get_manufacturers_page:".gettype($osc_manufacturers));
 $osc_manufacturers->osc_get_manufacturers_page();
 ?>

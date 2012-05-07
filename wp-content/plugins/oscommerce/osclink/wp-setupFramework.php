@@ -25,13 +25,12 @@ error_reporting(E_ALL & ~E_NOTICE  & ~E_DEPRECATED);
 // Set the local configuration parameters - mainly for developers
 //if (file_exists('includes/local/configure.php')) include('includes/local/configure.php');
 
-// set_include_path('/var/www/vhosts/shopkatapult.com/httpdocs/'.PATH_SEPARATOR.get_include_path());
 // include server parameters
 define ('FILENAME_WP_CREATE_ACCOUNT', 'wp-create_account.php');
 define ('FILENAME_WP_CREATE_ACCOUNT_SUCCESS', 'wp-create_account_success.php');
 define('OSCOMMERCE_OSCLINK_PATH', 'wp-content/plugins/oscommerce/osclink/');
-define('DIR_FS_CATALOG', 'E:/Devel/wordpress/shopkatapult/');
-// define('DIR_FS_CATALOG', '/httpdocs/wordpress/wp-includes/prixxsas/');
+define('DIR_FS_CATALOG', 'E:/Devel/shopkatapult/');
+define('DIR_FS_CATALOG', '/var/www/vhosts/dev1.shitkatapult.com/httpdocs/wordpress/shopkatapult/');
 define('DIR_FS_INCLUDES', DIR_FS_CATALOG. 'includes/');
 define('DIR_WS_INCLUDES', DIR_FS_CATALOG. 'includes/');
 define('DIR_FS_FUNCTIONS', DIR_FS_INCLUDES. 'functions/');
@@ -41,10 +40,10 @@ define('HTTP_SERVER', 'http://mywebsite:8080');
 define('HTTPS_SERVER', 'https://mywebsite:8080');
 define('HTTP_COOKIE_DOMAIN', 'mywebsite');
 define('HTTPS_COOKIE_DOMAIN', 'mywebsite');
-define('HTTP_SERVER', 'http://dev1.shitkatapult.com');
-define('HTTPS_SERVER', 'https://dev1.shitkatapult.com');
-define('HTTP_COOKIE_DOMAIN', 'dev1.shitkatapult.com');
-define('HTTPS_COOKIE_DOMAIN', 'dev1.shitkatapult.com');
+// define('HTTP_SERVER', 'http://dev1.shitkatapult.com');
+// define('HTTPS_SERVER', 'https://dev1.shitkatapult.com');
+// define('HTTP_COOKIE_DOMAIN', 'dev1.shitkatapult.com');
+// define('HTTPS_COOKIE_DOMAIN', 'dev1.shitkatapult.com');
 
 require(DIR_FS_INCLUDES.'configure.php');
 
@@ -139,7 +138,7 @@ require(DIR_FS_FUNCTIONS . 'sessions.php');
 
 // set the session name and save path
 tep_session_name('osCsid');
-tep_session_save_path(SESSION_WRITE_DIRECTORY);
+tep_session_save_path('./sessions');
 
 // set the session cookie parameters
 if (function_exists('session_set_cookie_params')) {
@@ -292,9 +291,9 @@ require(DIR_FS_FUNCTIONS . 'validations.php');
 // infobox
 require(DIR_FS_CLASSES . 'boxes.php');
   // START STS 4.5
-//   require (DIR_FS_CLASSES.'sts.php');
-//   $sts= new sts();
-//   $sts->start_capture();
+  require (DIR_FS_CLASSES.'sts.php');
+  $sts= new sts();
+  $sts->start_capture();
   // END STS
 // initialize the message stack for output messages
 require(DIR_FS_CLASSES . 'message_stack.php');

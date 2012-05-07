@@ -26,7 +26,7 @@ if ($model && $pid) {
 	$result->formats = $osc_products->osc_get_product_formats($model);
   $result->xsell = $osc_products->osc_get_xsell_products($pid);
 } elseif ($pid) {	// for missing prods in client database with parent
-	$result->complete = $osc_products->osc_get_product_and_parent($pid);
+	$result->prodpair = $osc_products->osc_get_product_and_parent($pid);
 }
 
 if ($osc_products->json) {

@@ -25,6 +25,7 @@ var cart = 0;
 var shoppingBoxCtx = 0;
 var ajaxPending = false;
 var VAT = 19.; // 0.;
+var shopFormat = undefined;
 
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
@@ -144,6 +145,18 @@ jQuery.noConflict();
 				totalItems = manufacturersCount;
 				pageSize = manufacturersPageSize;
 				// manufacturersSets
+			} else if (isShopPage()) {
+				if (typeof products === 'undefined' || products == undefined || countProperties(products) == 0) { // empty test
+					var msg = 'No JSON products received for curTabCtx: ' + curTabCtx + ' page: ' + paged;
+					$('#content .page .post-content').append(
+							'<h1 style="color: red;">' + msg + '<br>Check Database Connection to shopdb</h1>');
+					console.error(msg);
+					return false;
+				}
+				json = products;
+				templateName = '#product-box-template';
+				totalItems = productsCount;
+				pageSize = productsPageSize;				
 			} else
 				return false; // ABORT nothing to do
 			// cleanup DOM struct from wordpress to match grid page
@@ -452,7 +465,10 @@ jQuery.noConflict();
 				tabSelector.find('span.reccount').html(totalRecCount);
 				// add tabname to anchor href to be picked up by the clickHandler
 				var newHref = addHashParm(pager.attr('href'), getTabParm(tabSelector), eval(getTabParm(tabSelector.selector)));
-				newHref = addHashParm(newHref, 'paged', (+pageno) + 1); // link to the next page
+				if (tabSelector.parents('#release-format-tabs').length)
+					newHref = addHashParm(newHref, 'rpage', (+pageno) + 1); // link to the next page
+				else
+					newHref = addHashParm(newHref, 'paged', (+pageno) + 1); // link to the next page
 				pager.attr('href', newHref);
 			} else { // write new one for ARTIST RELEASE PAGES
 				console.log('add missing pagination for ' + tabSelector);
@@ -551,6 +567,7 @@ jQuery.noConflict();
 			// products_id = null; // reset previous product selection NOT HERE
 			// render template with artist data (header, image, text)
 			$('#artist-detail-template').tmpl(artist).appendTo(seltor);
+			$('#artist-text').resizable();
 
 			$('#artist-image-big').click(toggleArtist); // close handler
 			// render releases tab container for artist
@@ -708,6 +725,22 @@ jQuery.noConflict();
 			if (removeVideo) {
 				getTabDiv(curTabCtxSel, 'video').remove();
 				getTabLnk(curTabCtxSel, 'video').parent().remove();
+			}
+
+			/** *************************************************************** */
+			/** * soundcloud handlers * */
+			/** *************************************************************** */
+			var removeSound = true;
+			if (prod.products_isrc) {
+				console.log('found a soundcloud link "%s"', prod.products_upc);
+				removeSound = false;
+				renderSoundCloud(curTabCtxSel, prod.products_isrc);				
+			}
+			
+			// remove video tab if no video found
+			if (removeSound) {
+				getTabDiv(curTabCtxSel, 'free_song').remove();
+				getTabLnk(curTabCtxSel, 'free_song').parent().remove();
 			}
 
 			if (seltorName.indexOf('#release-detail') >= 0 // show tracks when showing releases
@@ -904,11 +937,10 @@ jQuery.noConflict();
 				}
 				if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 					// json data is already interpreted
-					osCsid = data.osCsid; // keep osCsid everywhere
-					cart.customer_id = data.customer_id;
-					cart.customer_firstname = data.customer_firstname;
-					setGreeting (data.customer_firstname, osCsid);
-					renderShoppingBox(data.cart, target);					
+					osCsid = data.cart.osCsid = data.osCsid; // keep osCsid everywhere
+					data.cart.customer_id = data.customer_id;
+					data.cart.customer_firstname = data.customer_firstname;
+					renderShoppingBox(data.cart, target);			
 				} else  {	
 					console.log('Problem with OSC cart. Response %s', data);
 					$('<div id="errMsg">ErrorMessage</div>').dialog({
@@ -955,9 +987,9 @@ jQuery.noConflict();
 				}
 				break;
 			case "check out":	// we have to post the session Id to cross domains
-				if (context == 'sidebar') {
-					showMainShoppingBox();
-				} else 
+//				if (context == 'sidebar') {
+//					showMainShoppingBox();
+//				} else 
 					checkout();
 				break;
 			case "continue shopping":
@@ -971,12 +1003,18 @@ jQuery.noConflict();
 			}
 		}
 		// ###############################################################################
+		function reloadCart() {
+			var shopbox = $('.shopping-box:visible');
+			console.log(shopbox);
+			showMainShoppingBox();
+		}
+		// ###############################################################################
 		function showMainShoppingBox() {
 			var contentpage = $('#content .page');
 			if (!cart)
 				if (osCsid) {
 					console.error('found %s - CAN LOAD CART', osCsid);
-					oscCartHandler('.shopping-box','return_cart', undefined, '#content');
+					oscCartHandler($('.shopping-box'),'return_cart', undefined, '#content');
 				} else {
 					console.error('nothing found %o for %s', cart, osCsid);
 					alert('your shopping cart is still empty!');
@@ -1003,13 +1041,9 @@ jQuery.noConflict();
 			};
 		}
 		// ###############################################################################
-		function reloadCart() {
-			var shopbox = $('.shopping-box:visible');
-			console.log(shopbox);
-		}
-		// ###############################################################################
 		/** render shopping box / cart showing the body is controlled via CSS sidebar/post-content * */
 		function renderShoppingBox(newcart, context) {
+			setGreeting (newcart);
 			shoppingBoxCtx = context;
 			var shopboxSelector = context + ' .shopping-box';
 			var shopbox = $(shopboxSelector);
@@ -1089,7 +1123,7 @@ jQuery.noConflict();
 			var i = 0;
 			$.each(newcart.contents, function(key, elem) { // loop over propelemrties (returned from handle_cart.php)
 				console.log('addCart #%d %s: %o', i, key, elem);
-				if (newcart.entries[i] == undefined) { // TODO check if we actually can have something here
+				if (newcart.entries[i] == undefined || true) { // TODO check if we actually can have something here
 					var prod = getProductForCart(key, renderShoppingBoxCallback(newcart,context));
 					if (prod == undefined) {
 						throw "missing product - wait for reload"; // skip the rest and wait for callback
@@ -1158,6 +1192,22 @@ jQuery.noConflict();
 				'youTubeId' : youTubeId
 			}).appendTo(target);
 		}
+		// ################# ##############################################################
+		/** render soundcloud object into video tab * */
+		function renderSoundCloud(curTabCtx, soundCloudId) {
+			var prod_soundcloud_tmpl = $('#product-soundcloud-template'); // variables need to be defined before
+			if (prod_soundcloud_tmpl.length == 0) {
+				var msg = '#product-soundcloud-template NOT FOUND!!!!!!!!!!!!! STOP';
+				alert(msg);
+				console.log(msg);
+				return false;
+			}
+			var target = getTabDiv(curTabCtx, 'free_song'); // browser can append suffixes
+			target.empty();
+			prod_soundcloud_tmpl.tmpl({
+				'soundCloudId' : soundCloudId
+			}).appendTo(target);
+		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// read from our local product_cache -- all formats are merged in there
 		function getProductMaster(prod_id) {
@@ -1212,8 +1262,17 @@ jQuery.noConflict();
 				url : fetchurl,
 				success : function(result, textStatus, jqXHR) {
 					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
-						if (result.complete && result.complete.length) {
-							addToCache(result.complete);
+						if (result.prodpair && result.prodpair.length) {
+							var parentId = undefined;
+							if (result.prodpair.length == 2) {
+								var p1 = result.prodpair[0];
+								var p2 = result.prodpair[1];
+								if (p1.products_parent == p2.products_model)
+									parentId = p2.products_model;
+								else if (p2.products_parent == p1.products_model)
+									parentId = p1.products_model;
+							}
+							addToCache(result.prodpair,parentId);
 							callback();	// call 	closure
 						} else
 							console.error('getProductFromDb: no data for %s', prodId);
@@ -1535,7 +1594,9 @@ jQuery.noConflict();
 				getStateFromUrl(href);
 				e.preventDefault();
 				e.stopPropagation();
-				// $(this).addClass('loading');
+				if ($('.error').length > 0) {		// remove error message
+					$('.error').empty().removeClass('error');
+				}
 				$(this).parent().find('.pagination').text('LOADING...');
 				initPage(href); // open page for href parms... dont necessarily reload
 			}
@@ -1559,7 +1620,7 @@ jQuery.noConflict();
 			case "show":
 //				if (osCsid) // if we have a session
 					// try to read the cart
-					oscCartHandler('.shopping-box','return_cart', undefined, '#content');
+					oscCartHandler($('.shopping-box'),'return_cart', undefined, '#content');
 //				else
 //					showMainShoppingBox();
 				break;
@@ -1633,10 +1694,13 @@ jQuery.noConflict();
 						osCsid = result.osCsid;
 						customer_id = result.customer_id;
 						customer_firstname = result.customer_firstname;
+						if (cart) {
+							cart.customer_id = result.customer_id;
+							cart.customer_firstname = result.customer_firstname;
+						}
 						$.cookie('osCsid', osCsid); // store the osCsid in cookie
 						$('.debug span.osCsid').html(osCsid);	// show us during development
 //						location.hash = addHashParm(location.hash, 'osCsid', osCsid);		// NOT IN THE HASH
-						setGreeting (customer_firstname, osCsid);
 						reloadCart();
 						loginDiv.dialog('close'); // SUCCESS						
 					} else { // houston we have a problem - try again
@@ -1688,8 +1752,9 @@ jQuery.noConflict();
 							console.error('problem with registration in %o: %s', jqXHR, responseText);
 							throw 'problem with registration ' + responseText;
 						}
-						var start = responseText.indexOf('<html');
-						regDiv.html((start >= 0) ? responseText.substr(start) : responseText);
+//						var start = responseText.indexOf('<html');
+//						regDiv.html((start >= 0) ? responseText.substr(start) : responseText);
+						regDiv.html(responseText);
 						$('#login').click(function(e) { // handler login link
 							regDiv.dialog('close');
 							loginUser();
@@ -1748,12 +1813,12 @@ jQuery.noConflict();
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// call checkout on shopkatapult, to keep the session we create a form and post into an iframe
 		function checkout() {
-			var iFrame = $('<iframe>').attr({
-				name : "checkout",
-				id: "iframe",
-//				width:"900px",
-				sandbox: "allow-forms allow-scripts"
-			});			
+//			var iFrame = $('<iframe>').attr({
+//				name : "checkout",
+//				id: "iframe",
+////				width:"900px",
+//				sandbox: "allow-forms allow-scripts"
+//			});			
 			var form = $('<form>').attr({
 				id : 'checkoutform',
 				name : 'checkoutform',
@@ -1761,7 +1826,7 @@ jQuery.noConflict();
 				enctype : "multipart/form-data",
 				action : checkoutUrl,
 				// setting form target to a window named 'checkout'
-				target : "_blank"
+				target : "_checkout" // "_blank"
 			//}).appendTo(iFrame);
 			}).appendTo('body');
 			$('<input>').attr({
@@ -1803,10 +1868,10 @@ jQuery.noConflict();
 //			});
 //			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
 		}
-		function setGreeting (customer_firstname) {
-			if (customer_firstname) {
-				$('.site-description').html(customer_firstname?'<h3>Hello '+customer_firstname+'!</h3>':'');			
-				$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
+		function setGreeting (cart) {
+			if (cart && cart.customer_firstname) {
+				$('.site-description').html('<h3>Hello '+cart.customer_firstname+'!</h3>');		
+//				$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
 			} else
 				$('.site-description').empty();
 		}

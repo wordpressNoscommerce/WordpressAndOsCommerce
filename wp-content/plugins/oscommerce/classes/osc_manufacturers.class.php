@@ -190,14 +190,14 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     }
     // TODO do selection better than with entry in m.manufacturers_label
     if(!empty($this->artist_set)) {
-      if ($this->artist_set == 'main')
-      $where .= " AND m.manufacturers_label LIKE '%999%' ";
-      else
+//       if ($this->artist_set == 'main')
+//       $where .= " AND m.manufacturers_label LIKE '%999%' ";
+//       else
       $where .= " AND m.manufacturers_label LIKE '%{$this->artist_set}%' ";
     }
     $group =  " GROUP BY p.manufacturers_id";
 
-    $order = ' ORDER BY m.manufacturers_name ASC';
+    $order = ' ORDER BY m.manufacturers_id DESC';
     // TODO DO/DONT include database tables from oscommerce installation
     //			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php";
     // from shopkatapult/index.php:#141

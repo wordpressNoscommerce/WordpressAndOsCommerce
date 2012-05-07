@@ -73,6 +73,13 @@ class osc_products extends osc_product_templates
 //			fb("prodCountFrom($sql):".$this->product_count);
 	}
 
+	
+	function osc_show_shop_page() {
+		$this->shopFilter = true;
+		array_push($this->release_formats, 'Stuff', 'Special Offers');
+		$this->osc_show_tabbed_products_page();
+	}
+	
 	/** list products according to parms set in oscProducts object **/
 	function osc_show_tabbed_products_page() {
 		try {
@@ -164,8 +171,9 @@ SELECT	p.products_id,
 	pd.products_format,
 	pd.products_viewed,
 	pd.products_head_keywords_tag,
-	p.products_upc ';			// this contains the youtube tag
-		$order = "ORDER BY p.products_model desc";
+	p.products_upc,  
+	p.products_isrc ';			// the last 2 contain the youtube and soundcloud tag
+		$order = "ORDER BY p.products_id desc";
 
 		//	TODO HACK: use literal table names cos cannot include other virthost installation dirs on production server
 		//			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php"; from shopkatapult/index.php:#141
@@ -177,13 +185,7 @@ LEFT JOIN specials s ON p.products_id = s.products_id
 LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
 		// general conditions  TODO fix this query
 		$where = "
-WHERE p.products_status = '1' and p.products_parent = ''
-AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
- OR FIND_IN_SET('LP',pd.products_head_keywords_tag) > 0
- OR FIND_IN_SET('EP',pd.products_head_keywords_tag) > 0
- OR FIND_IN_SET('Vinyl',pd.products_head_keywords_tag) > 0
- OR FIND_IN_SET('MP3',pd.products_head_keywords_tag) > 0
- OR FIND_IN_SET('Video',pd.products_head_keywords_tag) > 0)";
+WHERE p.products_status = '1' and p.products_parent = ''";
 		if ($this->artist_id) {
 			// show the products of a specified manufacturer
 			$where .= "
@@ -194,10 +196,43 @@ AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
 			$where .= "
 AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 		}
-		if ($this->format && $this->format <> 'All') {
-			// show the products having a specific format (keyword)
-			$where .= "
+		switch (strtolower($this->format)) {
+			case 'stuff':
+				$this->shopFilter = true;
+				$where .= "
+				AND (
+				lower(pd.products_format) LIKE '%size%'
+				OR lower(pd.products_format) LIKE '%patch%'
+				OR lower(pd.products_format) LIKE '%shirt%'
+				OR lower(pd.products_format) LIKE '%bag%'
+				)";
+				break;
+			case 'special_offers':
+				$this->shopFilter = true;
+				$where .= "
+				AND (
+				lower(pd.products_format) LIKE '%of 10%'
+				OR lower(pd.products_format) LIKE '%sale%'
+				OR lower(pd.products_format) LIKE '%action%'
+				OR lower(pd.products_format) LIKE '%size%'
+				OR lower(pd.products_format) LIKE '%poster%'
+				)";
+				break;
+			default: if ($this->format <> 'All') {
+				// show the products having a specific format (keyword)
+				$where .= "
 AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
+		}
+		}
+			if (!$this->shopFilter) {
+			$where .= "			
+AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('LP',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('EP',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('Vinyl',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('MP3',pd.products_head_keywords_tag) > 0
+ OR FIND_IN_SET('DVD',pd.products_head_keywords_tag) > 0)
+";
 		}
 		$sql = $select . $from . $where . $order;
 
@@ -431,6 +466,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 				p.products_image_lrg,
 				pd.products_name,
 				p.products_model,
+				p.products_parent,
 				p.products_weight,
 				p.products_quantity,
 				p.products_price,
@@ -457,6 +493,7 @@ UNION
 				parent.products_image_lrg,
 				pd.products_name,
 				parent.products_model,
+				parent.products_parent,
 				parent.products_weight,
 				parent.products_quantity,
 				parent.products_price,

@@ -44,7 +44,7 @@ define('EMPTY_IMAGE', OSCOMMERCEIMAGESURL."/no_image.gif");
 define('OSC_ARTIST_TAG','[oscArtistListing]');
 define('OSC_RELEASE_TAG','[oscReleaseListing]');
 define('OSC_SHOPPINGCART_TAG','[oscShoppingCart]');
-define('OSC_SHOP_TAG','[oscShop]');
+define('OSC_SHOP_TAG','[oscShopListing]');
 
 //$TAGLIST = array(OSC_ARTIST_TAG,OSC_RELEASE_TAG);
 // TODO improve shopkatapult OSC location config
@@ -238,20 +238,20 @@ function filterOscShopListing($content)
 	if(preg_match(OSC_SHOP_TAG, $content))
 	{
 		$osc_match_filter = '['.OSC_SHOP_TAG.']';
-		$osc_manufacturers = new osc_manufacturers();
+		$osc_products = new osc_products();
 
 		// the text before the tag
 		$before_shop_listing = osc_strstr($content, $osc_match_filter, false);
 		// is simply echoed
 		echo $before_shop_listing;
 		// as is our tabbed interface
-		$osc_manufacturers->osc_show_tabbed_manufacturers_page();
+		$osc_products->osc_show_shop_page();
 
 		$content = osc_strstr($content, $osc_match_filter, true);
 
 		// TODO does this disconnect db session?
-		unset($osc_manufacturers->osc_db);
-		unset($osc_manufacturers);
+		unset($osc_products->osc_db);
+		unset($osc_products);
 	}
 
 	return $content;

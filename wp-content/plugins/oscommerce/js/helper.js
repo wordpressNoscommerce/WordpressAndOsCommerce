@@ -59,6 +59,8 @@ function getMaxPageOfTab(tabSelector) {
 function getTabCtx(href, isPageLoad) {
 	if (isReleasePage(href))
 		return '#product-format-tabs';
+	else if (isShopPage(href))
+		return '#product-format-tabs';
 	else if (isArtistReleasePage(href) && !isPageLoad) // when we need to load artists from json first
 		return '#release-format-tabs';
 	else if (isArtistPage(href))
@@ -72,7 +74,26 @@ function getTabCtx(href, isPageLoad) {
 function getTabParm(href, isPageLoad) {
 	if (isReleasePage(href))
 		return 'format';
-	else if (isArtistReleasePage(href) && !isPageLoad) // when we need to load artists from json first
+	else if (isShopPage(href)) {
+		if (href.indexOf('#') >= 0) {
+			shopFormat = href.substring(href.indexOf('#')+1);
+			var format = getUrlParm('format',shopFormat);
+			if (format != 'null')
+				shopFormat = format;	//use url parm if found
+			else {
+				var ampPos = shopFormat.indexOf('&') ; 
+				if (ampPos< 0) {		// no & so only the tabname
+					if (shopFormat.indexOf('=') > 0)
+						shopFormat = 'Vinyl';
+				} else {
+					shopFormat = shopFormat.substring(ampPos);
+					console.log('found string for navigation: %s', shopFormat);
+				}
+			}
+			return 'shopFormat';
+		} else
+			return 'format';
+	} else if (isArtistReleasePage(href) && !isPageLoad) // when we need to load artists from json first
 		return 'artRelTab';
 	else if (isArtistPage(href))
 		return 'artistSet';
@@ -82,6 +103,8 @@ function getTabParm(href, isPageLoad) {
 function getTabLoaderFun(href, isPageLoad) {
 	if (isReleasePage(href))
 		return 'loadProductsForTab';
+	else if (isShopPage(href))
+		return 'loadProductsForTab';		
 	else if (isArtistReleasePage(href) && !isPageLoad) // when we need to load artists from json first
 		return 'loadProductsForArtist(artists_id)';
 	else if (isArtistPage(href))
@@ -92,6 +115,8 @@ function getTabLoaderFun(href, isPageLoad) {
 function getClickHandler(href, isPageLoad) {
 	if (isReleasePage(href))
 		return productClickHandler;
+	else if (isShopPage(href))
+		return productClickHandler;		
 	else if (isArtistReleasePage(href) && !isPageLoad) // when we need to load artists from json first
 		return releaseClickHandler;
 	else if (isArtistPage(href))
@@ -137,6 +162,13 @@ function isArtistPage(href) {
 		href = href.selector; // use the selector string of jQ object
 	return href.indexOf('/artists') >= 0 || href.indexOf('#artist-set-tabs') >= 0;
 }
+function isShopPage(href) {
+	if (href == undefined)
+		href = location.href;
+	if (typeof href != 'string')
+		href = href.selector; // use the selector string of jQ object
+	return href.indexOf('/shop') >= 0 || href.indexOf('#product-format-tabs') >= 0;
+}
 function isArtistReleasePage(href) {
 	if (href == undefined)
 		href = location.href;
@@ -159,7 +191,10 @@ function isArtistReleasePage(href) {
 // TODO this has to go when we render everything from this script
 // instead of relying on the server to provide rudimentary but required HTML to render into
 function isCurCtx(href) {
-	return ((isReleasePage() && isReleasePage(href)) || (isArtistPage() && isArtistPage(href)));
+	return ((isReleasePage() && isReleasePage(href)) 
+			|| (isArtistPage() && isArtistPage(href))
+			|| (isShopPage() && isShopPage(href))
+			);
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

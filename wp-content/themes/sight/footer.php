@@ -20,6 +20,7 @@
     /> </a>
   </p>
 </div><!-- footer -->
+<?php  /*
 <div
 	class="shr-bookmarks shr-bookmarks-expand shr-bookmarks-center shr-bookmarks-bg-knowledge"
 	style="margin-left: 3.5px; height: 32px; display: none; overflow: hidden;">
@@ -108,7 +109,7 @@
       echo "$filename<br>";
   }
   ?>
-</div>
+</div> */ ?>
 <!-- Page generated: <?php timer_stop(1); ?> s, <?php echo get_num_queries(); ?> queries -->
   <?php wp_footer(); ?>
 

@@ -12,6 +12,9 @@
 	font-size: 11px;
 }
 
+.guid {
+	display: none;
+}
 .error {
 	color: red	!important;
 	background-color: black;
@@ -258,12 +261,11 @@ div.wp-tabs div.ui-tabs div.wp-tab-content {
 	border-radius: 0px;
 }
 
-/* fix the erased line bug */
-.post-content ul.ui-tabs-nav li {
-	bottom: 0px;
+#content .post-content ul.ui-tabs-nav {
+	background: none repeat scroll 0 0 white;
 }
 
-.wp-tab-content {
+#content .wp-tab-content {
 	background: none repeat scroll 0 0 transparent;
 }
 
@@ -273,12 +275,14 @@ div.post-content .ui-tabs-nav {
 }
 
 div.post-content ul.ui-tabs-nav li {
-/* 	background: none repeat scroll 0 0 white; */
+	background: none repeat scroll 0 0 white;
 	border-style: none;
 	padding-top: 0px;
 	padding-left: 0px;
 	margin: 0px;
-}
+	bottom: 0px;/* fix the erased line bug */
+	}
+
 
 div.post-content ul.ui-tabs-nav li a {
 	/* 	background: none repeat scroll 0 0 white; */

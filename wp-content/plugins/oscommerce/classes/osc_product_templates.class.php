@@ -33,6 +33,7 @@ class osc_product_templates
 		$this->osc_inject_jplayerplaylist_template();
 		$this->osc_inject_videojs_template();
 		$this->osc_inject_youtube_template();
+		$this->osc_inject_soundcloud_template();
 		$this->osc_inject_pagination_template();
 		$this->osc_inject_shopcart_template();
 		$this->osc_inject_shopcart_entry_template();
@@ -100,7 +101,6 @@ class osc_product_templates
 	<div id="tab-video" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
 		<h3 class="wp-tab-title" style="display: none;">Video</h3>
 		<div class="wp-tab-content"></div>
-		<!-- wp-tab-content -->
 	</div>
 
 	<div id="tab-free-song" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
@@ -110,7 +110,7 @@ class osc_product_templates
 				src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F430866&show_artwork=true"> </iframe>
 		</div>
 	</div>
-
+<?php /* 
 	<div id="tab-dj-mix" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
 		<h3 class="wp-tab-title" style="display: none;">DJ-Mix</h3>
 		<div class="wp-tab-content">
@@ -119,6 +119,7 @@ class osc_product_templates
 		</div>
 	</div>
 	<!-- tab-dj-mix -->
+*/	?>
 </div>
 <!-- product-detail-tabs -->
 <?php echo '</script>';
@@ -228,7 +229,16 @@ class osc_product_templates
 	function osc_inject_youtube_template() {
 		echo '<script id="product-youtube-template" type="text/x-jquery-tmpl">
 		'; ?>
-<iframe width="640" height="264" src="http://www.youtube.com/embed/${youTubeId}" frameborder="0" allowfullscreen> </iframe>
+<iframe width="640" height="264" src="http://www.youtube.com/embed/${youTubeId}" frameborder="0" allowfullscreen>
+</iframe>
+<?php       echo '</script>
+';
+	}
+	function osc_inject_soundcloud_template() {
+		echo '<script id="product-soundcloud-template" type="text/x-jquery-tmpl">
+		'; ?>
+<iframe width="100%" height="166" src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F${soundCloudId}&amp;auto_play=false&amp;show_artwork=true&amp;color=ff7700" scrolling="no" frameborder="no" >
+</iframe>
 <?php       echo '</script>
 ';
 	}
