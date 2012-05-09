@@ -252,6 +252,7 @@ function updateTips(tips, t) {
 	}, 500);
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// take 2 jq selectors to describe what we move in what
 function draggableImage(img,mask) {
 	mask.css({
 		top : 0,

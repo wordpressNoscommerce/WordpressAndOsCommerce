@@ -653,8 +653,11 @@ jQuery.noConflict();
 
 			// render TEMPLATE with the prod data
 			$('#product-detail-template').tmpl(prod).appendTo(target);
+//			<div id="prod-image-big" class="product-image-wide">
+//			<img class="prod-image-wide" src="${products_image_url}" alt="${products_name} ">
+//		  </div>			
+//			draggableImage($('img.prod-image-wide'),$('#prod-image-big'));
 
-			// TODO now remove unused tabs....
 
 			// apply tabs magic to the UL LI graph
 			var curTabCtxSel = '#product-detail-tabs';
@@ -709,6 +712,7 @@ jQuery.noConflict();
 			if (prod.products_image_lrg_url != "")
 				addFullCoverHandler(target);
 
+			// remove unused tabs for video and soundcloud ....
 			/** *************************************************************** */
 			/** * video handlers * */
 			/** *************************************************************** */
