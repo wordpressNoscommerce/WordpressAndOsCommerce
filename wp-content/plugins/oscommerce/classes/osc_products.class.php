@@ -519,7 +519,8 @@ UNION
 
 		$prod_query_results = $this->shop_db->get_results($sql); // returns array of objects
 		$this->sql = $sql;
-		$this->result = $prod_query_results;		
+		$this->result = $prod_query_results;
+		$this->osc_fix_product_list_json();	// add the URLs	
 		return $prod_query_results;
 		
 	}

@@ -284,9 +284,18 @@ function filterAddGuidToPost($content)
 	global $wp_query;
 	$post = $wp_query->post;
 	$link = '<DIV class="guid">'.$post->guid.'</DIV>';
-    return $content.$link;
+	return $content.$link;
 }
 
+// convert
+// http:///www.shopkatapult.com/product_info.php?products_id=4558
+// http://mywebsite:8080/releases/?products_id=4961
+function filterPostLink ($permalink, $post) 
+{
+	$relaunchLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$post->guid);
+	$relaunchLink = str_replace('/product_info.php','/releases/',$relaunchLink);
+	return $relaunchLink;
+}
 
 register_activation_hook(__FILE__, 'osc_activate');
 // TODO osc_activate in register_deactivation_hook  ????
@@ -300,4 +309,5 @@ add_filter('the_content', 'filterOscArtistListing');
 add_filter('the_content', 'filterOscShopListing');
 add_filter('the_content', 'filterOscShoppingCart');
 add_filter('the_content', 'filterAddGuidToPost');
+add_filter('post_link', 'filterPostLink', 10, 2);
 ?>

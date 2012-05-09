@@ -439,12 +439,10 @@ jQuery.noConflict();
 					if (getArtistMaster(artists_id))
 						toggleArtist(artists_id, artistSet);
 			} else {
-				if (products_id != undefined)
-					if (getProductMaster(products_id)) // show product if available
-						if (curTabCtx == '#product-format-tabs')
-							toggleProduct(curTabCtx, products_id, format, "#product-detail");
-						else
-							toggleProduct(curTabCtx, products_id, format, "#release-detail");
+				if (products_id != undefined) {
+					var detail = (curTabCtx == '#product-format-tabs')?"#product-detail": "#release-detail";
+					toggleProduct(curTabCtx, products_id, format, detail);
+				}
 			}
 			loadingPage = false; // enable auto loading again
 		}
@@ -599,8 +597,8 @@ jQuery.noConflict();
 			return;
 		}
 		/**
-		 * ########################################################################### ##############################
-		 * PRODUCT MODE ###############################
+		 * ########################################################################### 
+		 * ############################## PRODUCT MODE ###############################
 		 * ###########################################################################
 		 */
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -622,13 +620,23 @@ jQuery.noConflict();
 				return false;
 			};
 		}
+		function toggleProductCallBack(curTabCtx, prodId, format, seltorName) {
+			return function() { 		
+				return toggleProduct(curTabCtx, prodId, format, seltorName);
+			};
+		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// show product data in product-detail or release-detail DIV
-		function toggleProduct(curTabCtx, prodId, format, seltorName) {
-			var seltor = $(seltorName);
+		function toggleProduct(curTabCtx, prodId, format, targetName) {
+			var prod = getProductWithCallback(prodId, toggleProductCallBack(curTabCtx, prodId, format, targetName));
+			if (prod == undefined) {
+				return false;		// just abort as there is a callback
+			}			
+			var target = $(targetName);
+			// prepare target (show/hide)
 			if (lastProductId == prodId) {
-				seltor.toggle(); // toggle if same
-				if (seltorName.indexOf('#release-detail')>= 0) {
+				target.toggle(); // toggle if same
+				if (targetName.indexOf('#release-detail')>= 0) {
 					$('#artist-detail').toggle(); 	// show artist detail if hiding release detail
 				}
 				// remove artist tab title for releases
@@ -640,20 +648,11 @@ jQuery.noConflict();
 					$(playerSelector).jPlayer("destroy"); // remove jplayer first TODO check when necessary
 					console.info('player for %d destroyed', lastProductId);
 				}
-				seltor.empty(); // clear if new prod after removing player
+				target.empty(); // clear if new prod after removing player
 			}
-			// $(seltor).fadeOut(100); // make invisible before writing
-			var prod = getProductMaster(prodId, format);
-			if (prod == undefined) {
-				var msg = 'product missing for ' + prodId + ' ' + format;
-				console.log(msg);
-				throw msg;
-			}
-			if (prod.products_image_lrg_url != "") // use large image if possible
-				prod.products_image_url = prod.products_image_lrg_url;
 
 			// render TEMPLATE with the prod data
-			$('#product-detail-template').tmpl(prod).appendTo(seltor);
+			$('#product-detail-template').tmpl(prod).appendTo(target);
 
 			// TODO now remove unused tabs....
 
@@ -708,7 +707,7 @@ jQuery.noConflict();
 			load_listenbuy_tab(curTabCtxSel, 0, prod);
 
 			if (prod.products_image_lrg_url != "")
-				addFullCoverHandler(seltor);
+				addFullCoverHandler(target);
 
 			/** *************************************************************** */
 			/** * video handlers * */
@@ -719,7 +718,7 @@ jQuery.noConflict();
 				renderVideo(curTabCtxSel, prod.products_upc);
 				removeVideo = false;
 			} else
-				removeVideo = extractVideoHandlerFromInfoText(seltor);
+				removeVideo = extractVideoHandlerFromInfoText(target);
 
 			// remove video tab if no video found
 			if (removeVideo) {
@@ -743,14 +742,14 @@ jQuery.noConflict();
 				getTabLnk(curTabCtxSel, 'free_song').parent().remove();
 			}
 
-			if (seltorName.indexOf('#release-detail') >= 0 // show tracks when showing releases
-					||	(seltorName.indexOf('#product-detail') >= 0 && playerShown)) { // or player open
+			if (targetName.indexOf('#release-detail') >= 0 // show tracks when showing releases
+					||	(targetName.indexOf('#product-detail') >= 0 && playerShown)) { // or player open
 				getTabLnk(curTabCtxSel, 'listenbuy').click(); 
 			}
 				// else
 			// scroll into view (its a DOM function not jquery
-			seltor.fadeIn(fadeintime); // show active tab
-			scrollTo(seltor, true);
+			target.fadeIn(fadeintime); // show active tab
+			scrollTo(target, true);
 			lastProductId = prodId;
 		}
 
@@ -1124,7 +1123,7 @@ jQuery.noConflict();
 			$.each(newcart.contents, function(key, elem) { // loop over propelemrties (returned from handle_cart.php)
 				console.log('addCart #%d %s: %o', i, key, elem);
 				if (newcart.entries[i] == undefined || true) { // TODO check if we actually can have something here
-					var prod = getProductForCart(key, renderShoppingBoxCallback(newcart,context));
+					var prod = getProductWithCallback(key, renderShoppingBoxCallback(newcart,context));
 					if (prod == undefined) {
 						throw "missing product - wait for reload"; // skip the rest and wait for callback
 					}
@@ -1148,7 +1147,7 @@ jQuery.noConflict();
 						cartEntry.products_price_tax = Math.round(prod.products_price * VAT) / 100;
 					}
 					cartEntry.products_price_total = Math.round(cartEntry.products_price_gross * elem.qty * 100.) / 100;
-					var parent = getProductForCart(prod.products_parent);
+					var parent = getProductMaster(prod.products_parent);
 					if (!parent) {
 						console.log("no parent for %s of product %d", prod.products_id, prod.products_parent);
 					} else {
@@ -1210,15 +1209,12 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// read from our local product_cache -- all formats are merged in there
-		function getProductMaster(prod_id) {
-			if (prod_id == undefined)
+		function getProductMaster(prodId) {		
+			if (prodId == undefined)
 				return;
-			var thisProd = prodmap[prod_id];
-			if (thisProd == undefined) {
-				// console.log('getProductMaster(%d): undefined',prod_id);
-				return;
-			}
-			thisProd.products_description = unescape(thisProd.products_description);
+			var thisProd = prodmap[prodId];
+			if (thisProd)
+				thisProd.products_description = unescape(thisProd.products_description);
 			// console.log('getProductMaster(%d): %o', prod_id, thisProd);
 			return thisProd;
 		}
@@ -1243,7 +1239,7 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// get product for cart (different from master!!)
-		function getProductForCart(prod_id,callback) {
+		function getProductWithCallback(prod_id,callback) {
 			var prod = prodmap[prod_id];
 			if (!prod) {
 				console.log('missing product %o in prodmap: %s ',prod_id, (callback?'callingback later':''));
@@ -1301,8 +1297,13 @@ jQuery.noConflict();
 				var o = newData[i];
 				if (parentId)
 					o.products_parent = parentId;
-				if (o.products_id != undefined)
+				if (o.products_id != undefined) {
 					prodmap[o.products_id] = o;
+					// use large image if possible
+					if (o.products_image_lrg_url && o.products_image_lrg_url != "") 
+						o.products_image_url = o.products_image_lrg_url;
+
+				}
 				if (o.manufacturers_id != undefined)
 					manumap[o.manufacturers_id] = o;
 			}
@@ -1433,7 +1434,7 @@ jQuery.noConflict();
 		function hideAllTabs(curTabCtx) {
 			var selContDivs = $(curTabCtx).find('div.ui-tabs DIV.ui-tabs-panel');
 			selContDivs.removeClass('ui-tabs-selected ui-state-active').addClass('ui-tabs-hide');
-			console.log('hiding tabs for %o', selContDivs);
+//			console.log('hiding tabs for %o', selContDivs);
 		}
 		// ###############################################################################
 		// #### HANDLER ##################################################################

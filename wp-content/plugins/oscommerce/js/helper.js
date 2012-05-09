@@ -251,3 +251,27 @@ function updateTips(tips, t) {
 		tips.removeClass("ui-state-highlight", 1500);
 	}, 500);
 }
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function draggableImage(img,mask) {
+	mask.css({
+		top : 0,
+		left : 0
+	});
+	var maskWidth = mask.width();
+	var maskHeight = mask.height();
+	var imgPos = img.offset();
+	var imgWidth = img.width();
+	var imgHeight = img.height();
+
+	var x1 = (imgPos.left + maskWidth) - imgWidth;
+	var y1 = (imgPos.top + maskHeight) - imgHeight;
+	var x2 = imgPos.left;
+	var y2 = imgPos.top;
+
+	img.draggable({
+		containment : [ x1, y1, x2, y2 ]
+	});
+	img.css({
+		cursor : 'move'
+	});
+}
