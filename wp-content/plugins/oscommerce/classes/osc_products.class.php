@@ -76,7 +76,7 @@ class osc_products extends osc_product_templates
 	
 	function osc_show_shop_page() {
 		$this->shopFilter = true;
-		array_push($this->release_formats, 'Stuff', 'Special Offers');
+		array_push($this->release_formats, 'Merchandize', 'Special Offers');
 		$this->osc_show_tabbed_products_page();
 	}
 	
@@ -197,7 +197,7 @@ AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
 AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 		}
 		switch (strtolower($this->format)) {
-			case 'stuff':
+			case 'merchandize':
 				$this->shopFilter = true;
 				$where .= "
 				AND (
@@ -205,6 +205,7 @@ AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 				OR lower(pd.products_format) LIKE '%patch%'
 				OR lower(pd.products_format) LIKE '%shirt%'
 				OR lower(pd.products_format) LIKE '%bag%'
+				OR lower(pd.products_format) LIKE '%poster%'
 				)";
 				break;
 			case 'special_offers':
@@ -215,7 +216,6 @@ AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 				OR lower(pd.products_format) LIKE '%sale%'
 				OR lower(pd.products_format) LIKE '%action%'
 				OR lower(pd.products_format) LIKE '%size%'
-				OR lower(pd.products_format) LIKE '%poster%'
 				)";
 				break;
 			default: if ($this->format <> 'All') {
