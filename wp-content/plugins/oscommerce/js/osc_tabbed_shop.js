@@ -7,26 +7,6 @@
  * @date: April 2012
  **********************************************************************************************************************/
 
-// lets pollute some global namespace :)
-var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
-var shopPrefix = 'http://dev2.shitkatapult.com:8080';
-var allArtReleases = 'All Releases Of Artist';
-// TODO deal with the tabnames better
-var artReltabNames = [ {
-	tab : allArtReleases
-} ];
-// , { tab : "Singles" }, { tab : "Albums" }, { tab : "Appears On" }, { tab : "Videos" } ]; var artistPage = '/artists';
-var artistPage = '/artists';
-var releasePage = '/releases';
-var osCsid = 0; // osc session
-var customer_id = 0; // osc customer
-var customer_firstname = 0; // osc customer
-var cart = 0;
-var shoppingBoxCtx = 0;
-var ajaxPending = false;
-var VAT = 19.; // 0.;
-var shopFormat = undefined;
-
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
 	$(function() {
