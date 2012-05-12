@@ -179,10 +179,10 @@ SELECT	p.products_id,
 		//			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php"; from shopkatapult/index.php:#141
 		$from ='
 FROM products p
-LEFT JOIN products_description pd ON pd.products_id = p.products_id
-LEFT JOIN manufacturers m ON m.manufacturers_id = p.manufacturers_id
-LEFT JOIN specials s ON p.products_id = s.products_id
-LEFT JOIN products_to_categories p2c ON p.products_id = p2c.products_id ';
+LEFT JOIN products_description pd USING (products_id)
+LEFT JOIN manufacturers m USING (manufacturers_id)
+LEFT JOIN specials s USING (products_id)
+LEFT JOIN products_to_categories p2c USING (products_id) ';
 		// general conditions  TODO fix this query
 		$where = "
 WHERE p.products_status = '1' and p.products_parent = ''";
@@ -201,22 +201,22 @@ AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 				$this->shopFilter = true;
 				$where .= "
 				AND (
-				lower(pd.products_format) LIKE '%size%'
-				OR lower(pd.products_format) LIKE '%patch%'
-				OR lower(pd.products_format) LIKE '%shirt%'
-				OR lower(pd.products_format) LIKE '%bag%'
-				OR lower(pd.products_format) LIKE '%poster%'
-				)";
+				lower(pd.products_head_keywords_tag) LIKE '%size%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%patch%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%shirt%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%bag%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%poster%'
+				) ";
 				break;
 			case 'special_offers':
 				$this->shopFilter = true;
 				$where .= "
 				AND (
-				lower(pd.products_format) LIKE '%of 10%'
-				OR lower(pd.products_format) LIKE '%sale%'
-				OR lower(pd.products_format) LIKE '%action%'
-				OR lower(pd.products_format) LIKE '%size%'
-				)";
+				lower(pd.products_head_keywords_tag) LIKE '%of 10%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%sale%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%action%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%size%'
+				) ";
 				break;
 			default: if ($this->format <> 'All') {
 				// show the products having a specific format (keyword)
