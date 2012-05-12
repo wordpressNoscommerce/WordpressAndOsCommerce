@@ -545,6 +545,7 @@ jQuery.noConflict();
 			// products_id = null; // reset previous product selection NOT HERE
 			// render template with artist data (header, image, text)
 			$('#artist-detail-template').tmpl(artist).appendTo(seltor);
+			draggableImage($('img.prod-image-wide'),$('div#artist-image-big'));
 			$('#artist-text').resizable();
 
 			$('#artist-image-big').click(toggleArtist); // close handler
