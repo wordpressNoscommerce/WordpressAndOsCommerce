@@ -631,13 +631,9 @@ jQuery.noConflict();
 				target.empty(); // clear if new prod after removing player
 			}
 
-			// render TEMPLATE with the prod data
+			// render TEMPLATE () with the prod data 
+			// @See osc_product_templates->osc_inject_product_detail_template() with the prod data
 			$('#product-detail-template').tmpl(prod).appendTo(target);
-//			<div id="prod-image-big" class="product-image-wide">
-//			<img class="prod-image-wide" src="${products_image_url}" alt="${products_name} ">
-//		  </div>			
-//			draggableImage($('img.prod-image-wide'),$('#prod-image-big'));
-
 
 			// apply tabs magic to the UL LI graph
 			var curTabCtxSel = '#product-detail-tabs';
@@ -647,6 +643,10 @@ jQuery.noConflict();
 			location.hash = location.hash.replace(/&.*/, '');
 			curTabCtx.wptabs();
 			location.hash = temphash;
+
+			draggableImage($('img.prod-image-wide'),$('#prod-image-big'));
+			// make text widget resizable
+			$('#product-detail-template .ui-tabs .ui-tabs-panel .textwidget').resizable();
 
 			// TODO fix links
 			curTabCtx.find('ul.ui-tabs-nav li.ui-state-default a').each(function(i, e) {
@@ -1343,7 +1343,7 @@ jQuery.noConflict();
 					null ])[2]);
 			if (value == "null" || value == undefined) {
 				// if the hash is a single token (alphnumeric and _) we use it for the respective parameter
-				if ((isReleasePage(hash) && name == 'format')
+				if ((useFormatTabs(hash) && name == 'format')
 						|| (isArtistPage(hash) && ((name == 'artistSet' && !products_id) || name == 'artRelTab')))
 					value = decodeURI((RegExp('[^#]*#([a-z0-9_]+)(&|$)').exec(hash ? hash : location.hash) || [ , null ])[1]);
 			}
@@ -1533,7 +1533,8 @@ jQuery.noConflict();
 			};
 			var bigImgCss = {};
 			return function(e) {
-				playerShown = e.currentTarget.href.indexOf('listen') > 0; // is the player shown
+				if (e.currentTarget.href)
+					playerShown = e.currentTarget.href.indexOf('listen') > 0; // is the player shown
 				var divImg = $('div#prod-image-big');
 				var bigimg = divImg.find('img');
 				var newCss = flatImgCss;

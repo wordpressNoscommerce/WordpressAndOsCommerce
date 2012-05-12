@@ -167,6 +167,13 @@ function getPageSize(href) {
 		return productsPageSize;
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function useFormatTabs(href) {
+	if (href == undefined)
+		href = location.href;
+	if (typeof href != 'string')
+		href = href.selector; // use the selector string of jQ object
+	return href.indexOf('/releases') >= 0 || href.indexOf('/shop') >= 0;
+}
 // match pathname or tabctx string dont match trailing slash which is optional
 function isReleasePage(href) {
 	if (href == undefined)
