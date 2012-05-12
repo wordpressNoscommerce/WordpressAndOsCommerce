@@ -297,7 +297,7 @@ function draggableImage(img,mask) {
 	var y2 = imgPos.top;
 
 	img.draggable({
-		containment : [ x1, y1, x2, y2 ]
+//		containment : [ x1, y1, x2, y2 ]
 	});
 	img.css({
 		cursor : 'move'

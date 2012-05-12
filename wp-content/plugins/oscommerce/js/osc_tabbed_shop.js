@@ -644,7 +644,7 @@ jQuery.noConflict();
 			curTabCtx.wptabs();
 			location.hash = temphash;
 
-			draggableImage($('img.prod-image-wide'),$('#prod-image-big'));
+			draggableImage($('img.prod-image-wide'),$('div#prod-image-big'));
 			// make text widget resizable
 			$('#product-detail-template .ui-tabs .ui-tabs-panel .textwidget').resizable();
 
