@@ -168,10 +168,13 @@ jQuery.noConflict();
 
         /************************* SOCIAL MENU *****************************/
         /***** call api with current location. callback then draws the links ****/
-        $.getJSON( "/tinyurlapi.php?", {longurl: location.href}, function(data){
+        var data = {
+        		longurl: location.href,
+        		};
+        $.getJSON( "/tinyurlapi.php?", { longurl: location.href, }, function(data){
         	console.log(data);
         	drawSocialLinks(data);
-		});
+        });
         /**** deal with the social menu .. called back by the tinyUrl request ****/
         function drawSocialLinks(tinyUrl) {
         	var ul = $('div.nav ul#dd');
