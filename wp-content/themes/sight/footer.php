@@ -9,13 +9,13 @@
 
 <div class="footer">
   <p class="copyright">
-    &copy; 2011 <a href="<?php bloginfo('home'); ?>"><?php bloginfo('name'); ?> </a>. All Rights Reserved.
+    &copy; 2011 <a target="_blank" href="http://www.shopkatapult.com/information.php?info_id=9"><?php bloginfo('name'); ?> </a>. All Rights Reserved.
 <?php //    <br />
 //     <a href="#" onClick="toggleDebugDiv();" style="font-size: 150%; color: red;" ><b>toggleDebugDiv</b> </a>  ?>
     <span>Powered by <a href="http://wordpress.org">WordPress</a>.</span>
   </p>
   <p class="credits">
-    Designed by <a href="http://wpshower.com">WPSHOWER</a>&nbsp;&&nbsp;<a href="">UV<img id="uv"
+    Designed by <a href="http://wpshower.com">WPSHOWER</a>&nbsp;&&nbsp;<a href="http://www.gulp.de/profil/uv.html">UV<img id="uv"
       src="/wp-content/themes/sight/images/moebius.png"
     /> </a>
   </p>
