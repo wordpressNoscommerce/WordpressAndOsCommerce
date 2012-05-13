@@ -3,7 +3,7 @@
  **/
 // lets pollute some global namespace :)
 var mp3Prefix = 'http://www.shopkatapult.com/prxlstz/';
-var shopPrefix = 'http://dev2.shitkatapult.com';
+var shopPrefix = 'http://dev2.shitkatapult.com:8080';
 var allArtReleases = 'All Releases Of Artist';
 // TODO deal with the tabnames better
 var artReltabNames = [ {
@@ -29,6 +29,19 @@ function fixTabName(tabName) {
 	return tabName.toLowerCase().replace(/ /g, '_');
 }
 
+// move hash parms to URL parms
+function hashToParms() {
+	var parms = '';
+	var nohash = location.href.substr(0, location.href.indexOf('#'));
+	if (location.hash) {
+		parms = encodeURI(location.hash.substr(location.hash.indexOf('#') + 1));
+	}
+	if (nohash.indexOf('?') >= 0)
+		return nohash + parms;
+	else
+		return nohash + '?' + parms;
+}
+
 function getPageVarForCtx(curTabCtx) {
 	if (curTabCtx == '#release-format-tabs')
 		return 'rpage';
@@ -39,7 +52,19 @@ function getPageVarForCtx(curTabCtx) {
 function getUrlParm(name, url) {
 	return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(url) || [ , null ])[1]);
 }
-
+// get parms from hash
+function getHashVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.hash.slice(window.location.hash.indexOf('#') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
 function getTabDiv(curTabCtx, tabName) {
 	var divsel = 'div[id^=' + fixTabName(tabName) + ']';
 	if (typeof curTabCtx == 'string')

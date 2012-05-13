@@ -827,6 +827,7 @@ div.artist-text {
 	width: 100%;
 	overflow-y: auto;
 	font-size: 12px;
+	padding: 10px 0 10px 0;
 }
 
 div#prod-detail-header span.product-title {
@@ -851,7 +852,9 @@ div#artist-name-detail {
 #release-format-tabs .ui-tabs-panel .wp-tab-content {
 	margin: 0;
 }
-
+/* div#release-format-tabs.wp-tabs div.ui-tabs ul.ui-tabs-nav li.ui-state-default { */
+/* 	padding-top: 10px; */
+/* } */
 /**************************************************************************************/
 /* pagination css */
 .pagination {
@@ -935,4 +938,15 @@ div#scrollTextContent form table tbody tr td img {
 }
 td.main {
 	width: 180px;
+}
+/**************************************************************************************/
+#social-like {	
+	border-top: 1px solid #ebebeb;
+	margin-top: 10px;
+	padding-top: 10px;
+}
+#social-like-iframe {
+	height: 30px;
+	width: 254px;
+	float:right;
 }

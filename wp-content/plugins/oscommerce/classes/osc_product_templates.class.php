@@ -131,9 +131,8 @@ class osc_product_templates
 		// hack to trick eclipse into formatting the HTML
 		echo '<script id="social-buttons-template" type="text/x-jquery-tmpl">
 		'; ?>
-<div id="social-like">
-<iframe src="http://www.facebook.com/plugins/like.php?href=${url}" scrolling="no" frameborder="0"
-        style="border:none; width:450px; height:80px"></iframe></div>		
+<div id="social-like" class="clear">
+<iframe id="social-like-iframe" src="http://www.facebook.com/plugins/like.php?href=${url}" scrolling="no" frameborder="0"></iframe></div>		
 <?php echo '</script>';
 	}
 	

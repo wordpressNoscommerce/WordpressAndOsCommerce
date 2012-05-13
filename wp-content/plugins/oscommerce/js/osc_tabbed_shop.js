@@ -23,7 +23,9 @@ jQuery.noConflict();
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#' + playerContent;
 
-//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
+		// PHP debugging
+		//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
+		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 
 		var oscPrefix = '/wp-content/plugins/oscommerce';
@@ -375,14 +377,14 @@ jQuery.noConflict();
 				$('#product-detail').empty(); // clear prod detail when showing new tab
 				lastProductId = 0; // clear the state
 			}
-			if (curTabCtx == '#release-format-tabs') {
+			if (isReleasePage(curTabCtx) || isArtistPage(curTabCtx)) {
 				// remove the title from the tab also
 				$('div#artist-set-tabs.wp-tabs  > div.ui-tabs').children('div.ui-tabs-panel:visible').find('h3').html(
 						function(i, html) {
 							return html.replace(/ Artist Overview/, '');
 						}).hide(); //css('display', 'none');
 				$('#artist-detail').empty(); // clear artist detail only when not showing releases
-				// TODO check for duplicate ID here
+				lastArtistId = 0;
 			}
 
 			// remove selection for ALL tab header LI
@@ -571,6 +573,9 @@ jQuery.noConflict();
 			// load release page for artist
 			loadProductsForArtist(artistId)(curTabCtx, allArtReleases, rpage);
 
+			// insert social links
+			$('#social-buttons-template').tmpl({url: hashToParms()}).appendTo('#artist-detail');
+			
 			// and activate tabs
 			$(seltor).fadeIn(fadeintime);
 			scrollTo(seltor, true); // dont forget to scroll to artist detail
@@ -731,7 +736,10 @@ jQuery.noConflict();
 					||	(targetName.indexOf('#product-detail') >= 0 && playerShown)) { // or player open
 				getTabLnk(curTabCtxSel, 'listenbuy').click(); 
 			}
-				// else
+
+			// insert social links
+			$('#social-buttons-template').tmpl({url: hashToParms()}).appendTo('#product-detail');
+			
 			// scroll into view (its a DOM function not jquery
 			target.fadeIn(fadeintime); // show active tab
 			scrollTo(target, true);
@@ -1398,22 +1406,13 @@ jQuery.noConflict();
 			var anchors = $(curTabCtx + ' li.ui-state-default a');
 			console.log('fixWpTabHeader found %d anchors in ', anchors.length, curTabCtx);
 			anchors.each(function(i, e) {
-				$(e).parent().html(function(i, html) {
+				$(e).parent(':not(h3)').html(function(i, html) {
 					return '<h3>' + html + '</h3>';
 					console.log('wptabHeader in %s : %s', curTabCtx, html);
 				});
 			});
 			// also replace wptabs clickhandler here
 			attachTabClickHandler(curTabCtx);
-		}
-		// wrap the entries into H3 to use existing CSS
-		function wrapHtmlInTag(selector, tag) {
-			$(selector).each(function(i, e) {
-				$(e).parent().html(function(i, html) {
-					return '<' + tag + '>' + html + '</' + tag + '>';
-					console.log($(e).attr('href'));
-				});
-			});
 		}
 		// remove selection for ALL tab-panel DiV and hide them (robuster version)
 		function hideAllTabs(curTabCtx) {

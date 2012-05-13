@@ -524,6 +524,26 @@ UNION
 		return $prod_query_results;
 		
 	}
+	
+	/** answer AJAX request for special offers and return the data as json (get_special_offers.php) **/
+	function osc_get_special_offers() {
+	
+		$this->result = $this->osc_query_products();        // result as a member var?
+		if (empty($this->result)) {
+			$now = date(DATE_RFC822);
+			$msg ="No Records found for prod_query_result ($now): $this->sql";
+			fb($msg);
+			echo ($this->json)?$msg:"<h3>$msg</h3>";
+		} else {
+			$this->osc_fix_product_list_json();    // add extra fields to list items
+			header('Content-type: application/json');
+			$retval = new stdClass();
+			$retval->result = $this->result;
+			// encode tuple of pagesize, count and result
+			echo json_encode($retval);
+		}
+	}
+
 	/** get handle to shop DB using data from wordpress DB,
 	 * $osc_db is member and has been injected from caller to avoid dependency **/
 	function osc_get_shop_db () {
