@@ -34,6 +34,7 @@ class osc_product_templates
 		$this->osc_inject_videojs_template();
 		$this->osc_inject_youtube_template();
 		$this->osc_inject_soundcloud_template();
+		$this->osc_inject_social_buttons();
 		$this->osc_inject_pagination_template();
 		$this->osc_inject_shopcart_template();
 		$this->osc_inject_shopcart_entry_template();
@@ -120,11 +121,22 @@ class osc_product_templates
 	</div>
 	<!-- tab-dj-mix -->
 */	?>
-</div>
-<!-- product-detail-tabs -->
+<!-- product-detail-tabs --></div>
 <?php echo '</script>';
 	}
-
+	
+	///////////////////////////////////////////////////////////////////////////
+	/** jquery template for PRODUCT XSELL listing in product-tab **/
+	function osc_inject_social_buttons() {
+		// hack to trick eclipse into formatting the HTML
+		echo '<script id="social-buttons-template" type="text/x-jquery-tmpl">
+		'; ?>
+<div id="social-like">
+<iframe src="http://www.facebook.com/plugins/like.php?href=${url}" scrolling="no" frameborder="0"
+        style="border:none; width:450px; height:80px"></iframe></div>		
+<?php echo '</script>';
+	}
+	
 	///////////////////////////////////////////////////////////////////////////
 	/** jquery template for PRODUCT XSELL listing in product-tab
 	 * PROPERTIES
