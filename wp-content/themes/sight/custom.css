@@ -38,11 +38,6 @@
 	height: 100px;
 }
 
-/* disable search box */
-/* div.search,div.menu {  */
-/* 	display: none; */
-/* } */
-
 div.site-description {
 /* 	 padding-top: 20px; */
 	display: none;
@@ -401,13 +396,18 @@ div.post-content div.wp-tabs div.ui-tabs ul.ui-tabs-nav li.ui-state-default h3 {
 /* z-index is not working somehoew */
 /* div.nav, div.nav * { z-index: 100; } */
 /* div.search, div.search * { z-index: 999; } */
-
-.header .search {
-    position: relative;
-    margin-top: 0;
-    top: 70px;
+.header {
+	overflow: visible;
+}
+.nav {
+	clear: both;
+}
+.header .search  {
+	position: relative;
+	margin-top: 0;
+	top: 110px;
 	left: 32px;
-    width: 145px;
+	width: 145px;
 }
 
 /******************************************************************/
