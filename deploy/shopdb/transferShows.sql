@@ -9,8 +9,8 @@ truncate wordpress.wp_gigpress_shows;
 INSERT into wordpress.wp_gigpress_shows
 
 SELECT distinct d.`date_id` show_id, d.`manufacturers_id` show_artist_id, v.venue_id show_venue_id,
-      null show_tour_id, d.`date_date` show_date,
-      null, '20:00' show_time, d.`date_date` show_expire, null show_price, null, null,
+      null show_tour_id, adddate(d.`date_date`, INTERVAL 4 year) show_date,
+      null, '20:00' show_time, adddate(d.`date_date`, INTERVAL 49 month) show_expire, null show_price, null, null,
       null show_ages, d.`date_comment` show_notes, null, 'active' show_status, null,
       d.`date_location` show_address, d.`date_manfacturer_way` show_locale, c.countries_iso_code_2 show_country, d.`date_location` show_venue, d.date_link show_venue_url, d.date_comment show_venue_phone
 FROM wordpress.dates d

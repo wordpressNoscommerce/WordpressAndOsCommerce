@@ -25,7 +25,8 @@ jQuery.noConflict();
 
 		// PHP debugging
 		//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
-		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP';
+		document.cookie= 'KEY=123456789012345';
 		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 
 		var oscPrefix = '/wp-content/plugins/oscommerce';
@@ -220,6 +221,8 @@ jQuery.noConflict();
 					fetchurl += "&paged=" + paged; // append extra param
 				if (artists_id)
 					fetchurl += "&artistId=" + artists_id; // append extra param
+				if (XDEBUGparms != '')
+					fetchurl += XDEBUGparms;
 				// the url returns a tuple with record count and result
 				// $('div.pagination').addClass('ui-tabs-hide'); // hide all before loading
 				getTabLnk(curTabCtx, tabName).addClass('loading');
@@ -460,12 +463,17 @@ jQuery.noConflict();
 				console.assert(template.length);
 				// append to visible div.ui-tabs-panel for our tab
 				// all our parms other parms are already in location.hash except the new pageno
-				$(template).tmpl({
+				var newHref = location.hash;
+				if (tabSelector.parents('#release-format-tabs').length)
+					newHref = addHashParm(newHref, 'rpage', (+pageno) + 1); // link to the next page
+				else
+					newHref = addHashParm(newHref, 'paged', (+pageno) + 1); // link to the next page					
+				template.tmpl({
 					paged : (+pageno),
 					maxpage : maxPage,
 					loaded : loaded,
 					reccount : totalRecCount,
-					href : addHashParm(location.hash, 'rpage', (+pageno) + 1)
+					href : newHref
 				}).appendTo(tabSelector); // never mind the visibility thats done later
 				// reload pager JQ after creation
 				pager = tabSelector.find(' div.pagination a');

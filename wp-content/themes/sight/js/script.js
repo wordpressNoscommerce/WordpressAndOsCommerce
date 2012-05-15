@@ -171,7 +171,7 @@ jQuery.noConflict();
         var data = {
         		longurl: location.href,
         		};
-        $.getJSON( "/tinyurlapi.php?", { longurl: location.href, }, function(data){
+        $.getJSON( "/tinyurlapi.php?", data , function(data){
         	console.log(data);
         	drawSocialLinks(data);
         });

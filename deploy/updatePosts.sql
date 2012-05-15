@@ -7,8 +7,8 @@ set post_content = replace (post_content,'http://localhost:8080/wordpress','')
 where post_content like  '%http://localhost:8080/wordpress%'
 
 update wp_posts
-set guid = replace (guid,'http://192.168.99.100:8080/wordpress','')
-where guid like  '%http://192.168.99.100:8080/wordpress%';
+set guid = concat ('http://www.shopkatapult.com/',guid)
+where post_type = 'attachment';
 
 update  `wp_posts`
 set post_content = replace(post_content , 'oscProductListing','oscReleaseListing')

@@ -26,7 +26,7 @@
     $passedurl = $_GET['longurl'];
 
     // Determine if the passed long URL has the 'http://' at the start
-    if (strpos($passedurl, 'http://') !== false) {
+    if (strpos($passedurl, 'http://') < 0) {
         $passedurl = 'http://' . $passedurl;
     }
 
@@ -62,7 +62,7 @@
 
     // TinyURL shortener
     function shortTinyURL($ToConvert) {
-    	return $ToConvert;
+//    	return $ToConvert;
     	try {
         $short_url = file_get_contents('http://tinyurl.com/api-create.php?url=' . $ToConvert);
     	} 

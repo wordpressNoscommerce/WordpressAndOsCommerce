@@ -182,22 +182,18 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
 				JOIN manufacturers_info min ON m.manufacturers_id = min.manufacturers_id
 				JOIN products p ON m.manufacturers_id = p.manufacturers_id
 				JOIN products_description pd ON pd.products_id = p.products_id
-				';
+				';    
     $where = " WHERE m.manufacturers_image <> '' "; // only with images
     // only compare ints with 0 !!!!!
     if(!empty($this->label_id) && $this->label_id != 0) {
       $where .= " AND m.manufacturers_label LIKE '%{$this->label_id}%' ";
     }
     // TODO do selection better than with entry in m.manufacturers_label
-    if(!empty($this->artist_set)) {
-      // TODO workaround 
-      if ($this->artist_set == 'main')
-	      $where .= " AND (m.manufacturers_label LIKE '%999%' OR m.manufacturers_label LIKE '%32%') ";
-      else
-	      $where .= " AND (m.manufacturers_label LIKE '%33%' OR m.manufacturers_label LIKE '%22%') ";
- //      $where .= " AND m.manufacturers_label LIKE '%{$this->artist_set}%' ";
+    if(!empty($this->artist_set)) {    	
+    	$label = ($this->artist_set == 'main')?"'%244%'":"'%245%'";
+   		$where .= " AND m.manufacturers_label LIKE $label";
     }
-    $group =  " GROUP BY p.manufacturers_id";
+    $group =  " GROUP BY p.manufacturers_id ";
 
     $order = ' ORDER BY m.manufacturers_id ASC';
     // TODO DO/DONT include database tables from oscommerce installation
@@ -217,7 +213,31 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
       $firstRecordOfPage = $this->records_per_page * ($this->paged - 1);
       if(!empty($this->paged))
       $sql = sprintf('%s LIMIT %d, %d', $sql, $firstRecordOfPage, $this->records_per_page);
-    }
+    } else {    
+    	//#####################################################################
+    	// WORKAROUND for artist_sets when nothing found
+    	//#####################################################################
+    	if(!empty($this->artist_set)) {
+    		$where = " WHERE m.manufacturers_image <> '' "; // only with images
+    		if ($this->artist_set == 'main')
+    			$where .= " AND (m.manufacturers_label LIKE '%999%' OR m.manufacturers_label LIKE '%32%') ";
+    		else
+    			$where .= " AND (m.manufacturers_label LIKE '%33%' OR m.manufacturers_label LIKE '%22%') ";
+    		$sql = $select . $from . $where . $group . $order;
+    		$this->osc_count_manufacturers_from($from.$where);
+    		if($this->artist_count > 0)
+    		{
+    			$this->max_page = ceil($this->artist_count/$this->records_per_page);
+    			if($this->paged > $this->max_page) $this->paged = $this->max_page;
+    			$firstRecordOfPage = $this->records_per_page * ($this->paged - 1);
+    			if(!empty($this->paged))
+    				$sql = sprintf('%s LIMIT %d, %d', $sql, $firstRecordOfPage, $this->records_per_page);
+    		}
+    	}
+    	//#####################################################################
+    	// EOW
+    	//#####################################################################    	
+   	}
     /////////////// QUERY
     $query_results = $this->shop_db->get_results($sql); // returns array of objects
     fb('SQL:'.$sql.' read # Records: '.$this->shop_db->num_rows);

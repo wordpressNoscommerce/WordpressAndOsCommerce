@@ -10,7 +10,7 @@
 -- TODO consider using the post_parent relation for the attachments
 
 -- the postmeta of the POST attachments
-DELETE pmdel.*
+DELETE  pmdel.*
 FROM wordpress.wp_postmeta pmdel, wordpress.wp_postmeta pm
 JOIN wordpress.wp_term_relationships wtr ON wtr.object_id = pm.post_id
 JOIN wordpress.wp_term_taxonomy wtt USING (term_taxonomy_id)
@@ -69,8 +69,8 @@ INSERT INTO wordpress.wp_posts
 SELECT
 	null ID,
 	1 post_author,
-	n.news_date_added post_date,
-	n.news_date_added post_date_gmt,
+	adddate(n.news_date_added, interval 1 year) post_date,
+	adddate(n.news_date_added, interval 1 year) post_date_gmt,
 	IF (LENGTH(n.news_description) = 0, n.news_subtitel, n.news_description) post_content,
 	n.news_titel post_title,
 	n.news_subtitel post_excerpt,
@@ -81,8 +81,8 @@ SELECT
 	'post_name' post_name,
 	'' to_ping,
 	'' pinged,
-	if (n.news_last_modified != 0, n.news_last_modified,'0000-00-00') post_modified,
-	if (n.news_last_modified != 0, n.news_last_modified,'0000-00-00') post_modified_gmt,
+	if (n.news_last_modified != 0, adddate(n.news_last_modified, interval 1 year),'0000-00-00') post_modified,
+	if (n.news_last_modified != 0, adddate(n.news_last_modified, interval 1 year),'0000-00-00') post_modified_gmt,
 	'' post_content_filtered,
 	0 post_parent,
 	n.news_link guid,				--  put link into guid for now ...
@@ -141,8 +141,8 @@ SELECT
 	SUBSTR(n.news_image,0,20) post_name,
 	'' to_ping,
 	'' pinged,
-	if (n.news_last_modified != 0, n.news_last_modified,'0000-00-00') post_modified,
-	if (n.news_last_modified != 0, n.news_last_modified,'0000-00-00') post_modified_gmt,
+	if (n.news_last_modified != 0, adddate(n.news_last_modified, interval 1 year),'0000-00-00') post_modified,
+	if (n.news_last_modified != 0, adddate(n.news_last_modified, interval 1 year),'0000-00-00') post_modified_gmt,
 	'' post_content_filtered,
 	post.ID post_parent,			-- this has to point to the related post
 	n.news_image guid,
