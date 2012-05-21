@@ -22,20 +22,22 @@ jQuery.noConflict();
 		var playerSelector = '#' + playerId;
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#' + playerContent;
+		var labels = {};
 
 		// PHP debugging
 		//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
 		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP';
 		document.cookie= 'KEY=123456789012345';
 		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+//		var XDEBUGparms = '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+
+		var checkoutUrl = shopPrefix + '/checkout_payment.php';
 
 		var oscPrefix = '/wp-content/plugins/oscommerce';
 		var oscLinkPrefix = oscPrefix+'/osclink';
-
-		var checkoutUrl = shopPrefix + '/checkout_payment.php';
 		var shoppingCartUrl = oscLinkPrefix + '/wp-handle_cart.php';
 		var loginUrl = oscLinkPrefix + '/wp-login.php?action=process' + XDEBUGparms;
-		var logoffUrl = oscLinkPrefix + '/wp-logoff.php' + XDEBUGparms;
+		var logoffUrl = oscLinkPrefix + '/wp-logoff.php' + '?a=0' + XDEBUGparms;
 		var createAccountUrl = oscLinkPrefix + '/wp-create_account.php';
 
 		// our local database where we keep everything
@@ -87,6 +89,9 @@ jQuery.noConflict();
 		if (location.hash.indexOf('action') > 0) { // we have an action
 			actionHandler();
 		}
+		// loading labels
+		
+		// error handling
 		var ajaxError = $('<div id="ajaxError"></div>');
 		ajaxError.ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
 			ajaxError.dialog({ modal: true});
@@ -767,6 +772,7 @@ jQuery.noConflict();
 			else
 				loadMsg.addClass('loading');
 			var fetchurl = oscPrefix + "/get_product_data.php?json=1&pid=" + prod.products_id + '&mdl=' + prod.products_model;
+			fetchurl += XDEBUGparms;
 			// the url returns a tuple of record count and result lists for formats and xsell
 			$.ajax({
 				type : 'GET',
@@ -777,7 +783,7 @@ jQuery.noConflict();
 						addToCache(result.formats, prod.products_id);
 						addToCache(result.xsell, prod.products_id);
 						console.log(result);
-						var target = lstbuytab.find(' div.wp-tab-content'); // select the content div!!!
+						var target = lstbuytab.find('div.wp-tab-content'); // select the content div!!!
 						target.empty();
 						if (result.xsell && result.xsell.length)
 							renderPlaylistPlayer(target, prod, result.xsell);
@@ -1611,6 +1617,9 @@ jQuery.noConflict();
 			case "register":
 				registerUser();
 				break;
+			case "label":
+				showLabel();
+				break;
 			case "show":
 //				if (osCsid) // if we have a session
 					// try to read the cart
@@ -1862,12 +1871,41 @@ jQuery.noConflict();
 //			});
 //			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
 		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		function setGreeting (cart) {
 			if (cart && cart.customer_firstname) {
 				$('.site-description').html('<h3>Hello '+cart.customer_firstname+'!</h3>');		
 //				$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
 			} else
 				$('.site-description').empty();
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		function showLabel() {
+			var label = getHashParm('label', location.hash);
+			if (!labels[label]) {
+				$.ajax({
+					type : 'GET',
+					url : fetchurl,
+					success : function(result, textStatus, jqXHR) {
+						getTabLnk(curTabCtx, tabName).removeClass('loading');
+						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
+							labels = result;
+							showLabel();
+						} else {
+							console.error(result);
+							$('#product-detail').html(result).addClass('error');
+						}
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						getTabLnk(curTabCtx, tabName).removeClass('loading');
+						console.error('request(%s) error(%o)', fetchurl, jqXHR);
+						var msg = "status=" + jqXHR.status + " " + errorThrown + " when trying to load Releases for " + tabName;
+						getTabDiv(curTabCtx, tabName).html('<h3 class="error">' + msg + '</h3>').addClass('error');
+					}
+				});				
+			} else {
+				$('#content').empty();				
+			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page

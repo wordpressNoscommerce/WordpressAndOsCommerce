@@ -544,6 +544,32 @@ UNION
 		}
 	}
 
+	/** get label info and return the data (NO JSON HERE) **/
+	function osc_get_labels() {
+		// fbDebugBacktrace();
+		$this->osc_get_shop_db ();    // get handle for shop database
+		$sql = '
+		SELECT 
+		categories_id,
+		categories_image,
+		categories_name,
+		categories_description
+		FROM categories 
+		JOIN categories_description using (categories_id)
+		WHERE categories_id IN (22,32,33,238)
+';
+	$cat_query_results = $this->shop_db->get_results($sql); // returns array of objects		
+	if (empty($cat_query_results)) {
+			$now = date(DATE_RFC822);
+			$msg ="No Records found for cat_query_result ($now): $sql";
+			fb($msg);
+			echo ($this->json)?$msg:"<h3>$msg</h3>";
+		} else {
+			$this->labels = $cat_query_results;
+		}
+		return $cat_query_results;
+	}
+	
 	/** get handle to shop DB using data from wordpress DB,
 	 * $osc_db is member and has been injected from caller to avoid dependency **/
 	function osc_get_shop_db () {
@@ -586,7 +612,7 @@ UNION
 		return $this->shop_db;
 	}
 	// just redirect to the html in our template for now
-	function osc_show_shopping_cart($db, $shop_id, $oscSid){
+	function osc_show_shopping_cart($oscSid){
 		$this->osc_show_shopcart($oscSid,'');
 	}
 } // EOC class def

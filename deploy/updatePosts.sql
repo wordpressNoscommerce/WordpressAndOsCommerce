@@ -12,4 +12,4 @@ where post_type = 'attachment';
 
 update  `wp_posts`
 set post_content = replace(post_content , 'oscProductListing','oscReleaseListing')
-where post_content like '%oscProductListing%'
+where post_content like '%oscProductListing%';

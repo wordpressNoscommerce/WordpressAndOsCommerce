@@ -5,8 +5,9 @@ require_once ('debug.php');
  Plugin URI: http://localhost/wordpress/wp-cpntent/plugins/index.php
  Description: Pulls the categories and products from an osCommerce system that has been defined in the admin section.
  Version: 1.0
- Author: Tal Orlik
+ Author: Tal Orlik heavily modified by Uv Wildner
  Author URI: http://everything-about-everything-else.blogspot.com/2008/11/oscommerce-pulginwidget-for-wordpress.html
+ Author URI:
 
  ------------------------------------------------------------------------------
  Copyright YEAR  PLUGIN_AUTHOR_NAME  (email : talorlik@gmail.com)
@@ -45,6 +46,7 @@ define('OSC_ARTIST_TAG','[oscArtistListing]');
 define('OSC_RELEASE_TAG','[oscReleaseListing]');
 define('OSC_SHOPPINGCART_TAG','[oscShoppingCart]');
 define('OSC_SHOP_TAG','[oscShopListing]');
+define('OSC_LABEL_TAG','[oscLabelListing]');
 
 //$TAGLIST = array(OSC_ARTIST_TAG,OSC_RELEASE_TAG);
 // TODO improve shopkatapult OSC location config
@@ -65,170 +67,175 @@ $_GET['paged'] = 1;
 
 if(isset($_GET['osc_action']) && $_GET['osc_action'] == 'osc_delete')
 {
-    $db = new osc_db();
+	$db = new osc_db();
 
-    $db->osc_delete($_GET['intID']);
+	$db->osc_delete($_GET['intID']);
 
-    unset($db);
+	unset($db);
 }
 
 function osc_activate()
 {
-    // fbDebugBacktrace();
-    $db = new osc_db();
-    $db->create_tbl();
-    unset($db);
+	// fbDebugBacktrace();
+	$db = new osc_db();
+	$db->create_tbl();
+	unset($db);
 }
 
 function osc_init()
 {
-    $svr_uri = $_SERVER['REQUEST_URI'];
-    $inadmin = strstr($svr_uri, 'wp-admin');
+	$svr_uri = $_SERVER['REQUEST_URI'];
+	$inadmin = strstr($svr_uri, 'wp-admin');
 
-    if($inadmin)
-    wp_enqueue_script('java_script', OSCOMMERCEJSURL.'/java_script.js');
-    else {
-        wp_enqueue_script('jquery.tmpl', OSCOMMERCEJSURL.'/jquery.tmpl.js', array('jquery'));
-        wp_enqueue_script('jquery.updown', OSCOMMERCEJSURL.'/jquery.updown.js', array('jquery'));
-        // inject jplayer
-        wp_enqueue_script('jplayer', OSCOMMERCEJPLAYERURL.'/jquery.jplayer.js', array('jquery','jquery.tmpl'));
-        wp_enqueue_script('jplayer.playlist', OSCOMMERCEJPLAYERURL.'/add-on/jplayer.playlist.js', array('jquery','jquery.tmpl','jplayer'));
-//        wp_enqueue_script('jplayer.playlist.inspector', OSCOMMERCEJPLAYERURL.'/add-on/jquery.jplayer.inspector.js', array('jquery','jquery.tmpl','jplayer'));
+	if($inadmin)
+	wp_enqueue_script('java_script', OSCOMMERCEJSURL.'/java_script.js');
+	else {
+		wp_enqueue_script('jquery.tmpl', OSCOMMERCEJSURL.'/jquery.tmpl.js', array('jquery'));
+		wp_enqueue_script('jquery.updown', OSCOMMERCEJSURL.'/jquery.updown.js', array('jquery'));
+		// inject jplayer
+		wp_enqueue_script('jplayer', OSCOMMERCEJPLAYERURL.'/jquery.jplayer.js', array('jquery','jquery.tmpl'));
+		wp_enqueue_script('jplayer.playlist', OSCOMMERCEJPLAYERURL.'/add-on/jplayer.playlist.js', array('jquery','jquery.tmpl','jplayer'));
+		//        wp_enqueue_script('jplayer.playlist.inspector', OSCOMMERCEJPLAYERURL.'/add-on/jquery.jplayer.inspector.js', array('jquery','jquery.tmpl','jplayer'));
 
-        // 3 includes for videobox (TODO try to get rid of it...)
-        // wp_enqueue_script('mootools', OSCOMMERCEVIDEOURL.'/js/mootools.js');
-        // load older version of swfobject also... needs different label
-        // wp_enqueue_script('swfobjectOLD', OSCOMMERCEVIDEOURL.'/js/swfobject.js');
-        // wp_enqueue_script('videobox', OSCOMMERCEVIDEOURL.'/js/videobox.js');
-        // wp_enqueue_script('video.js', OSCOMMERCEVIDEOJSURL.'/video.js');
+		// 3 includes for videobox (TODO try to get rid of it...)
+		// wp_enqueue_script('mootools', OSCOMMERCEVIDEOURL.'/js/mootools.js');
+		// load older version of swfobject also... needs different label
+		// wp_enqueue_script('swfobjectOLD', OSCOMMERCEVIDEOURL.'/js/swfobject.js');
+		// wp_enqueue_script('videobox', OSCOMMERCEVIDEOURL.'/js/videobox.js');
+		// wp_enqueue_script('video.js', OSCOMMERCEVIDEOJSURL.'/video.js');
 
-        // helper functions extracted
-        wp_enqueue_script('helper', OSCOMMERCEJSURL.'/helper.js', array('jquery'));
-        // our tabbed interface for products --  this has to depend on wpui-init for right inclusion order
-        wp_enqueue_script('osc_releasesNartists', OSCOMMERCEJSURL.'/osc_tabbed_shop.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
-    }
+		// helper functions extracted
+		wp_enqueue_script('helper', OSCOMMERCEJSURL.'/helper.js', array('jquery'));
+		// our tabbed interface for products --  this has to depend on wpui-init for right inclusion order
+		wp_enqueue_script('osc_tabbed_shop', OSCOMMERCEJSURL.'/osc_tabbed_shop.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
+	}
 
-    if(!$inadmin || ($inadmin && strstr($svr_uri, 'widget')))
-    {
-        $widget     = new osc_widget();
-        $management = new osc_management();
+	if(!$inadmin || ($inadmin && strstr($svr_uri, 'widget')))
+	{
+		$widget     = new osc_widget();
+		$management = new osc_management();
 
-        if(!function_exists('register_sidebar_widget')) return;
+		if(!function_exists('register_sidebar_widget')) return;
 
-        register_sidebar_widget(__('osCommerce', 'osCommerce'), array(&$widget, 'display'));
-        register_widget_control(__('osCommerce', 'osCommerce'), array(&$management, 'widget_control'));
+		register_sidebar_widget(__('osCommerce', 'osCommerce'), array(&$widget, 'display'));
+		register_widget_control(__('osCommerce', 'osCommerce'), array(&$management, 'widget_control'));
 
-        unset($widget);
-    }
-    global $wp_scripts;
-    $scriptlist;
-    foreach ($wp_scripts as $script) {
-      $scriptlist .=$script.'
-';
-    }
+		unset($widget);
+	}
+	global $osc_labels;
+	if (empty($osc_labels)) {
+		$osc_products = new osc_products();
+		$osc_labels = $osc_products->osc_get_labels();
+	}
+	//    global $wp_scripts;
+	//    $scriptlist;
+	//    foreach ($wp_scripts as $script) {
+	//       $scriptlist .=$script.'
+	// ';
+	//    fb('osc_init()'.$scriptlist);
 
-//    fb('osc_init()'.$scriptlist);
 }
+
 
 // action function for above hook
 function osc_management_init()
 {
-    $management = new osc_management();
-    add_menu_page(__('osCommerce', 'osCommerce'), __('osCommerce', 'osCommerce'), 8, 'osCommerce', array(&$management, 'display'));
+	$management = new osc_management();
+	add_menu_page(__('osCommerce', 'osCommerce'), __('osCommerce', 'osCommerce'), 8, 'osCommerce', array(&$management, 'display'));
 
-    if(isset($_GET['page']) && strstr($_GET['page'], 'osCommerce'))
-    {
-        global $loc_lang;
-        wp_enqueue_script('java_script', OSCOMMERCEJSURL.'/java_script.js');
-        add_submenu_page('osCommerce', __('osCommerce', 'osCommerce'), __('Listing', 'osCommerce'), 8, 'osCommerce', array(&$management, 'osc_listing'));
-        add_submenu_page('osCommerce', __('osCommerce','osCommerce'), __('Add Shop','osCommerce'), 8, 'osCommerce-add-form', array(&$management, 'osc_add_form'));
+	if(isset($_GET['page']) && strstr($_GET['page'], 'osCommerce'))
+	{
+		global $loc_lang;
+		wp_enqueue_script('java_script', OSCOMMERCEJSURL.'/java_script.js');
+		add_submenu_page('osCommerce', __('osCommerce', 'osCommerce'), __('Listing', 'osCommerce'), 8, 'osCommerce', array(&$management, 'osc_listing'));
+		add_submenu_page('osCommerce', __('osCommerce','osCommerce'), __('Add Shop','osCommerce'), 8, 'osCommerce-add-form', array(&$management, 'osc_add_form'));
 
-        if(isset($_GET['osc_action']) && $_GET['osc_action'] == 'osc_edit')
-        add_submenu_page('osCommerce', __('osCommerce','osCommerce'), __('Edit Shop','osCommerce'), 8, 'osCommerce-edit-form', array(&$management, 'osc_edit_form'));
-    }
+		if(isset($_GET['osc_action']) && $_GET['osc_action'] == 'osc_edit')
+		add_submenu_page('osCommerce', __('osCommerce','osCommerce'), __('Edit Shop','osCommerce'), 8, 'osCommerce-edit-form', array(&$management, 'osc_edit_form'));
+	}
 }
 
 function osCommerceHeaderScript()
 {
-    ?>
-<link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCECSSURL;?>/osc_front.css" />
-<link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEJPLAYERURL;?>/blue.monday/jplayer.blue.monday.css" />
-    <?php
-/** currently notused as we use embedded
-    <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOURL;?>/css/videobox.css" />
-    <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOJSURL;?>/video-js.css" title="Video JS">
-**/
+	?>
+<link type="text/css"
+	rel="stylesheet" href="<?php echo OSCOMMERCECSSURL;?>/osc_front.css" />
+<link
+	type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEJPLAYERURL;?>/blue.monday/jplayer.blue.monday.css" />
+	<?php
+	/** currently notused as we use embedded
+	 <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOURL;?>/css/videobox.css" />
+	 <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOJSURL;?>/video-js.css" title="Video JS">
+	 **/
 }
 
 function osCommerceAdminHeaderScript()
 {
-    if(isset($_GET['page']) && substr($_GET['page'], 0, 10) == 'osCommerce')
-    {
-        ?>
-<link type="text/css" rel="stylesheet"
-  href="<?php echo OSCOMMERCECSSURL;?>/osc_management.css"
-/>
-        <?php
-    }
+	if(isset($_GET['page']) && substr($_GET['page'], 0, 10) == 'osCommerce')
+	{
+		?>
+<link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCECSSURL;?>/osc_management.css" />
+		<?php
+	}
 }
 
 function osc_strstr($haystack, $needle, $before_needle = false)
 {
-    if(($pos = strpos($haystack, $needle)) === false) return false;
+	if(($pos = strpos($haystack, $needle)) === false) return false;
 
-    if($before_needle) return substr($haystack, 0, $pos);
-    else return substr($haystack, $pos + strlen($needle));
+	if($before_needle) return substr($haystack, 0, $pos);
+	else return substr($haystack, $pos + strlen($needle));
 }
 
 /** replace release tag with funky tabbed UI **/
 function filterOscReleaseListing($content)
 {
-    if(preg_match(OSC_RELEASE_TAG, $content))
-    {
-        $osc_match_filter = '['.OSC_RELEASE_TAG.']';
-        $osc_products = new osc_products();
+	if(preg_match(OSC_RELEASE_TAG, $content))
+	{
+		$osc_match_filter = '['.OSC_RELEASE_TAG.']';
+		$osc_products = new osc_products();
 
-        // the text before the tag
-        $before_product_listing = osc_strstr($content, $osc_match_filter, false);
-        // is simply echoed
-        echo $before_product_listing;
-        // as is our tabbed interface
-        $osc_products->osc_show_tabbed_products_page();
+		// the text before the tag
+		$before_product_listing = osc_strstr($content, $osc_match_filter, false);
+		// is simply echoed
+		echo $before_product_listing;
+		// as is our tabbed interface
+		$osc_products->osc_show_tabbed_products_page();
 
-        $content = osc_strstr($content, $osc_match_filter, true);
+		$content = osc_strstr($content, $osc_match_filter, true);
 
-        // TODO does this disconnect db session?
-        unset($osc_products->osc_db);
-        unset($osc_products);
-    }
+		// TODO does this disconnect db session?
+		unset($osc_products->osc_db);
+		unset($osc_products);
+	}
 
-    return $content;
+	return $content;
 }
 
 /** replace artist tag with funky tabbed UI **/
 function filterOscArtistListing($content)
 {
-//    fbDebugBacktrace(); // debug only when doing something
-    if(preg_match(OSC_ARTIST_TAG, $content))
-    {
-        $osc_match_filter = '['.OSC_ARTIST_TAG.']';
-        $osc_manufacturers = new osc_manufacturers();
+	//    fbDebugBacktrace(); // debug only when doing something
+	if(preg_match(OSC_ARTIST_TAG, $content))
+	{
+		$osc_match_filter = '['.OSC_ARTIST_TAG.']';
+		$osc_manufacturers = new osc_manufacturers();
 
-        // the text before the tag
-        $before_artist_listing = osc_strstr($content, $osc_match_filter, false);
-        // is simply echoed
-        echo $before_artist_listing;
-        // as is our tabbed interface
-        $osc_manufacturers->osc_show_tabbed_manufacturers_page();
+		// the text before the tag
+		$before_artist_listing = osc_strstr($content, $osc_match_filter, false);
+		// is simply echoed
+		echo $before_artist_listing;
+		// as is our tabbed interface
+		$osc_manufacturers->osc_show_tabbed_manufacturers_page();
 
-        $content = osc_strstr($content, $osc_match_filter, true);
+		$content = osc_strstr($content, $osc_match_filter, true);
 
-        // TODO does this disconnect db session?
-        unset($osc_manufacturers->osc_db);
-        unset($osc_manufacturers);
-    }
+		// TODO does this disconnect db session?
+		unset($osc_manufacturers->osc_db);
+		unset($osc_manufacturers);
+	}
 
-    return $content;
+	return $content;
 }
 
 /** replace artist tag with funky tabbed UI **/
@@ -260,22 +267,58 @@ function filterOscShopListing($content)
 /** inject shopping cart for tag **/
 function filterOscShoppingCart($content)
 {
-    if(preg_match(OSC_SHOPPINGCART_TAG, $content))
-    {
-        $db = new osc_db();
-        $osc_products = new osc_products();
-        $osc_match_filter = '['.OSC_SHOPPINGCART_TAG.']';
-        $shop_id = $_GET['shopID'];
-        if (is_null($shop_id)) $shop_id = 1;        // default is shop 1
-        $oscSid  = $_GET['oscSid'];
+	if(preg_match(OSC_SHOPPINGCART_TAG, $content))
+	{
+		$osc_products = new osc_products();
+		$osc_match_filter = '['.OSC_SHOPPINGCART_TAG.']';
+		$shop_id = $_GET['shopID'];
+		if (is_null($shop_id)) $shop_id = 1;        // default is shop 1
+		$oscSid  = $_GET['oscSid'];
 
-        $content = osc_strstr($content, $osc_match_filter, true);
-        $osc_products->osc_show_shopping_cart($db, $shop_id, $oscSid);
+		$content = osc_strstr($content, $osc_match_filter, true);
+		$osc_products->osc_show_shopping_cart($oscSid);
+	}
 
-        unset($db);
-    }
+	return $content;
+}
+$osc_labels = 0;
+/** inject label tabs for tag **/
+function filterOscLabelTabs($content)
+{
+	if(preg_match(OSC_LABEL_TAG, $content))
+	{
+		global $osc_labels;
+		$osc_match_filter = '['.OSC_LABEL_TAG.']';
+		$shop_id = $_GET['shopID'];
+		if (is_null($shop_id)) $shop_id = 1;        // default is shop 1
+		$oscSid  = $_GET['oscSid'];
 
-    return $content;
+		// page content before
+		$content = osc_strstr($content, $osc_match_filter, true);
+		$content .= renderLabels($osc_labels);
+		// page content after
+		$content .= osc_strstr($content, $osc_match_filter);
+	}
+
+	return $content;
+}
+
+// return the label texts
+function renderLabels($labels) {
+	$labelText = '[wptabs]
+';
+	foreach ($labels as $label) {
+		$labelText .= "[wptabtitle]$label->categories_name[/wptabtitle]
+";
+		$labelText .= "[wptabcontent]
+		$label->categories_description
+[/wptabcontent]
+";
+	}
+	$labelText .= '
+[/wptabs]
+';
+	return $labelText;
 }
 
 // this filter simply appends the guid as a div to the post
@@ -290,7 +333,7 @@ function filterAddGuidToPost($content)
 // convert
 // http:///www.shopkatapult.com/product_info.php?products_id=4558
 // http://mywebsite:8080/releases/?products_id=4961
-function filterPostLink ($permalink, $post) 
+function filterPostLink ($permalink, $post)
 {
 	if (strpos($permalink, 'www.shopkatapult.com') >= 0) {
 		$relaunchLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$post->guid);
@@ -314,5 +357,6 @@ add_filter('the_content', 'filterOscArtistListing');
 add_filter('the_content', 'filterOscShopListing');
 add_filter('the_content', 'filterOscShoppingCart');
 add_filter('the_content', 'filterAddGuidToPost');
+add_filter('the_content', 'filterOscLabelTabs', 0);	// run it first to place wptabs in there
 add_filter('post_link', 'filterPostLink', 10, 2);
 ?>
