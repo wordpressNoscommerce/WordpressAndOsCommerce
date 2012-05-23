@@ -940,6 +940,46 @@ td.main {
 	width: 180px;
 }
 /**************************************************************************************/
+/* special-offer widget */
+.special-offer-box {
+	display: block;
+	clear: both;
+	height: 95px;
+}
+.special-offer-box-img {
+	float: left;
+}
+.special-offer-img {
+	width: 80px;
+	height: 80px;
+}
+.special-offer-box-text {
+	padding-top: 10px;
+}	
+.special-offer-box-text a{
+	text-decoration: none;
+}
+.special-offer-box-img img {
+	padding-right: 10px;
+}
+.special-offer-box-format{
+	font-weight: bold;
+}
+.special-offer-box-name {
+	font-weight: bold;
+	font-style: italic;
+}
+.special-offer-box-price {
+	padding-top: 5px;
+	color: #808080;
+}
+
+.widget-body hr {
+	border-bottom: 1px dotted #888;
+	border-top: 0px dotted #888;
+	margin: 0 0 5px 0;
+}
+/**************************************************************************************/
 #social-like {	
 	border-top: 1px solid #ebebeb;
 	margin-top: 10px;

@@ -33,7 +33,6 @@ define('OSCOMMERCECLASSPATH', OSCOMMERCEPATH. '/classes');
 define('OSCOMMERCEURL', get_option('siteurl'). '/wp-content/plugins/oscommerce');
 define('OSCOMMERCEJPLAYERURL', OSCOMMERCEURL. '/jplayer');
 define('OSCOMMERCEJSURL', OSCOMMERCEURL. '/js');
-define('OSCOMMERCEVIDEOJSURL', get_option('siteurl'). '/wp-content/plugins/video-js');
 define('OSCOMMERCEVIDEOURL', OSCOMMERCEURL. '/video');
 define('OSCOMMERCECSSURL', OSCOMMERCEURL. '/css');
 define('OSCOMMERCEIMAGESURL', OSCOMMERCEURL. '/images');
@@ -54,6 +53,8 @@ define('OSC_LABEL_TAG','[oscLabelListing]');
 
 require_once(OSCOMMERCECLASSPATH .'/osc_db.class.php');
 require_once(OSCOMMERCECLASSPATH .'/osc_widget.class.php');
+require_once(OSCOMMERCECLASSPATH .'/osc_specials_sidebar_widget.class.php');
+//require_once(OSCOMMERCECLASSPATH .'/osc_special_widget.class.php');
 require_once(OSCOMMERCECLASSPATH .'/osc_management.class.php');
 
 /* INIT LOCALISATION ----------------------------------------------------------*/
@@ -97,19 +98,12 @@ function osc_init()
 		wp_enqueue_script('jplayer.playlist', OSCOMMERCEJPLAYERURL.'/add-on/jplayer.playlist.js', array('jquery','jquery.tmpl','jplayer'));
 		//        wp_enqueue_script('jplayer.playlist.inspector', OSCOMMERCEJPLAYERURL.'/add-on/jquery.jplayer.inspector.js', array('jquery','jquery.tmpl','jplayer'));
 
-		// 3 includes for videobox (TODO try to get rid of it...)
-		// wp_enqueue_script('mootools', OSCOMMERCEVIDEOURL.'/js/mootools.js');
-		// load older version of swfobject also... needs different label
-		// wp_enqueue_script('swfobjectOLD', OSCOMMERCEVIDEOURL.'/js/swfobject.js');
-		// wp_enqueue_script('videobox', OSCOMMERCEVIDEOURL.'/js/videobox.js');
-		// wp_enqueue_script('video.js', OSCOMMERCEVIDEOJSURL.'/video.js');
-
 		// helper functions extracted
 		wp_enqueue_script('helper', OSCOMMERCEJSURL.'/helper.js', array('jquery'));
 		// our tabbed interface for products --  this has to depend on wpui-init for right inclusion order
 		wp_enqueue_script('osc_tabbed_shop', OSCOMMERCEJSURL.'/osc_tabbed_shop.js', array('jquery','jquery-ui','jquery.tmpl', 'jplayer', 'wp-ui-min','helper'));
 	}
-
+	// register the widgets old school style (@see gigpress)
 	if(!$inadmin || ($inadmin && strstr($svr_uri, 'widget')))
 	{
 		$widget     = new osc_widget();
@@ -127,15 +121,7 @@ function osc_init()
 		$osc_products = new osc_products();
 		$osc_labels = $osc_products->osc_get_labels();
 	}
-	//    global $wp_scripts;
-	//    $scriptlist;
-	//    foreach ($wp_scripts as $script) {
-	//       $scriptlist .=$script.'
-	// ';
-	//    fb('osc_init()'.$scriptlist);
-
 }
-
 
 // action function for above hook
 function osc_management_init()
@@ -156,17 +142,12 @@ function osc_management_init()
 }
 
 function osCommerceHeaderScript()
-{
-	?>
+{ ?>
 <link type="text/css"
 	rel="stylesheet" href="<?php echo OSCOMMERCECSSURL;?>/osc_front.css" />
 <link
 	type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEJPLAYERURL;?>/blue.monday/jplayer.blue.monday.css" />
-	<?php
-	/** currently notused as we use embedded
-	 <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOURL;?>/css/videobox.css" />
-	 <link type="text/css" rel="stylesheet" href="<?php echo OSCOMMERCEVIDEOJSURL;?>/video-js.css" title="Video JS">
-	 **/
+<?php
 }
 
 function osCommerceAdminHeaderScript()
@@ -345,9 +326,30 @@ function filterPostLink ($permalink, $post)
 	return $relaunchLink;
 }
 
+function oscommerce_template($tmpl) {
+
+	// Look for our template in the following locations:
+	// 1) Child theme directory
+	// 2) Parent theme directory
+	// 3) wp-content directory
+	// 4) Default template directory
+
+	if(file_exists(get_stylesheet_directory() . '/oscommerce-templates/' . $tmpl . '.php')) {
+		$load = get_stylesheet_directory() . '/oscommerce-templates/' . $tmpl . '.php';
+	} elseif(file_exists(get_template_directory() . '/oscommerce-templates/' . $tmpl . '.php')) {
+		$load = get_template_directory() . '/oscommerce-templates/' . $tmpl . '.php';
+	} elseif(file_exists(WP_CONTENT_DIR . '/oscommerce-templates/' . $tmpl . '.php')) {
+		$load = WP_CONTENT_DIR . '/oscommerce-templates/' . $tmpl . '.php';
+	} else {
+		$load = WP_PLUGIN_DIR . '/oscommerce/templates/'  . $tmpl . '.php';
+	}
+	return $load;
+}
+
 register_activation_hook(__FILE__, 'osc_activate');
 // TODO osc_activate in register_deactivation_hook  ????
 //register_deactivation_hook(__FILE__, 'osc_activate');
+add_action('widgets_init', 'oscommerce_load_widgets');
 add_action('plugins_loaded', 'osc_init');
 add_action('admin_menu', 'osc_management_init');
 add_action('wp_head', 'osCommerceHeaderScript');

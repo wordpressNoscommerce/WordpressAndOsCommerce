@@ -2,7 +2,7 @@
  * javascript for oscommerce tabbed UI JSON injection is used for initial data to be shown on the first tab additonal
  * pages are loaded using AJAX requests to PHP server pages get_product_data.php, get_product_page.php,
  * get_manufacturer_page.php state is kept in location.hash to make local state bookmarkable (REST)
- * 
+ *
  * @author: uvwild@gmail.com
  * @date: April 2012
  **********************************************************************************************************************/
@@ -90,13 +90,13 @@ jQuery.noConflict();
 			actionHandler();
 		}
 		// loading labels
-		
+
 		// error handling
 		var ajaxError = $('<div id="ajaxError"></div>');
 		ajaxError.ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
 			ajaxError.dialog({ modal: true});
 			ajaxError.html('<p>calling '+ajaxSettings.url+':'+ thrownError+'</p>'+jqXHR.responseText);
-			
+
 		});
 		// ##########################################################################
 		// ##########################################################################
@@ -144,7 +144,7 @@ jQuery.noConflict();
 				json = products;
 				templateName = '#product-box-template';
 				totalItems = productsCount;
-				pageSize = productsPageSize;				
+				pageSize = productsPageSize;
 			} else
 				return false; // ABORT nothing to do
 			// cleanup DOM struct from wordpress to match grid page
@@ -193,7 +193,7 @@ jQuery.noConflict();
 					url : fetchurl,
 					success : function(result, textStatus, jqXHR) {
 						getTabLnk(curTabCtx, tabName).removeClass('loading');
-						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 							addToCache(result[3]); // this is the product list
 							renderItemsInTab(curTabCtx, result[3], tabName, pageno, '#product-box-template');
 							renderPagination(getTabDiv(curTabCtx, tabName), result[0], result[1], result[3], pageno);
@@ -286,7 +286,7 @@ jQuery.noConflict();
 						url : fetchurl,
 						success : function(result, textStatus, jqXHR) {
 							getTabLnk(curTabCtx, tabName).removeClass('loading');
-							if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+							if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 								addToCache(result[3], artistId); // this is the product list and artist relation
 								renderItemsInTab(curTabCtx, result[3], tabName, pageno, '#release-box-template'); // use pageno nos
 								// function renderPagination(curTabCtx, pageSize, totalRecCount, newItems, paged)
@@ -472,7 +472,7 @@ jQuery.noConflict();
 				if (tabSelector.parents('#release-format-tabs').length)
 					newHref = addHashParm(newHref, 'rpage', (+pageno) + 1); // link to the next page
 				else
-					newHref = addHashParm(newHref, 'paged', (+pageno) + 1); // link to the next page					
+					newHref = addHashParm(newHref, 'paged', (+pageno) + 1); // link to the next page
 				template.tmpl({
 					paged : (+pageno),
 					maxpage : maxPage,
@@ -588,7 +588,7 @@ jQuery.noConflict();
 
 			// insert social links
 			$('#social-buttons-template').tmpl({url: hashToParms()}).appendTo('#artist-detail');
-			
+
 			// and activate tabs
 			$(seltor).fadeIn(fadeintime);
 			scrollTo(seltor, true); // dont forget to scroll to artist detail
@@ -596,7 +596,7 @@ jQuery.noConflict();
 			return;
 		}
 		/**
-		 * ########################################################################### 
+		 * ###########################################################################
 		 * ############################## PRODUCT MODE ###############################
 		 * ###########################################################################
 		 */
@@ -620,7 +620,7 @@ jQuery.noConflict();
 			};
 		}
 		function toggleProductCallBack(curTabCtx, prodId, format, seltorName) {
-			return function() { 		
+			return function() {
 				return toggleProduct(curTabCtx, prodId, format, seltorName);
 			};
 		}
@@ -630,7 +630,7 @@ jQuery.noConflict();
 			var prod = getProductWithCallback(prodId, toggleProductCallBack(curTabCtx, prodId, format, targetName));
 			if (prod == undefined) {
 				return false;		// just abort as there is a callback
-			}			
+			}
 			var target = $(targetName);
 			// prepare target (show/hide)
 			if (lastProductId == prodId) {
@@ -650,7 +650,7 @@ jQuery.noConflict();
 				target.empty(); // clear if new prod after removing player
 			}
 
-			// render TEMPLATE () with the prod data 
+			// render TEMPLATE () with the prod data
 			// @See osc_product_templates->osc_inject_product_detail_template() with the prod data
 			$('#product-detail-template').tmpl(prod).appendTo(target);
 
@@ -736,9 +736,9 @@ jQuery.noConflict();
 			if (prod.products_isrc) {
 				console.log('found a soundcloud link "%s"', prod.products_upc);
 				removeSound = false;
-				renderSoundCloud(curTabCtxSel, prod.products_isrc);				
+				renderSoundCloud(curTabCtxSel, prod.products_isrc);
 			}
-			
+
 			// remove video tab if no video found
 			if (removeSound) {
 				getTabDiv(curTabCtxSel, 'free_song').remove();
@@ -747,12 +747,12 @@ jQuery.noConflict();
 
 			if (targetName.indexOf('#release-detail') >= 0 // show tracks when showing releases
 					||	(targetName.indexOf('#product-detail') >= 0 && playerShown)) { // or player open
-				getTabLnk(curTabCtxSel, 'listenbuy').click(); 
+				getTabLnk(curTabCtxSel, 'listenbuy').click();
 			}
 
 			// insert social links
 			$('#social-buttons-template').tmpl({url: hashToParms()}).appendTo('#product-detail');
-			
+
 			// scroll into view (its a DOM function not jquery
 			target.fadeIn(fadeintime); // show active tab
 			scrollTo(target, true);
@@ -778,7 +778,7 @@ jQuery.noConflict();
 				type : 'GET',
 				url : fetchurl,
 				success : function(result, textStatus, jqXHR) {
-						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 						// merge named members to local database
 						addToCache(result.formats, prod.products_id);
 						addToCache(result.xsell, prod.products_id);
@@ -926,7 +926,7 @@ jQuery.noConflict();
 		/** @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 		// diff
 		function oscCartHandler(button,action, products, target) {
-			button.addClass('loading');				
+			button.addClass('loading');
 			var productId = (products instanceof Array) ? products.shift() : products;
 			var data = {
 				'products_id' : productId,
@@ -946,8 +946,8 @@ jQuery.noConflict();
 					osCsid = data.cart.osCsid = data.osCsid; // keep osCsid everywhere
 					data.cart.customer_id = data.customer_id;
 					data.cart.customer_firstname = data.customer_firstname;
-					renderShoppingBox(data.cart, target);			
-				} else  {	
+					renderShoppingBox(data.cart, target);
+				} else  {
 					console.log('Problem with OSC cart. Response %s', data);
 					$('<div id="errMsg">ErrorMessage</div>').dialog({
 						position : [ 'center', 'top' ],
@@ -989,13 +989,13 @@ jQuery.noConflict();
 				if (context == 'sidebar') {
 					showMainShoppingBox();
 				} else {
-					oscCartHandler(button,'return_cart', undefined, '#content');					
+					oscCartHandler(button,'return_cart', undefined, '#content');
 				}
 				break;
 			case "check out":	// we have to post the session Id to cross domains
 //				if (context == 'sidebar') {
 //					showMainShoppingBox();
-//				} else 
+//				} else
 					checkout();
 				break;
 			case "continue shopping":
@@ -1063,7 +1063,7 @@ jQuery.noConflict();
 				return;
 			}
 			try {
-				cart = prepareCart(newcart,context); // global reference to cart				
+				cart = prepareCart(newcart,context); // global reference to cart
 			} catch (err){
 				console.log('caught %s', err);
 				return;	// skip this for now... the callback does it again
@@ -1092,7 +1092,7 @@ jQuery.noConflict();
 				shopbox.find('.shop-cart-checkout').show();
 			} else {
 				shopbox.find('.order-text').show();
-				shopbox.find('.shop-cart-checkout').hide();				
+				shopbox.find('.shop-cart-checkout').hide();
 			}
 			shopbox.show(fadeintime);
 			// keep session in hash now
@@ -1102,13 +1102,13 @@ jQuery.noConflict();
 			shopbox.find('.button').click(shopBoxClickHandler);
 			// set cookie
 			if (osCsid) {
-				$.cookie('osCsid', osCsid);				
+				$.cookie('osCsid', osCsid);
 			}
 		}
 		// ###############################################################################
 		/*******************************************************************************************************************
 		 * create datastruct in cart for display in cart-entry-template
-		 * 
+		 *
 		 * @see osc_jquery_templates.class.php c.index c.products_id, c.products_image, c.products_tax_class_id,
 		 *      c.products_name, c.products_model, c.products_qty, c.products_format, c.products_price, c.products_price_tax
 		 ******************************************************************************************************************/
@@ -1216,7 +1216,7 @@ jQuery.noConflict();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// read from our local product_cache -- all formats are merged in there
-		function getProductMaster(prodId) {		
+		function getProductMaster(prodId) {
 			if (prodId == undefined)
 				return;
 			var thisProd = prodmap[prodId];
@@ -1253,7 +1253,7 @@ jQuery.noConflict();
 				if (callback)
 					getProductFromDb(prod_id,callback);
 			}
-			return prod;			
+			return prod;
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		/** ************************************************************************** */
@@ -1264,7 +1264,7 @@ jQuery.noConflict();
 				type : 'GET',
 				url : fetchurl,
 				success : function(result, textStatus, jqXHR) {
-					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 						if (result.prodpair && result.prodpair.length) {
 							var parentId = undefined;
 							if (result.prodpair.length == 2) {
@@ -1279,14 +1279,14 @@ jQuery.noConflict();
 							callback();	// call 	closure
 						} else
 							console.error('getProductFromDb: no data for %s', prodId);
-					} else 
+					} else
 						console.error(data);
 				},
 				error : function(jqXHR, textStatus, errorThrown) {
 					console.error('request(%s) error(%o)', fetchurl, jqXHR);
 					}
 			});
-		}		
+		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// add new products to artist,release cache,product cache depending on data
 		// due to disjoint key sets we merge master-detail from product and artists in same map!!!
@@ -1307,7 +1307,7 @@ jQuery.noConflict();
 				if (o.products_id != undefined) {
 					prodmap[o.products_id] = o;
 					// use large image if possible
-					if (o.products_image_lrg_url && o.products_image_lrg_url != "") 
+					if (o.products_image_lrg_url && o.products_image_lrg_url != "")
 						o.products_image_url = o.products_image_lrg_url;
 
 				}
@@ -1685,7 +1685,7 @@ jQuery.noConflict();
 							"eg. ui@jquery.com");
 			if (bValid) {
 				console.log('now we can try to login with: %s/%s', email.val(), password.val());
-				var data = { 'email_address' : email.val(), 'password' : password.val(), 'osCsid' : osCsid, };
+				var data = { 'email_address' : email.val(), 'password' : password.val(), 'osCsid' : osCsid };
 				// cartId is new each time when not logged in (cart in session, basket in DB)
 				$.post(loginUrl, data, function(result, textStatus, jqXHR) {
 					var loginDiv = $('#login-div');
@@ -1693,7 +1693,7 @@ jQuery.noConflict();
 						console.error('problem with login in %o: %s', jqXHR, result);
 						// throw 'problem with login ' + responseText;
 					}
-					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {						
+					if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
 						osCsid = result.osCsid;
 						customer_id = result.customer_id;
 						customer_firstname = result.customer_firstname;
@@ -1705,7 +1705,7 @@ jQuery.noConflict();
 						$('.debug span.osCsid').html(osCsid);	// show us during development
 //						location.hash = addHashParm(location.hash, 'osCsid', osCsid);		// NOT IN THE HASH
 						reloadCart();
-						loginDiv.dialog('close'); // SUCCESS						
+						loginDiv.dialog('close'); // SUCCESS
 					} else { // houston we have a problem - try again
 						loginDiv.dialog("option", "buttons", {});
 						// loginDiv.dialog("option", "position", [ 'center', 'center' ]);
@@ -1722,7 +1722,7 @@ jQuery.noConflict();
 									console.log('clicked close on $o', this);
 									registerUser();
 									return false;
-								} }); 
+								} });
 							loginDiv.dialog('close'); // DONE
 							return false;
 						});
@@ -1809,7 +1809,7 @@ jQuery.noConflict();
 						} else {
 							setGreeting();
 							cart = 0;
-							$('.shopping-box').remove();							
+							$('.shopping-box').remove();
 						}
 					});
 		}
@@ -1821,7 +1821,7 @@ jQuery.noConflict();
 //				id: "iframe",
 ////				width:"900px",
 //				sandbox: "allow-forms allow-scripts"
-//			});			
+//			});
 			var form = $('<form>').attr({
 				id : 'checkoutform',
 				name : 'checkoutform',
@@ -1854,27 +1854,27 @@ jQuery.noConflict();
 //				open : function() {
 //					$(this).html(iFrame.html());
 //					form.submit();
-//					form.remove();				
+//					form.remove();
 //				},
 //				close : function () {
 //					$(this).remove();
-//				}			
+//				}
 //			});
 // window.open('', 'checkout', 'scrollbars=no,menubar=no,height=600,width=800,resizable=yes,toolbar=no,status=no');
 //			iFrame.dialog('open');
-	
+
 //			var data = { 'osCsid' : osCsid };
 //			for (prop in XDEBUG) { data[prop] = XDEBUG[prop];}
 //			$.post(checkoutUrl, data , function (returned) {
 //				$('<div id="checkout"></div>').dialog("option", "position", [ 'center', 'center' ]);
 //				$('#checkout').html(returned);
 //			});
-//			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!! 
+//			window.open(checkoutUrl + ((checkoutUrl.indexOf('?')>0)?'&':'?')+'osCsid='+osCsid); ; // use cookies!!!!
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		function setGreeting (cart) {
 			if (cart && cart.customer_firstname) {
-				$('.site-description').html('<h3>Hello '+cart.customer_firstname+'!</h3>');		
+				$('.site-description').html('<h3>Hello '+cart.customer_firstname+'!</h3>');
 //				$('.site-description').append('<p style:"color:red;font-weight:bold;">'+osCsid+'!</p>');
 			} else
 				$('.site-description').empty();
@@ -1902,9 +1902,9 @@ jQuery.noConflict();
 						var msg = "status=" + jqXHR.status + " " + errorThrown + " when trying to load Releases for " + tabName;
 						getTabDiv(curTabCtx, tabName).html('<h3 class="error">' + msg + '</h3>').addClass('error');
 					}
-				});				
+				});
 			} else {
-				$('#content').empty();				
+				$('#content').empty();
 			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

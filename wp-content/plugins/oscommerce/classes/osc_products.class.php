@@ -29,7 +29,7 @@ class osc_products extends osc_product_templates
 	/** constructor reads all parms from the Request URL and sets defaults **/
 	function osc_products()
 	{
-		$this->osc_db = new osc_db();		// a connection to wordpress DB
+		$this->osc_db = new osc_db();		// a connection to wordpress DB to read oscommerce TABLE
 		$this->shop_id = $_GET['shopId'];
 		$this->artist_id = $_GET['artistId'];
 		$this->format = $_GET['format'];
@@ -47,16 +47,16 @@ class osc_products extends osc_product_templates
 		$this->release_formats = array('Vinyl','CD','MP3','LP','EP','DVD');
 	}
 
-	/** count total available products in shop **/
-	function osc_count_products($db)
+	/** count total available products in shop LEGACY from source **/
+	function osc_count_products($db, $categories_id)
 	{
 		// p.products_quantity is 0 for master products without parent
 		$sql = 'SELECT COUNT(p.products_id) AS cnt
 				FROM products p
-				INNER JOIN products_to_categories p2c ON p.products_id = pc.products_id';
-		$sql.= ' WHERE p.products_quantity > 0 AND p.products_parent = "" ';
+				INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
+				WHERE p.products_parent = "" AND  p2c.categories_id = 32';
 
-		$this->product_count = $db->get_var($sql);
+		$this->record_count = $db->get_var($sql);
 		fb("prodCountCatId($cat_id):$sql:".$this->product_count);
 	}
 
@@ -73,13 +73,13 @@ class osc_products extends osc_product_templates
 //			fb("prodCountFrom($sql):".$this->product_count);
 	}
 
-	
+
 	function osc_show_shop_page() {
 		$this->shopFilter = true;
 		array_push($this->release_formats, 'Merchandize', 'Special Offers');
 		$this->osc_show_tabbed_products_page();
 	}
-	
+
 	/** list products according to parms set in oscProducts object **/
 	function osc_show_tabbed_products_page() {
 		try {
@@ -115,8 +115,8 @@ class osc_products extends osc_product_templates
 		?>
 
 <script type="text/javascript">// initial JSON injection including count, next ones get loaded by AJAX
-	var oscShopUrl = "<?php echo $this->shop_url ?>";  
-	var osCsidJson = "<?php echo $this->osc_sid ?>";  
+	var oscShopUrl = "<?php echo $this->shop_url ?>";
+	var osCsidJson = "<?php echo $this->osc_sid ?>";
 	var productsCount = <?php echo $this->product_count ?>;
   var productsPageSize = <?php echo $this->records_per_page ?>;
   var productsReleaseFormats = <?php echo $this->release_formats ?>;
@@ -171,7 +171,7 @@ SELECT	p.products_id,
 	pd.products_format,
 	pd.products_viewed,
 	pd.products_head_keywords_tag,
-	p.products_upc,  
+	p.products_upc,
 	p.products_isrc ';			// the last 2 contain the youtube and soundcloud tag
 		$order = "ORDER BY p.products_id desc";
 
@@ -225,7 +225,7 @@ AND pd.products_head_keywords_tag LIKE '%$this->format%' ";
 		}
 		}
 			if (!$this->shopFilter) {
-			$where .= "			
+			$where .= "
 AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
  OR FIND_IN_SET('LP',pd.products_head_keywords_tag) > 0
  OR FIND_IN_SET('EP',pd.products_head_keywords_tag) > 0
@@ -381,7 +381,7 @@ AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
 		} else {
 			$this->osc_fix_product_list_json();    // add extra fields to list items
 			if ($this->json) {
-				header('Content-type: application/json');				
+				header('Content-type: application/json');
 				$retval = array($this->records_per_page,$this->product_count, $this->max_page, $this->result,$this->release_formats);
 				// encode tuple of pagesize, count and result
 				echo json_encode($retval);
@@ -456,8 +456,8 @@ AND (FIND_IN_SET('CD',pd.products_head_keywords_tag) > 0
 		}
 		return $prod_format_query_results;
 	}
-	/** 
-	 * this is to reload data when we are missing a product in client cache 
+	/**
+	 * this is to reload data when we are missing a product in client cache
 	 **/
 	function osc_get_product_and_parent($pid) {
 		$sql = '
@@ -514,34 +514,38 @@ UNION
 			LEFT JOIN products_description pd ON pd.products_id = parent.products_id
 			LEFT JOIN manufacturers m ON m.manufacturers_id = parent.manufacturers_id
 			LEFT JOIN specials s ON parent.products_id = s.products_id
-			WHERE p.products_id = '.$pid;				
+			WHERE p.products_id = '.$pid;
 		$this->osc_get_shop_db ();    // get handle for shop database
-
 		$prod_query_results = $this->shop_db->get_results($sql); // returns array of objects
 		$this->sql = $sql;
 		$this->result = $prod_query_results;
-		$this->osc_fix_product_list_json();	// add the URLs	
+		$this->osc_fix_product_list_json();	// add the URLs
 		return $prod_query_results;
-		
 	}
-	
+
 	/** answer AJAX request for special offers and return the data as json (get_special_offers.php) **/
-	function osc_get_special_offers() {
-	
-		$this->result = $this->osc_query_products();        // result as a member var?
-		if (empty($this->result)) {
+	function osc_get_special_offers($limit) {
+		$this->osc_get_shop_db ();    // get handle for shop database
+		$sql = '
+SELECT
+p.products_id,p.products_model,pd.products_format,pd.products_name,p.products_image,m.manufacturers_id, m.manufacturers_name, pp.products_price
+FROM featured f
+LEFT JOIN products p ON f.products_id = p.products_id
+LEFT JOIN products pp ON pp.products_parent = p.products_model
+LEFT JOIN products_description pd ON f.products_id = pd.products_id
+LEFT JOIN products_to_categories p2c ON f.products_id = p2c.products_id
+LEFT JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
+WHERE p.products_parent = "" AND (p2c.categories_id = 32 OR p2c.categories_id = "")';
+		if (!empty($limit))
+		$sql .= ' LIMIT '.$limit;
+		$special_query_results = $this->shop_db->get_results($sql); // returns array of objects
+	if (empty($special_query_results)) {
 			$now = date(DATE_RFC822);
-			$msg ="No Records found for prod_query_result ($now): $this->sql";
+			$msg ="No Records found for special_query_result ($now): $sql";
 			fb($msg);
 			echo ($this->json)?$msg:"<h3>$msg</h3>";
-		} else {
-			$this->osc_fix_product_list_json();    // add extra fields to list items
-			header('Content-type: application/json');
-			$retval = new stdClass();
-			$retval->result = $this->result;
-			// encode tuple of pagesize, count and result
-			echo json_encode($retval);
 		}
+		return $special_query_results;
 	}
 
 	/** get label info and return the data (NO JSON HERE) **/
@@ -549,16 +553,16 @@ UNION
 		// fbDebugBacktrace();
 		$this->osc_get_shop_db ();    // get handle for shop database
 		$sql = '
-		SELECT 
+		SELECT
 		categories_id,
 		categories_image,
 		categories_name,
 		categories_description
-		FROM categories 
+		FROM categories
 		JOIN categories_description using (categories_id)
 		WHERE categories_id IN (22,32,33,238)
 ';
-	$cat_query_results = $this->shop_db->get_results($sql); // returns array of objects		
+	$cat_query_results = $this->shop_db->get_results($sql); // returns array of objects
 	if (empty($cat_query_results)) {
 			$now = date(DATE_RFC822);
 			$msg ="No Records found for cat_query_result ($now): $sql";
@@ -569,16 +573,15 @@ UNION
 		}
 		return $cat_query_results;
 	}
-	
+
 	/** get handle to shop DB using data from wordpress DB,
 	 * $osc_db is member and has been injected from caller to avoid dependency **/
 	function osc_get_shop_db () {
-		$db = $this->osc_db;
 		// TODO try to fix shop_id to save queries
 		$shopSql = 'SELECT vchUrl, vchUsername, vchPassword, vchDbName, vchHost
-				FROM '.$db->dbuser.'.wp_oscommerce WHERE intShopId = '. $this->shop_id;
+				FROM '.$this->osc_db->dbuser.'.wp_oscommerce WHERE intShopId = '. $this->shop_id;
 
-		$res_arr  = $db->get_results($shopSql);
+		$res_arr  = $this->osc_db->get_results($shopSql);
 
 		/// check if database connection works and show it to frontend
 		if (!is_array($res_arr)|| count($res_arr) == 0) {
@@ -587,7 +590,7 @@ UNION
 //			fb($msg);
 			throw new Exception($msg);
 		}
-		//  	echo '<h4 style="color: gray;">'.$db->dbuser.'@'.$db->dbname.' table '.$db->table_name ;
+		//  	echo '<h4 style="color: gray;">'.$this->osc_db->dbuser.'@'.->dbname.' table '.->table_name ;
 		//	echo '<h4 style="color: blue;">Found Entry: '.$res_arr[0]->vchUrl .' DB:'.$res_arr[0]->vchUsername .':'.$res_arr[0]->vchPassword .'@'.$res_arr[0]->vchHost .'#'.$res_arr[0]->vchDbName .'</h4>';
 		$shop_url = $res_arr[0]->vchUrl;
 		if (preg_match('/http:/', $shop_url))
