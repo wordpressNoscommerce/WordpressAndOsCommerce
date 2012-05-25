@@ -1,27 +1,18 @@
 <?php
-//require_once ('debug.php');
+/** AJAX entry point for various product queries:
+ * formats & xsell for the products page
+ * prodpair for single product reloads after a shopping cart reload 
+ **/
+// include wordpress
 require_once( "../../../wp-config.php" );
-require_once (ABSPATH."/wp-content/plugins/oscommerce/osCommerce.php");
-
-// can be used to declare javascript variables with namespaces to use with your script
-// wp_localize_script( $handle, $namespace, $variable_array );
-
-
-// embed the javascript file that makes the AJAX request
-wp_enqueue_script( 'my-ajax-request', plugin_dir_url( __FILE__ ) . 'js/ajax.js', array( 'jquery' ) );
-
-/*    fb ("wp_enqueue_script( 'my-ajax-request', ".plugin_dir_url( __FILE__ )."js/ajax.js', array( 'jquery' ) ");
- // declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
- wp_localize_script( 'my-ajax-request', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
- */
+require_once ("osCommerce.php");
 // prepare product query
 $osc_products = new osc_products();
-if (is_null($osc_products->shop_id)) $osc_products->shop_id = 1;     	// fix shop id
-
+// get special parms
 $pid = $_GET['pid'];
 $model = $_GET['mdl'];
-
 $result = new StdClass;
+
 if ($model && $pid) {
 	$result->formats = $osc_products->osc_get_product_formats($model);
   $result->xsell = $osc_products->osc_get_xsell_products($pid);

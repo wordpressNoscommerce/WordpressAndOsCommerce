@@ -28,8 +28,8 @@ jQuery.noConflict();
 		//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
 		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP';
 		document.cookie= 'KEY=123456789012345';
-		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
-//		var XDEBUGparms = '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+//		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+		var XDEBUGparms = '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 
 		var checkoutUrl = shopPrefix + '/checkout_payment.php';
 
@@ -175,6 +175,7 @@ jQuery.noConflict();
 			var curLoader = eval(getTabLoaderFun(href, isPageLoad));
 			var pageno = eval(getPageVarForCtx(curTabCtx));
 			curLoader(curTabCtx, curTab, pageno); // try to load the requested page
+			loadGigpressWidget();
 			isPageLoad = false; /// reset flag
 		}
 		// ###############################################################################
@@ -589,6 +590,9 @@ jQuery.noConflict();
 			// insert social links
 			$('#social-buttons-template').tmpl({url: hashToParms()}).appendTo('#artist-detail');
 
+			// load upcoming shows for artist
+			loadGigpressWidget(artistId);
+			
 			// and activate tabs
 			$(seltor).fadeIn(fadeintime);
 			scrollTo(seltor, true); // dont forget to scroll to artist detail
@@ -1880,32 +1884,56 @@ jQuery.noConflict();
 				$('.site-description').empty();
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// load gigpress sidebar from wordpress
+		function loadGigpressWidget(artistId){
+			var widget = $('.sidebar div.widget_gigpress'); 
+			var artistHeader = "Upcoming shows";
+			if (artistId) {
+				var artist = getArtistMaster(artistId);
+				artistHeader = artist.manufacturers_name+"'s Shows";
+			} 
+			if (widget.find('h3:contains('+artistHeader+')').length)
+					return; // already there
+			// redraw the sidebar widget
+			var fetchurl = oscPrefix + '/get_gigpress_sidebar.php?json=1' + XDEBUGparms;
+			if (artistId)
+				fetchurl += '&artistId=' + artistId;
+			$.ajax({
+				type : 'GET',
+				url : fetchurl,
+				success : function(result, textStatus, jqXHR) {
+					if (jqXHR.getResponseHeader('Content-type') == 'text/html') {
+						widget.html("<h3>"+artistHeader+"</h3>");
+						widget.append(result);						
+					} else {
+						console.error(result);
+						$('#product-detail').html(result).addClass('error');
+					}
+				}
+			});			
+		}
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		function showLabel() {
 			var label = getHashParm('label', location.hash);
-			if (!labels[label]) {
-				$.ajax({
-					type : 'GET',
-					url : fetchurl,
-					success : function(result, textStatus, jqXHR) {
-						getTabLnk(curTabCtx, tabName).removeClass('loading');
-						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
-							labels = result;
-							showLabel();
-						} else {
-							console.error(result);
-							$('#product-detail').html(result).addClass('error');
-						}
-					},
-					error : function(jqXHR, textStatus, errorThrown) {
-						getTabLnk(curTabCtx, tabName).removeClass('loading');
-						console.error('request(%s) error(%o)', fetchurl, jqXHR);
-						var msg = "status=" + jqXHR.status + " " + errorThrown + " when trying to load Releases for " + tabName;
-						getTabDiv(curTabCtx, tabName).html('<h3 class="error">' + msg + '</h3>').addClass('error');
-					}
-				});
-			} else {
-				$('#content').empty();
-			}
+			var fetchurl;
+//			if (!labels[label]) {
+//				$.ajax({
+//					type : 'GET',
+//					url : fetchurl,
+//					success : function(result, textStatus, jqXHR) {
+//						getTabLnk(curTabCtx, tabName).removeClass('loading');
+//						if (jqXHR.getResponseHeader('Content-type') == 'application/json') {
+//							labels = result;
+//							showLabel();
+//						} else {
+//							console.error(result);
+//							$('#product-detail').html(result).addClass('error');
+//						}
+//					}
+//				});
+//			} else {
+//				$('#content').empty();
+//			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page

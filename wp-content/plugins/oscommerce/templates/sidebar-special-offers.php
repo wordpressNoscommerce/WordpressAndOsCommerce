@@ -24,4 +24,3 @@
 		</a> <br /> <br/><span class="special-offer-box-price"><?php echo $record->products_price_gross ?> </span>
 	</div>
 </div>
-<br class="clear" />
