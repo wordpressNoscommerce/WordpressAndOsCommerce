@@ -10,8 +10,11 @@
 jQuery.noConflict();
 (function($) { // this defines a scope so we cannot simply split this up into multiple files
 	$(function() {
-		if (console != undefined && console.clear != undefined)
-			console.clear();
+		if (console != undefined) {
+			console.log = function() {};
+			if (console.clear != undefined)
+				console.clear();
+		}
 		// dont pollute global namespace too much
 		// config values for jquery and player
 		var fadeintime = 500; // animation parameter
@@ -22,14 +25,14 @@ jQuery.noConflict();
 		var playerSelector = '#' + playerId;
 		var playerContent = 'jp_container_1';
 		var playerContentSelector = '#' + playerContent;
-		var labels = {};
+//		var labels = {};
 
 		// PHP debugging
 		//		var XDEBUG = { 'XDEBUG_SESSION_START': 'ECLIPSE_DBGP', 'KEY':'123456789012345'};
 		document.cookie= 'XDEBUG_SESSION_START=ECLIPSE_DBGP';
 		document.cookie= 'KEY=123456789012345';
-//		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
-		var XDEBUGparms = '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+		var XDEBUGparms = '';//'&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
+//		var XDEBUGparms = '&XDEBUG_SESSION_START=ECLIPSE_DBGP&KEY=123456789012345';
 
 		var checkoutUrl = shopPrefix + '/checkout_payment.php';
 
@@ -1622,7 +1625,7 @@ jQuery.noConflict();
 				registerUser();
 				break;
 			case "label":
-				showLabel();
+//				showLabel();
 				break;
 			case "show":
 //				if (osCsid) // if we have a session
@@ -1913,9 +1916,9 @@ jQuery.noConflict();
 			});			
 		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		function showLabel() {
-			var label = getHashParm('label', location.hash);
-			var fetchurl;
+//		function showLabel() {
+//			var label = getHashParm('label', location.hash);
+//			var fetchurl;
 //			if (!labels[label]) {
 //				$.ajax({
 //					type : 'GET',
@@ -1934,7 +1937,7 @@ jQuery.noConflict();
 //			} else {
 //				$('#content').empty();
 //			}
-		}
+//		}
 		// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// SCROLL TRIGGER to load more items when hitting bottom of page
 		var cnt = 0;
