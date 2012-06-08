@@ -327,10 +327,12 @@ function gigpress_menu($options = null) {
 
 	// Build query
 	$artists = $wpdb->get_results("
-			SELECT distinct artist_id, artist_name
+			SELECT artist_id, artist_name, COUNT(show_id) as shows
 			FROM ".GIGPRESS_SHOWS."
 			JOIN ".GIGPRESS_ARTISTS." ON show_artist_id = artist_id
 			WHERE show_status != 'deleted'
+			AND show_date " . $date_condition . $further_where . " 
+			GROUP BY  artist_id, artist_name
 			ORDER BY  artist_name");
 				
 	if($artists) : ?>
@@ -339,9 +341,9 @@ function gigpress_menu($options = null) {
 		<?php echo 'Artist Finder'; ?>
 	</option>
 	<?php foreach($artists as $this_artist) : ?>
-	<option value="<?php echo $base.'gaid='.$this_artist->artist_id; ?>" <?php if($this_artist == $artist) : ?>
-		selected="selected" <?php endif; ?>>
-		<?php echo $this_artist->artist_name; ?>
+	<option value="<?php echo $base.'gaid='.$this_artist->artist_id; ?>" 
+		<?php if($this_artist->artist_id == $artist) : ?> selected="selected" <?php endif; ?>>
+		<?php echo $this_artist->artist_name." ( ".$this_artist->shows." ) "; ?>
 	</option>
 	<?php endforeach; ?>
 </select>
@@ -357,7 +359,7 @@ function gigpress_menu($options = null) {
 	<?php foreach($dates as $date) : ?>
 	<?php $this_date = ($type == 'monthly') ? $date->year.$date->month : $date->year; ?>
 	<option value="<?php echo $base.'gpy='.$date->year; if($type == 'monthly') echo '&amp;gpm='.$date->month; ?>"
-	<?php if($this_date == $current) : ?> selected="selected" <?php endif; ?>>
+		<?php if($this_date == $current) : ?> selected="selected" <?php endif; ?>>
 		<?php if($type == 'monthly') echo $wp_locale->get_month($date->month).' '; echo $date->year; ?>
 		<?php if($show_count && $show_count == 'yes') : ?> ( <?php echo $date->shows; ?> )
 		<?php endif; ?>
