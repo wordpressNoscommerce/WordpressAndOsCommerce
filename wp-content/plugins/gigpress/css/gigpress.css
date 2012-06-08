@@ -298,3 +298,13 @@ abbr {
 	text-decoration: none;
 	font-size: 100%;
 }
+
+.gigpress-sidebar-artist {
+	font-weight: bold;
+	color: #909090;
+	text-decoration: none;
+}
+.gigpress-sidebar-city {
+	font-weight: bold;
+	color: #787878;
+}
