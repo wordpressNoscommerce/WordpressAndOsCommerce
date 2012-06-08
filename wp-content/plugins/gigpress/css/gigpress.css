@@ -308,3 +308,9 @@ abbr {
 	font-weight: bold;
 	color: #787878;
 }
+
+.gigpress-empty {
+	color: #F08080;
+	font-size: medium;
+	font-weight: bold;
+}

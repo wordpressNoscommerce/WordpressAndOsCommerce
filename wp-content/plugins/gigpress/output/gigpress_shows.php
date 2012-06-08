@@ -57,7 +57,9 @@ function gigpress_shows($filter = null, $content = null) {
 			if(empty($sort)) $sort = 'desc';
 			break;
 	}
-	
+	if(isset($_REQUEST['gaid'])) {
+		$artist = $_REQUEST['gaid'];
+	}
 	// Artist, tour and venue filtering
 	if($artist) $further_where .= ' AND show_artist_id = ' . $wpdb->prepare('%d', $artist);
 	if($tour) $further_where .= ' AND show_tour_id = ' . $wpdb->prepare('%d', $tour);
@@ -292,6 +294,9 @@ function gigpress_menu($options = null) {
 	
 	$further_where = '';
 	
+	if(isset($_REQUEST['gaid'])) {
+		$artist = $_REQUEST['gaid'];
+	}
 	// Artist, tour and venue filtering
 	if($artist) $further_where .= ' AND show_artist_id = ' . $wpdb->prepare('%d', $artist);
 	if($tour) $further_where .= ' AND show_tour_id = ' . $wpdb->prepare('%d', $tour);
@@ -319,23 +324,48 @@ function gigpress_menu($options = null) {
 		AND show_date " . $date_condition . $further_where . " 
 		GROUP BY YEAR(show_date)" . $sql_group_extra . " 
 		ORDER BY show_date " . $sort);
-	
-	ob_start();
-	
+
+	// Build query
+	$artists = $wpdb->get_results("
+			SELECT distinct artist_id, artist_name
+			FROM ".GIGPRESS_SHOWS."
+			JOIN ".GIGPRESS_ARTISTS." ON show_artist_id = artist_id
+			WHERE show_status != 'deleted'
+			ORDER BY  artist_name");
+				
+	if($artists) : ?>
+<select name="gigpress_menu" class="gigpress_menu" id="<?php echo $id; ?>">
+	<option value="<?php echo $base; ?>">
+		<?php echo 'Artist Finder'; ?>
+	</option>
+	<?php foreach($artists as $this_artist) : ?>
+	<option value="<?php echo $base.'gaid='.$this_artist->artist_id; ?>" <?php if($this_artist == $artist) : ?>
+		selected="selected" <?php endif; ?>>
+		<?php echo $this_artist->artist_name; ?>
+	</option>
+	<?php endforeach; ?>
+</select>
+
+<?php endif;
+
+
 	if($dates) : ?>
-			
-			<select name="gigpress_menu" class="gigpress_menu" id="<?php echo $id; ?>">
-				<option value="<?php echo $base; ?>"><?php echo $title; ?></option>
-			<?php foreach($dates as $date) : ?>
-				<?php $this_date = ($type == 'monthly') ? $date->year.$date->month : $date->year; ?>
-				<option value="<?php echo $base.'gpy='.$date->year; if($type == 'monthly') echo '&amp;gpm='.$date->month; ?>"<?php if($this_date == $current) : ?> selected="selected"<?php endif; ?>>
-					<?php if($type == 'monthly') echo $wp_locale->get_month($date->month).' '; echo $date->year; ?> 
-					<?php if($show_count && $show_count == 'yes') : ?>(<?php echo $date->shows; ?>)<?php endif; ?>
-				</option>
-			<?php endforeach; ?>
-			</select>
-	
-	<?php endif;
+<select name="gigpress_menu" class="gigpress_menu" id="<?php echo $id; ?>">
+	<option value="<?php echo $base; ?>">
+		<?php echo $title; ?>
+	</option>
+	<?php foreach($dates as $date) : ?>
+	<?php $this_date = ($type == 'monthly') ? $date->year.$date->month : $date->year; ?>
+	<option value="<?php echo $base.'gpy='.$date->year; if($type == 'monthly') echo '&amp;gpm='.$date->month; ?>"
+	<?php if($this_date == $current) : ?> selected="selected" <?php endif; ?>>
+		<?php if($type == 'monthly') echo $wp_locale->get_month($date->month).' '; echo $date->year; ?>
+		<?php if($show_count && $show_count == 'yes') : ?> ( <?php echo $date->shows; ?> )
+		<?php endif; ?>
+	</option>
+	<?php endforeach; ?>
+</select>
+
+<?php endif;
 	
 	return ob_get_clean();
 }

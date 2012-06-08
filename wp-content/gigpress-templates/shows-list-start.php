@@ -25,7 +25,7 @@
 		<tr class="gigpress-header">
 			<th scope="col" class="gigpress-cal"></th>
 			<th scope="col" class="gigpress-date"><?php _e("Date", "gigpress"); ?></th>
-		<?php if( (!$artist && $group_artists == 'no') && $total_artists > 1) : ?>
+		<?php if( (!$artist && $group_artists == 'no') || true /* && $total_artists > 1 */ ) : ?>
 			<th scope="col" class="gigpress-artist"><?php echo wptexturize($gpo['artist_label']); ?></th>
 		<?php endif; ?>
 			<th scope="col" class="gigpress-city"><?php _e("City", "gigpress"); ?></th>

@@ -44,7 +44,7 @@
 			<span class="hide url"><?php echo $showdata['url']; ?></span>
 		</td>
 
-	<?php if((!$artist && $group_artists == 'no') && $total_artists > 1) : ?>
+	<?php if(true || (!$artist && $group_artists == 'no') && $total_artists > 1) : ?>
 		<td class="gigpress-artist">
 			<?php echo $showdata['artist']; ?>
 		</td>
