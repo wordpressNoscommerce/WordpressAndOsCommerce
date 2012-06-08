@@ -682,7 +682,7 @@ jQuery.noConflict();
 					var anchor = $(this);
 
 					var newHref = anchor.attr('href');
-					newHref = addHashParm(newHref, 'format', format);
+					newHref = addHashParm(newHref, 'format', fixTabName(format));
 					newHref = addHashParm(newHref, 'paged', paged);
 					newHref = addHashParm(newHref, 'products_id', prodId);
 					location.hash = newHref;
