@@ -189,8 +189,10 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
       $where .= " AND m.manufacturers_label LIKE '%{$this->label_id}%' ";
     }
     // TODO do selection better than with entry in m.manufacturers_label
+    $mainArtistSet = '244';
+    $alumniArtistSet = '245';
     if(!empty($this->artist_set)) {    	
-    	$label = ($this->artist_set == 'main')?"'%244%'":"'%245%'";
+    	$label = ($this->artist_set == 'main')?"'%".$mainArtistSet."%'":"'%".$alumniArtistSet."%'";
    		$where .= " AND m.manufacturers_label LIKE $label";
     }
     $group =  " GROUP BY p.manufacturers_id ";
