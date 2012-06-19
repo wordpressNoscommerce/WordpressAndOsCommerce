@@ -1907,7 +1907,8 @@ jQuery.noConflict();
 				success : function(result, textStatus, jqXHR) {
 					if (jqXHR.getResponseHeader('Content-type') == 'text/html') {
 						widget.html("<h3>"+artistHeader+"</h3>");
-						widget.append(result);						
+						widget.append(result);
+						$('.gigpress-sidebar-artist').parent().click(changeStateHandler);
 					} else {
 						console.error(result);
 						$('#product-detail').html(result).addClass('error');
