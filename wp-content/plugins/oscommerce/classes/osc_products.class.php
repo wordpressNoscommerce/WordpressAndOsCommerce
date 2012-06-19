@@ -195,6 +195,10 @@ AND m.manufacturers_id = '" . (int)$this->artist_id . "' ";
 			// show the products in a given categorie
 			$where .= "
 AND p2c.categories_id = '" . (int)$this->label_id . "' ";
+		} else {
+			// show only shitkatapult labels!!!
+			$where .= "
+AND p2c.categories_id IN (22,32,33,238)";
 		}
 		switch (strtolower($this->format)) {
 			case 'merchandize':
@@ -203,19 +207,17 @@ AND p2c.categories_id = '" . (int)$this->label_id . "' ";
 				AND (
 				lower(pd.products_head_keywords_tag) LIKE '%size%'
 				OR lower(pd.products_head_keywords_tag) LIKE '%patch%'
-				OR lower(pd.products_head_keywords_tag) LIKE '%shirt%'
 				OR lower(pd.products_head_keywords_tag) LIKE '%bag%'
-				OR lower(pd.products_head_keywords_tag) LIKE '%poster%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%cap%'
+				OR lower(pd.products_head_keywords_tag) LIKE '%scarf%'
 				) ";
 				break;
 			case 'special_offers':
 				$this->shopFilter = true;
 				$where .= "
 				AND (
-				lower(pd.products_head_keywords_tag) LIKE '%of 10%'
-				OR lower(pd.products_head_keywords_tag) LIKE '%sale%'
+				lower(pd.products_head_keywords_tag) LIKE '%sale%'
 				OR lower(pd.products_head_keywords_tag) LIKE '%action%'
-				OR lower(pd.products_head_keywords_tag) LIKE '%size%'
 				) ";
 				break;
 			default: if ($this->format <> 'All') {
