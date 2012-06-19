@@ -197,7 +197,7 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
     }
     $group =  " GROUP BY p.manufacturers_id ";
 
-    $order = ' ORDER BY m.manufacturers_id ASC';
+    $order = ' ORDER BY m.manufacturers_name ASC';
     // TODO DO/DONT include database tables from oscommerce installation
     //			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php";
     // from shopkatapult/index.php:#141
