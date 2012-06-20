@@ -316,13 +316,15 @@ function filterAddGuidToPost($content)
 // http://mywebsite:8080/releases/?products_id=4961
 function filterPostLink ($permalink, $post)
 {
-	if (strpos($permalink, 'www.shopkatapult.com') >= 0) {
-		$relaunchLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$post->guid);
+	$relaunchLink = $post->guid;
+	if (strpos($relaunchLink, 'http://www.shopkatapult.com') !== false) {
+		$relaunchLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$relaunchLink);
 		$relaunchLink = str_replace('/product_info.php','/releases/',$relaunchLink);
-	} elseif (strpos($permalink, 'www.shitkatapult.com') >= 0) {
-		$relaunchLink = str_replace('http://www.shitkatapult.com',get_option('siteurl'),$post->guid);
+	} elseif (strpos($relaunchLink, 'http://www.shitkatapult.com') !== false) {
+		$relaunchLink = str_replace('http://www.shitkatapult.com',get_option('siteurl'),$relaunchLink);
 		$relaunchLink = str_replace('/index.php?page=releaseinfo&','/releases/?',$relaunchLink);
 	}
+	$relaunchLink = str_replace('#038;','',$relaunchLink);	// remove converted &
 	return $relaunchLink;
 }
 
