@@ -219,7 +219,7 @@ function filterOscArtistListing($content)
 	return $content;
 }
 
-/** replace artist tag with funky tabbed UI **/
+/** replace shop tag with funky tabbed UI **/
 function filterOscShopListing($content)
 {
 	//    fbDebugBacktrace(); // debug only when doing something
@@ -302,30 +302,34 @@ function renderLabels($labels) {
 	return $labelText;
 }
 
-// this filter simply appends the guid as a div to the post
-function filterAddGuidToPost($content)
-{
-	global $wp_query;
-	$post = $wp_query->post;
-	$link = '<DIV class="guid">'.$post->guid.'</DIV>';
-	return $content.$link;
-}
-
 // convert
 // http:///www.shopkatapult.com/product_info.php?products_id=4558
 // http://mywebsite:8080/releases/?products_id=4961
 function filterPostLink ($permalink, $post)
 {
-	$relaunchLink = $post->guid;
-	if (strpos($relaunchLink, 'http://www.shopkatapult.com') !== false) {
-		$relaunchLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$relaunchLink);
-		$relaunchLink = str_replace('/product_info.php','/releases/',$relaunchLink);
-	} elseif (strpos($relaunchLink, 'http://www.shitkatapult.com') !== false) {
-		$relaunchLink = str_replace('http://www.shitkatapult.com',get_option('siteurl'),$relaunchLink);
-		$relaunchLink = str_replace('/index.php?page=releaseinfo&','/releases/?',$relaunchLink);
+	if ($post->guid == '') {
+		// try to get product ID from shortcode
+		do_shortcode($post->post_content);
+		global $osc_product_id;	// messy global return parameter!
+		if ($osc_product_id !== '') {
+			$releaseLink = '/releases/?products_id='.$osc_product_id;
+			$osc_product_id = '';
+			$post->guid = $releaseLink;	// keep in GUID
+			return $releaseLink;			
+		} 
 	}
-	$relaunchLink = str_replace('#038;','',$relaunchLink);	// remove converted &
-	return $relaunchLink;
+	$releaseLink = $post->guid;
+	if (strpos($releaseLink, 'http://www.shopkatapult.com') !== false) {
+		$releaseLink = str_replace('http://www.shopkatapult.com',get_option('siteurl'),$releaseLink);
+		$releaseLink = str_replace('/product_info.php','/releases/',$releaseLink);
+	} elseif (strpos($releaseLink, 'http://www.shitkatapult.com') !== false) {
+		$releaseLink = str_replace('http://www.shitkatapult.com',get_option('siteurl'),$releaseLink);
+		$releaseLink = str_replace('/index.php?page=releaseinfo&','/releases/?',$releaseLink);
+	} else {
+//		do_shortcode($post->content);
+	}
+	$releaseLink = str_replace('#038;','',$releaseLink);	// remove converted &
+	return $releaseLink;
 }
 
 function oscommerce_template($tmpl) {
@@ -348,6 +352,16 @@ function oscommerce_template($tmpl) {
 	return $load;
 }
 
+// this filter simply reads a releaseid tag and adds its id as GUID to the post which is used to create the link to the post
+function shortcode_product($atts) {
+	global $wp_query;
+	global $osc_product_id;
+	$post = $wp_query->post;
+	extract(shortcode_atts(array('id' => false), $atts));
+	$osc_product_id = $post->guid = $atts['id'];
+}
+
+
 register_activation_hook(__FILE__, 'osc_activate');
 // TODO osc_activate in register_deactivation_hook  ????
 //register_deactivation_hook(__FILE__, 'osc_activate');
@@ -360,7 +374,18 @@ add_filter('the_content', 'filterOscReleaseListing');
 add_filter('the_content', 'filterOscArtistListing');
 add_filter('the_content', 'filterOscShopListing');
 add_filter('the_content', 'filterOscShoppingCart');
-add_filter('the_content', 'filterAddGuidToPost');
-add_filter('the_content', 'filterOscLabelTabs', 0);	// run it first to place wptabs in there
+add_filter('the_content', 'filterOscLabelTabs', 0);	
+// run it first to place wptabs in there
 add_filter('post_link', 'filterPostLink', 10, 2);
+
+$shortcode = 'product';
+$funcname='shortcode_product';
+add_shortcode($shortcode, $funcname);
+// if ( is_callable($funcname)) {
+// 	global $shortcode_tags;
+// 	$shortcode_tags[$shortcode] = $funcname;
+// } else {
+// 	echo 'hallo';
+// }
+
 ?>

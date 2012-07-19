@@ -173,7 +173,7 @@ SELECT	p.products_id,
 	pd.products_head_keywords_tag,
 	p.products_upc,
 	p.products_isrc ';			// the last 2 contain the youtube and soundcloud tag
-		$order = "ORDER BY p.products_id desc";
+		$order = "ORDER BY p.products_model desc";
 
 		//	TODO HACK: use literal table names cos cannot include other virthost installation dirs on production server
 		//			require OSCOMMERCE_DOC_ROOT."/includes/database_tables.php"; from shopkatapult/index.php:#141
