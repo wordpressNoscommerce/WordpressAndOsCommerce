@@ -1246,7 +1246,8 @@ jQuery.noConflict();
 			if (thisManu == undefined)
 				return; // no exception as we use this for control logic
 			thisManu.manufacturers_description = unescape(thisManu.manufacturers_description);
-			if (thisManu.products_image_lrg_url != "") // use large image if possible
+			// use large image if small one is missing
+			if (thisManu.products_image_url == "" && thisManu.products_image_lrg_url && thisManu.products_image_lrg_url != "")
 				thisManu.products_image_url = thisManu.products_image_lrg_url;
 			console.log('getArtistMaster(%d,%s): %o', artistId, artistSet, thisManu);
 			return thisManu;
@@ -1313,8 +1314,8 @@ jQuery.noConflict();
 					o.products_parent = parentId;
 				if (o.products_id != undefined) {
 					prodmap[o.products_id] = o;
-					// use large image if possible
-					if (o.products_image_lrg_url && o.products_image_lrg_url != "")
+					// use large image if small one is missing
+					if (o.products_image_url == "" && o.products_image_lrg_url && o.products_image_lrg_url != "")
 						o.products_image_url = o.products_image_lrg_url;
 
 				}

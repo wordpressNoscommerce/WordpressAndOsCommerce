@@ -139,12 +139,20 @@ class osc_manufacturers extends osc_manufacturer_templates // DISPLAY OSC manufa
       if ($manufacturer->manufacturers_image) {
         $manufacturer->manufacturers_image_url = rtrim($this->shop_url, '/') ."/images/". $manufacturer->manufacturers_image;
       } else // empty image link
-      $manufacturer->manufacturers_image_url = "/wp-content/plugins/oscommerce/images/no_image.gif";
+      	$manufacturer->manufacturers_image_url = "/wp-content/plugins/oscommerce/images/no_image.gif";
 
-      if ($manufacturer->manufacturers_image_lrg){
-        $manufacturer->manufacturers_image_lrg_url = rtrim($this->shop_url, '/') ."/images/". $manufacturer->manufacturers_image_lrg;
-      } else // empty image link
-      $manufacturer->manufacturers_image_lrg_url = "/wp-content/plugins/oscommerce/images/no_image.gif";
+      
+      if ($manufacturer->manufacturers_press_image) {
+      	$manufacturer->manufacturers_press_image_url = rtrim($this->shop_url, '/') ."/images/". $manufacturer->manufacturers_press_image;
+      } 
+      
+      if ($manufacturer->manufacturers_image_med){
+        $manufacturer->manufacturers_image_med_url = rtrim($this->shop_url, '/') ."/images/". $manufacturer->manufacturers_image_med;
+      } else // use press image link
+      	if ($manufacturer->manufacturers_press_image_url)       	
+      		$manufacturer->manufacturers_image_med_url = $manufacturer->manufacturers_press_image_url;
+      	else 	// or use small images
+      		$manufacturer->manufacturers_image_med_url = $manufacturer->manufacturers_image_url;
     }
   }
 

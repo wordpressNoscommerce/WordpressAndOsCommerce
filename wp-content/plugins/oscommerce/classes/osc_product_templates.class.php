@@ -78,7 +78,7 @@ class osc_product_templates
 		class="product-title">${products_name}</span> <span id="product-id" class="hidden">${products_id}</span>
 </div>
 <div id="prod-image-big" class="product-image-wide">
-	<img class="prod-image-wide" src="${products_image_url}" alt="${products_name} ">
+	<img class="prod-image-wide" src="${products_image_lrg_url}" alt="${products_name} ">
 </div>
 <div id="product-detail-tabs" class="wp-tabs shit-style wpui-styles">
 

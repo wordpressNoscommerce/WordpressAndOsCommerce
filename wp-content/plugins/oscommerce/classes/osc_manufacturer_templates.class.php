@@ -5,9 +5,9 @@
 manufacturers_description "andreas paruschke start...bsp;&nbsp;&nbsp; <br />"
 manufacturers_id "316"
 manufacturers_image "artist_anaphie_kl.jpg"
-manufacturers_image_lrg_url "/wp-content/plugins/oscommerce/images/no_image.gif"
 manufacturers_image_med "rnm_170_anaphie.jpg"
 manufacturers_image_url "http://shopkatapult.com...s/artist_anaphie_kl.jpg"
+manufacturers_image_med_url "http://shopkatapult.com...s/rnm_170_anaphie.jpg"
 manufacturers_index 0
 manufacturers_label "999"
 manufacturers_name "Anaphie"
@@ -71,7 +71,7 @@ class osc_manufacturer_templates extends osc_product_templates // we need all of
 <div id="artist-header-detail" class="product-detail format-standard">
   <div id="artist-name-detail" class="artist-name">${manufacturers_name}</div>
   <div id="artist-image-big" class="product-image-wide">
-    <img class="prod-image-wide" src="${manufacturers_image_url}" alt="${manufacturers_name} ">
+    <img class="prod-image-wide" src="${manufacturers_image_med_url}" alt="${manufacturers_name} ">
   </div>
   <div id="artist-text" class="artist-text textwidget">{{html manufacturers_description}}</div>
 </div><!-- artist-header-detail -->
