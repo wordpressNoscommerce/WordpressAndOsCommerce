@@ -1595,8 +1595,9 @@ jQuery.noConflict();
 		// ##############################################################################
 		function changeStateHandler(e) {
 			var href = $(e.currentTarget).attr('href');
-			// filter the all releases link
-			if (href.indexOf('#all_releases_of_artist') >= 0)
+			// filter the all_releases link but not the release pager!!!
+			if (href.indexOf('#all_releases_of_artist') >= 0
+			    && href.indexOf('rpage=') < 0)
 				return;	// do nothing
 			if (href.indexOf('#') == 0)
 				href = location.pathname + href; // include pathname of current page in context
